@@ -1,6 +1,6 @@
 // node q99.test.mjs <null.html> [main null.html]   (cd into this folder first) -- item 99: Your rider, and the rider on the Closet card.
 // Every numbered point, QA line and decision (DECISIONS.md "Item 99"):
-//   cache    sw.js CACHE and APP_BUILD match, v123 or later; the bundle is the design chat's v7 (FW.built 2026-11-08 09:29) or later, and each
+//   cache    sw.js CACHE and APP_BUILD match, v123 or later; the bundle is the design chat's v8 (FW.built 2026-11-17 14:45) or later, and each
 //            inlined block is that build byte for byte (its sha1 in BUILDS: a hand edit fails; a newer build fails until its sha1 is added)
 //   row      99.1: Settings › You has the row Your rider (a sheet row, searchable; with Settings on Running, a search for it names
 //            the row under Cycling, one tap away, never a blank page; and back: on Cycling, a Running-only match is named under
@@ -37,7 +37,7 @@
 //            of height) and room for a whole field beside or under it; (review round 6) each fold holds its decided fields in order and
 //            each field's label is its own (LABELS; the accessibility tree's group names too); every two choices of a field shown draw
 //            different riders as painted (PAIR; "Same as jersey" against the jersey's own colour allowed by name); every pattern reads on
-//            every jersey and fade (PAT_SHOW; the measured misses held in PAT_AWAIT, awaiting the app chat, skip lines); a window too short
+//            every jersey and fade (PAT_SHOW; none held from v8 on: v7's misses, PAT_WAS, judged and printed beside v7's); a window too short
 //            for a stuck rider and too narrow for the side column (320 x 256, 427 x 267) and a short computer layout (1280 x 400): the
 //            rider scrolls with the choices, the whole view holds a field, taps and the keyboard stay clear of the title bar (fit);
 //            (review round 7) the arrow keys in every field shown (the word groups, the colours, the fade and sleeves), not the jersey alone
@@ -87,11 +87,10 @@
 //            ids FW.OUTFIT_LOOK has as its own, in its order; its drawing is FW.riderOutfit(rider, those ids) (ids aside); each item it
 //            lists shows on it (leave-one-out at strip size, and its own colour where it has one: knee grey and the like), the under-
 //            layers drawn by design as nothing aside (with v7 also wool socks under any foot cover, everything under the rain jacket,
-//            a thermal jersey under any sleeved outer piece) and the known v7 gaps (V7_GAPS, each tied to its FROM-APP-CHAT-6 point and
-//            as wide as measured on v7: 1 leg wear under overshoes, 2 the shoe covers' own colour (their pixels changed still judged),
-//            3 dark gloves on deep brown skin, the fingerless ones' own colour only; and, held until the app chat decides, a proposed point
-//            4: the winter jacket's own colour on a Black jersey, the thermal jersey in Black under the vest with arm warmers) printed as
-//            notes; every v6 gap v7 fixed is judged
+//            a thermal jersey under any sleeved outer piece); nothing else is held (bundle v8): every case v7 held (V7_GAPS, FROM-APP-CHAT-6
+//            points 1-3: leg wear under overshoes, the shoe covers' own colour, dark gloves on deep brown skin; AWAIT, 6B points 6-7: the
+//            dark jackets on Black and Navy jerseys, the thermal jersey in Black under the vest with arm warmers) is judged in full, must be
+//            judged on a list the strip gets and is printed with its least measurement beside v7's (FIXED_BY_V8); every v6 gap v7 fixed is judged
 //            (a ride or a direct list where no ride reaches it: the rain jacket over the jackets, a windbreaker over a thermal jersey,
 //            the skullcap with glasses none, which leaves the eyes alone) and printed with its least measurement, and so is each
 //            by-design rule's edge (wool socks with toe covers or bare shoes, the vest and a thermal jersey with no rain jacket or
@@ -106,12 +105,12 @@
 //            a rider arriving by sync with the sheet open: the sheet (pressed, names, summaries, its live rider) and the row follow;
 //            (review round 5) no words painted by CSS in the strip (its box only the drawing); wool socks are by design only under overshoes,
 //            or under shoe covers or boots with leg wear or knee warmers (over bare shins they are judged: a closet with no leg wear on the cold
-//            and freezing rides, and direct lists); the two Black-jersey cases are no longer held in V7_GAPS: AWAIT (awaiting the app chat)
-//            prints them as skip lines, counted on the run's last line, never passed, and holds nothing from v8 on; (review round 6)
+//            and freezing rides, and direct lists); (review round 6)
 //            the strip centred in its box (within 1 px: here, the Clothing-only results, the computer layout and fit); (review round 7) every
 //            list with an outer layer judged for both riders in every jersey with every other fade, sleeves, shorts and pattern (the wide
-//            sweep); a held case that shows (the item, or its own colour) fails, the entry being wider than v7; AWAIT's dark jackets as
-//            measured on v7 (probe99/r7/p/outer.json); the strip built in the app for riders on which they read poorly
+//            sweep); the strip built in the app for riders on which v7's dark jackets read poorly; (bundle v8) each item's own colour is
+//            v8's (OWN: the covers #4F6478, the thermal jacket #5B4E9E, the winter jacket #2F6B4F; the gloves their fill, the #C9D1DA cuff
+//            being shared by every glove and the overshoe hem; the thermal jersey the jersey's colour or its white cuff, which it alone draws)
 //   painted  (review round 3) the strip, the sheet's live rider and both avatars as the page paints them: the spot's svg screenshot at dpr 2
 //            against FW.plain of the same drawing at that size on the colour behind it (at most 0.5% of the pixels more than 48 apart, the
 //            strip at most 24 device px: a fifth of what an item needs to show, review round 5;
@@ -157,10 +156,10 @@ const AVWATCH = HOOK + "new MutationObserver(R=>R.forEach(m=>{ if(m.target.nodeT
 const AVW = hooked(PAGE, 'q99-av.html', AVWATCH); MADE.push(AVW); const AVW_SYNCED = syncOf(AVW);
 
 const NOW = '2026-10-29T15:00:00-07:00';
-// the bundle builds this item may ship: the sha1 of each handoff file, trimmed (as fw-inline.mjs inlines it). v7 09:29, the build the
-// independent check confirmed (probe99/verify-bundle5.json; handoff sha256 js b033ddbb..., css 94077852...). v6 22:08 (css fa534ae6...,
-// js ed9957e7...) went with v7: the strip check holds only v7's gaps, so a v6 page is not this item. The item that takes v8 adds its sha1
-const BUILDS = { '2026-11-08 09:29 EST': { css: '71e5e2c4a305377330ee5bf2e82b5e1cfae6b0cd', js: 'fa84301fd127321cf804fb13be29f962cb8a1768' } };
+// the bundle builds this item may ship: the sha1 of each handoff file, trimmed (as fw-inline.mjs inlines it). v8 14:45, the build the
+// independent check confirmed (probe99/verify-bundle6.json; handoff file sha1 js 80c2f827..., css 547317a8...). v7 09:29 (css 71e5e2c4...,
+// js fa84301f...) went with v8, as v6 went with v7: the strip and sheet hold nothing now, so a v7 page is not this item
+const BUILDS = { '2026-11-17 14:45 EST': { css: 'e24007a53d3794ee03302175b7afcefe8d2afa06', js: '455487635b91b21bea2fba2a54f5334e6ae2a884' } };
 // a page: athlete A, the hooked copy, a made-up forecast (wx: its day's temperatures and rain), motion on unless o.motion === false
 const openH = (o = {}) => open(o.file || HOOKED, Object.assign({ athlete: 'A', browser, motion: true, repo: REPO, now: NOW, settle: 600 }, o, {
   route: (r, u) => (o.route && o.route(r, u)) || (o.forecast === false ? null : weatherRouteFor(o.wx || {})(r, u)) })).then(x => { if (!o.noErrs) ERRS.push(x.errors); x.p.on('dialog', d => d.accept()); return x; });
@@ -301,7 +300,7 @@ section('cache', async () => {
   const b = (SRC.match(/const APP_BUILD='([^']+)'/) || [])[1], c = (swf.match(/const CACHE = '([^']+)'/) || [])[1];
   ok(!!b && b === c && +(b.match(/v(\d+)$/) || [])[1] >= 123, 'cache: APP_BUILD = sw.js CACHE, v123 or later', { b, c });
   const built = (/window\.FW = \{[^\n]*built: '([^']+)'/.exec(SRC) || [])[1], ver = (/window\.FW = \{ version: '(\d+)'/.exec(SRC) || [])[1];
-  ok(!!built && built >= '2026-11-08 09:29 EST' && +ver >= 7, 'cache: the bundle is the design chat\'s v7 (09:29) or later (FW.version ' + ver + ', built ' + built + ')', { ver, built });
+  ok(!!built && built >= '2026-11-17 14:45 EST' && +ver >= 8, 'cache: the bundle is the design chat\'s v8 (14:45) or later (FW.version ' + ver + ', built ' + built + ')', { ver, built });
   // each block is the design chat's file byte for byte (as q97's byte check, which skips when the handoff folder holds a newer build): a
   // hand edit inside the bundle fails here whatever that folder holds; the item that takes a new build adds its sha1 here
   const sha = t => crypto.createHash('sha1').update(t).digest('hex'), blk = re => (re.exec(SRC) || [])[1];
@@ -502,9 +501,8 @@ section('sheet', async () => {
   ok(DR.length >= 13 * 6 && !drBad.length, 'sheet: a field is shown exactly when its choices draw different riders (' + DR.filter(d => !d.shown).map(d => d.k + ' in ' + d.st).join(', ') + ' hidden; every other field\'s choices draw ' + Math.min(...DR.filter(d => d.shown).map(d => d.n)) + ' riders or more)', drBad);
   // and choice by choice (review round 6: a field drawing 3 riders or more passed with one choice drawing what another does: the chest band
   // on a Coral jersey is the jersey's own colour): in each field shown, every two choices draw different riders as painted (PAIR), for the
-  // same six riders; allowed by name: "Same as jersey" (the fade, the sleeves) against the jersey's own colour; a pattern AWAIT holds on
-  // that jersey and fade (PAT_AWAIT, below) is skipped there until v8
-  FWV = await p.evaluate(() => +FW.version);
+  // same six riders; allowed by name: "Same as jersey" (the fade, the sleeves) against the jersey's own colour (bundle v8: no pattern is
+  // skipped any more; PAT_AWAIT's were until v8)
   const PB = [], PA = [], pairMin = {};
   for (const st of PAIR_STATES) { const r = Object.assign({}, RIDER99, st), shown = DR.filter(d => d.st === JSON.stringify(st) && d.shown).map(d => d.k);
     const G = await p.evaluate(([r, shown]) => shown.map(k => { const o = FW.RIDER_OPTIONS[k]; return { k, L: Array.isArray(o) ? o : Object.keys(o) }; }), [r, shown]);
@@ -512,21 +510,21 @@ section('sheet', async () => {
     G.forEach((g, n) => D[n].forEach(([i, j, d8, d24, d48]) => { const a = g.L[i], b = g.L[j], tag = g.k + ' ' + JSON.stringify(a) + ' / ' + JSON.stringify(b) + ' in ' + JSON.stringify(st);
       const differ = d8 >= PAIR.d8 || d48 >= PAIR.d48;
       if (!differ && (g.k === 'kit2' || g.k === 'sleeve') && ((a === '' && b === r.kit) || (b === '' && a === r.kit))) { PA.push(tag + ': the jersey\'s own colour (by name)'); return; }
-      const w = !differ && g.k === 'pattern' && (patHeld(r, a) || patHeld(r, b)); if (w) { AWAIT_MET.add(w); PA.push(tag + ': awaiting the app chat (' + w.pattern + ')'); return; }
       if (!pairMin[g.k] || d8 < pairMin[g.k][0]) pairMin[g.k] = [d8, d48, tag]; /* the closest pairs judged */
       if (!differ) PB.push({ tag, d: [d8, d24, d48] }); })); }
   ok(!PB.length, 'sheet: in each field shown, every two choices draw different riders as painted (at least ' + PAIR.d8 + ' device px more than 8 apart, or ' + PAIR.d48 + ' more than 48; the closest: ' + Object.entries(pairMin).sort((a, b) => a[1][0] - b[1][0]).slice(0, 3).map(([k, v]) => v[2] + ' ' + v[0] + ' / ' + v[1]).join(', ') + ')' + (PA.length ? '; allowed: ' + PA.join('; ') : ''), PB.slice(0, 6));
   // every pattern reads on every jersey and fade (review round 6): against Plain at the sheet's size, for the default rider and RIDER99, at
-  // least PAT_SHOW device px more than 48 apart (the v8 ask's measure); the measured misses are held in PAT_AWAIT (skip lines, before v8)
-  const PM = [], PH = new Map(), [D0, PATS, KITS0, FADES0] = await p.evaluate(() => [FW.RIDER_DEFAULT, Object.keys(FW.RIDER_OPTIONS.pattern), FW.RIDER_OPTIONS.kit, FW.RIDER_OPTIONS.kit2]);
+  // least PAT_SHOW device px more than 48 apart (the v8 ask's measure); nothing held (bundle v8): v7's misses (PAT_WAS, held in PAT_AWAIT
+  // until v8) are judged as every other and printed with their least, v7's beside it, and each must be judged
+  const PM = [], PW = new Map(), [D0, PATS, KITS0, FADES0] = await p.evaluate(() => [FW.RIDER_DEFAULT, Object.keys(FW.RIDER_OPTIONS.pattern), FW.RIDER_OPTIONS.kit, FW.RIDER_OPTIONS.kit2]);
   for (const [who, base] of [['the default rider', D0], ['RIDER99', RIDER99]]) {
     const combos = KITS0.flatMap(kit => FADES0.map(kit2 => Object.assign({}, base, { kit, kit2 })));
     const D = await riderDiffs(p, combos.map(c => ({ riders: PATS.map(v => Object.assign({}, c, { pattern: v })), all: false })));
-    combos.forEach((c, n) => D[n].forEach(([i, j, d8, d24, d48]) => { const v = PATS[j], key = v + ' ' + c.kit + ' ' + JSON.stringify(c.kit2), w = patHeld(c, v);
-      if (w) { AWAIT_MET.add(w); const h = PH.get(w) || { n: 0, shows: [], most: 0 }; h.n++; h.most = Math.max(h.most, d48); if (d48 >= PAT_SHOW) h.shows.push(key + ' (' + who + ', ' + d48 + ')'); PH.set(w, h); return; }
+    combos.forEach((c, n) => D[n].forEach(([i, j, d8, d24, d48]) => { const v = PATS[j], key = v + ' ' + c.kit + ' ' + JSON.stringify(c.kit2), w = PAT_WAS.find(g => g.pattern === v && g.on.some(([k, f]) => k === c.kit && f === c.kit2));
+      if (w) { const h = PW.get(w) || { n: 0, least: [Infinity, ''] }; h.n++; if (d48 < h.least[0]) h.least = [d48, key + ' (' + who + ')']; PW.set(w, h); }
       if (d48 < PAT_SHOW) PM.push(key + ' (' + who + '): ' + d48 + ' device px more than 48 apart (' + d24 + ' more than 24)'); })); }
-  for (const [w, h] of PH) console.log('  skip: awaiting the app chat (not in FROM-APP-CHAT-6) pattern ' + w.pattern + ': ' + w.what + ' (' + h.n + ' judgements held, at most ' + h.most + ' device px more than 48 apart); what it holds is neither judged nor passed');
-  ok(!PM.length && [...PH.values()].every(h => !h.shows.length) && (FWV >= 8 || PAT_AWAIT.every(w => PH.has(w))), 'sheet: every pattern reads on every jersey and fade (' + (PATS.length - 1) + ' patterns x ' + KITS0.length + ' jerseys x ' + FADES0.length + ' fades, both riders: at least ' + PAT_SHOW + ' device px more than 48 apart from Plain at the sheet\'s size), but for those held as measured (' + (FWV < 8 ? PAT_AWAIT.length : 0) + ' entries awaiting the app chat, none wider than measured)', { misses: PM.slice(0, 8), wider: [...PH.values()].flatMap(h => h.shows).slice(0, 4) });
+  for (const w of PAT_WAS) { const h = PW.get(w); console.log('  note: held on v7 (PAT_AWAIT, FROM-APP-CHAT-6B point 8), judged on v8: pattern ' + w.pattern + ': ' + w.what + ' -> v8: judged ' + (h ? h.n + ' times, the least ' + h.least[0] + ' device px more than 48 apart (' + h.least[1] + ')' : '0 times')); }
+  ok(!PM.length && PAT_WAS.every(w => PW.has(w)), 'sheet: every pattern reads on every jersey and fade (' + (PATS.length - 1) + ' patterns x ' + KITS0.length + ' jerseys x ' + FADES0.length + ' fades, both riders: at least ' + PAT_SHOW + ' device px more than 48 apart from Plain at the sheet\'s size), none held (v7\'s misses judged: ' + PAT_WAS.map(w => w.pattern + ' ' + (PW.has(w) ? PW.get(w).least[0] : 'never')).join(', ') + ')', { misses: PM.slice(0, 8) });
   // the accessibility tree (what VoiceOver reads): each group by its label, each swatch by its name, the chosen one pressed
   const snap = await p.locator('#rdGroups').ariaSnapshot();
   const ax = B.map(b => { const lab = LABELS[b.k], i = snap.indexOf('- group "' + lab + '"'); if (i < 0) return { k: b.k, group: false }; /* the decided label (review round 6: looked up by the page's own label, two swapped labels passed) */
@@ -1011,64 +1009,22 @@ const SHIN = ['legs', 'tights-light', 'tights-heavy', 'knees'];
 const byDesign = (id, L) => UNDER.has(id) || ((id === 'arms' || id === 'sun-sleeves') && L.some(x => SLEEVED.includes(x)))
   || (id === 'socks-wool' && (L.includes('overshoes') || (L.some(x => COVERS.includes(x)) && L.some(x => SHIN.includes(x))))) || (UNDER_RAIN.includes(id) && L.includes('jacket-rain'))
   || (id === 'jersey-heavy' && L.some(x => JACKETS.includes(x)));
-// the known v7 gaps (decision; the design chat is asked for v8 in FROM-APP-CHAT-6.md points 1-3): the one list of items the strip lists
-// that v7 draws as nothing or without their own colour, each tied to its point, as wide as measured on v7 (the default rider on all 8
-// skins and RIDER99, every ride's list: probe99/v7/m-v7.json) and no wider; printed as notes. The item that takes v8 empties it.
-// hold 'all': only a note (the point says the item draws nothing there); hold 'own': the pixels changed are judged as any item's, only
-// its own-colour count is a note.
 const LEG = ['legs', 'tights-light', 'tights-heavy'];
-const V7_GAPS = [
-  // v7's overshoe cuff starts at y 256 (ink from 253.5) and hides the leg wear: tights-heavy with overshoes draws what overshoes alone
-  // draw. On v7: tights-heavy 0 px changed on the Hard freezing and Recovery cold full-closet lists (with wool socks); leg warmers, light
-  // or heavy tights with overshoes alone 28 px, 0 in their colour
-  { ids: LEG, when: L => L.includes('overshoes'), point: 1, hold: 'all', what: 'leg warmers or tights under overshoes (the cuff from y 256 hides them): 0 px changed with wool socks too, 28 without' },
-  // the shoe-cover cuff (y 266-278, #1E1E24) is covered by its ink outline, the #C9D1DA hem and the shoe's outline: on v7 202 px changed
-  // over leg warmers (starter lists), 324 over tights (full lists) and alone, 256 with knee and toe covers, and 0 in #1E1E24 on every list
-  // and skin. The changed pixels still must pass
-  { ids: ['shoes'], when: () => true, point: 2, hold: 'own', what: 'shoe covers paint 0 device px of their own colour #1E1E24 (an ink band and the light hem: 202 px changed over leg warmers, 324 over tights)' },
-  // dark gloves on deep brown skin (#5A3622; once SKIN_GAPS A): on v7 the full-finger gloves (#2A2A30) change 0 px (the wet lists), the
-  // fingerless ones 304 px, 8 of them in #2A2A30 (only the light cuff reads: the hot and mild full lists); dark brown and lighter pass
-  { ids: ['gloves'], when: (L, r) => r.skin === 'deep', point: 3, hold: 'all', what: 'full-finger gloves (#2A2A30) on deep brown skin (#5A3622): no pixel changed by more than 48' },
-  { ids: ['gloves-finger'], when: (L, r) => r.skin === 'deep', point: 3, hold: 'own', what: 'fingerless gloves (#2A2A30) on deep brown skin: 304 px changed, 8 in their own colour (only the light cuff reads)' },
-];
-// awaiting the app chat (review round 5: these were held in V7_GAPS as a "proposed point 4", which let them pass; V7_GAPS holds only what
-// FROM-APP-CHAT-6 asks for). Review round 4 (every jersey colour judged) found two items that read poorly on a Black jersey (#1E1E24); neither
-// is in FROM-APP-CHAT-6 and the app chat has not decided them (a point for the v8 note, or a by-design rule). What each holds (all of it, or
-// its own colour: hold as in V7_GAPS) is neither judged nor passed: it is printed as a skip line, and the run's last line counts the entries
-// ("awaiting the app chat") so a run with them never reads as a plain OK. Each is as wide as measured on v7,
-// so anything outside it is judged as any item. From v8 on (FW.version 8 or later) nothing here holds: the item that takes v8 brings the
-// app chat's decision, as a FROM-APP-CHAT point in V7_GAPS' place or a by-design rule. The dark jackets (review round 7: round 4 measured them
-// on two riders only and held the winter jacket by the sleeves; the cause is the jersey, its fade, the shorts and the pattern): measured on v7
-// over every jersey x fade x sleeves x shorts x pattern, the default rider and RIDER99 alike, every other field aside (probe99/r7/p/outer2.json,
-// fields.log): the winter jacket (#1E2A4A, 38 a channel from Black in blue, at most 31 from Navy) changes 240-276 device px, 0-36 in its own
-// colour (only its seams read), on a Black jersey with a fade Same as jersey, Deep blue, Navy or Black, and on a Navy one with a fade Same as
-// jersey, Navy, Olive or Black, with Black or Navy shorts and no pattern or the side stripe, any sleeves (the freezing and Hard freezing full
-// lists); the thermal jacket (#2F3B6E) 240-290 / 0-29 on a Navy jersey with Navy shorts, a fade Same as jersey, Deep blue, Navy or Black, no
-// pattern or the side stripe, any sleeves (the cold, Recovery cold and Hard freezing full lists); a pattern (dots, chevron, splatter, the band),
-// other shorts or the other fades show them in their own colour (616 / 389 and more). The thermal jersey in Black with arm warmers and the vest
-// (the cold, freezing, Hard freezing and Recovery cold starter lists): 0 px changed with any fade, sleeves, shorts and pattern (its sleeves the
-// arm warmers' black, its body under the vest)
-const DARK_WINTER = { '#1E1E24': ['', '#0B7399', '#212D69', '#1E1E24'], '#212D69': ['', '#212D69', '#5F6A12', '#1E1E24'] }, PLAINISH = ['', 'side'];
-const AWAIT = [
-  { ids: ['jacket-winter'], when: (L, r) => (DARK_WINTER[r.kit] || []).includes(r.kit2) && ['#1E1E24', '#212D69'].includes(r.shorts) && PLAINISH.includes(r.pattern), hold: 'own', what: 'the winter jacket (#1E2A4A) on a Black jersey (fade Same as jersey, Deep blue, Navy or Black) or a Navy one (fade Same as jersey, Navy, Olive or Black), Black or Navy shorts, no pattern or the side stripe: 240-276 px changed, 0-36 in its own colour (only its seams read)' },
-  { ids: ['jacket-thermal'], when: (L, r) => r.kit === '#212D69' && ['', '#0B7399', '#212D69', '#1E1E24'].includes(r.kit2) && r.shorts === '#212D69' && PLAINISH.includes(r.pattern), hold: 'own', what: 'the thermal jacket (#2F3B6E) on a Navy jersey with Navy shorts (fade Same as jersey, Deep blue, Navy or Black), no pattern or the side stripe: 240-290 px changed, 0-29 in its own colour' },
-  { ids: ['jersey-heavy'], when: (L, r) => r.kit === '#1E1E24' && L.includes('arms') && L.includes('vest'), hold: 'all', what: 'the thermal jersey in Black with arm warmers and the vest: 0 px changed (its sleeves the arm warmers\' black, its body under the vest)' },
-].map(g => Object.assign(g, { await: true, note: 'awaiting the app chat (not in FROM-APP-CHAT-6)' }));
-let FWV = 7; // FW.version of the page (the sheet and strip sections read it): AWAIT and PAT_AWAIT hold before v8 only
-const AWAIT_MET = new Set(); // the entries awaiting the app chat that a run met (the last line counts them)
-// patterns that do not read on some jerseys (review round 6): the bundle draws the chest band in #F26B5B (the Coral jersey's own colour),
-// the side stripe in #F0708A and splatter in #2F5FB5, each with no outline, so on these jerseys and fades a pattern changes no device px
-// (or 10-12) by more than 48 from Plain at the sheet's size; measured on v7 for the default rider and RIDER99 alike (probe99/r6/plook/
-// patr.mjs, 12 of the 330 pattern x jersey x fade judgements each). Not in FROM-APP-CHAT-6: awaiting the app chat (its next note for v8:
-// a band and stripe that differ from the jersey and its fade by more than 48 in a channel), as AWAIT: skip lines, counted on the last line,
-// nothing held from v8 on; each exactly as measured (a held one that reads fails: the list is wider than v7)
+// bundle v8: nothing is held. Until v8 three lists held what v7 drew as nothing or without its own colour, each as wide as measured on v7:
+// V7_GAPS (FROM-APP-CHAT-6 points 1-3: leg wear under overshoes, the shoe covers' own colour, dark gloves on deep brown skin), AWAIT (6B
+// points 6-7: the dark jackets on Black and Navy jerseys, the thermal jersey in Black with arm warmers and the vest) and PAT_AWAIT (6B point
+// 8: patterns that drew nothing on some jerseys). v8 answers each, so each case is judged in full as any other (FIXED_BY_V8 for the strip,
+// PAT_WAS for the sheet's patterns), must be judged, and is printed with its least measurement beside v7's. A case that fails on v8 fails
+// here: it is never held again (the app chat's decision)
 const PAT_SHOW = 24; // a pattern reads: at least 24 device px (a fifth of SHOW.d48, as STRIP_APART) more than 48 apart from Plain (the v8 ask's measure)
-const PAT_AWAIT = [
-  { pattern: 'band', on: [['#F26B5B', ''], ['#F26B5B', '#D94F92'], ['#BECC41', '#D94F92'], ['#F28C28', '#D94F92']], what: 'the chest band (#F26B5B) on a Coral jersey with its fade Same as jersey or Berry, and on Lime or Orange with a Berry fade: 0 device px more than 48 apart from Plain' },
-  { pattern: 'side', on: [['#F26B5B', ''], ['#F26B5B', '#D94F92'], ['#F27FB4', ''], ['#F27FB4', '#D94F92'], ['#BECC41', '#D94F92'], ['#E8E58A', '#D94F92'], ['#F28C28', '#D94F92']], what: 'the side stripe (#F0708A) on a Coral or Pink jersey (fade Same as jersey or Berry) and on Lime, Pale yellow or Orange with a Berry fade: 0-12 device px' },
-  { pattern: 'splatter', on: [['#179BCC', '#212D69']], what: 'splatter (#2F5FB5) on a Bluebird blue jersey with a Navy fade: 0 device px' },
-].map(g => Object.assign(g, { await: true, note: 'awaiting the app chat (not in FROM-APP-CHAT-6)' }));
-const patHeld = (r, v) => (FWV < 8 && PAT_AWAIT.find(g => g.pattern === v && g.on.some(([k, f]) => k === r.kit && f === r.kit2))) || null;
+// the patterns v7 drew as nothing on some jerseys (PAT_AWAIT until v8): the band in #F26B5B (the Coral jersey's own colour), the side stripe in
+// #F0708A and splatter in #2F5FB5, none outlined; as measured on v7 for the default rider and RIDER99 alike (probe99/r6/plook/patr.mjs). v8 gives
+// each an ink edge on the rider (o.patEdge) and moves the side stripe to x 118-130
+const PAT_WAS = [
+  { pattern: 'band', on: [['#F26B5B', ''], ['#F26B5B', '#D94F92'], ['#BECC41', '#D94F92'], ['#F28C28', '#D94F92']], what: 'the chest band on a Coral jersey with its fade Same as jersey or Berry, and on Lime or Orange with a Berry fade (v7: 0 device px more than 48 apart from Plain)' },
+  { pattern: 'side', on: [['#F26B5B', ''], ['#F26B5B', '#D94F92'], ['#F27FB4', ''], ['#F27FB4', '#D94F92'], ['#BECC41', '#D94F92'], ['#E8E58A', '#D94F92'], ['#F28C28', '#D94F92']], what: 'the side stripe on a Coral or Pink jersey (fade Same as jersey or Berry) and on Lime, Pale yellow or Orange with a Berry fade (v7: 0-12 device px)' },
+  { pattern: 'splatter', on: [['#179BCC', '#212D69']], what: 'splatter on a Bluebird blue jersey with a Navy fade (v7: 0 device px)' },
+];
 // two choices of a field draw different riders as painted (review round 6): at least 120 device px (an item's area, SHOW.d48) more than 8
 // apart in a channel (a tone apart: the nearest skins, 13-19 a channel apart, change 1949 or more), or 24 more than 48 (a thin part in a
 // colour of its own); as measured on v7 the pairs that draw nothing apart change at most 88 (probe99/r6/plook/pairs.mjs)
@@ -1083,11 +1039,14 @@ const riderDiffs = (p, groups) => p.evaluate(async G => { const W = 240, H = 360
     for (let i = 0; i < I.length; i++) for (let j = i + 1; j < I.length; j++) { if (!g.all && i) break; const A = I[i], B = I[j]; let d8 = 0, d24 = 0, d48 = 0;
       for (let q = 0; q < A.length; q += 4) { const m = Math.max(Math.abs(A[q] - B[q]), Math.abs(A[q + 1] - B[q + 1]), Math.abs(A[q + 2] - B[q + 2])); if (m > 8) { d8++; if (m > 24) { d24++; if (m > 48) d48++; } } }
       D.push([i, j, d8, d24, d48]); } out.push(D); } return out; }, groups);
-const held = (id, L, r) => V7_GAPS.concat(FWV < 8 ? AWAIT : []).filter(g => g.ids.includes(id) && g.when(L, r));
-const gapOf = g => g.note || 'FROM-APP-CHAT-6 point ' + g.point; // where a held entry is asked for
-// each item's own colour (knee grey and the like): the bundle's OUTFIT_LOOK colours
-const OWN = { toes: '#8E949A', knees: '#B9C2CF', skullcap: '#8FA7C4', 'socks-wool': '#8E949A', gaiter: '#2ABCBB', vest: '#BFE6E6', windbreaker: '#DCE1E8', 'jacket-thermal': '#2F3B6E', 'jacket-winter': '#1E2A4A', 'jacket-rain': '#F2D64B',
-  boots: '#3A2F2A', 'tights-heavy': '#14141A', 'tights-light': '#1E1E24', legs: '#1E1E24', arms: '#1E1E24', 'sun-sleeves': '#FFFFFF', gloves: '#2A2A30', 'gloves-finger': '#2A2A30', 'gloves-thermal': '#1E1E24', 'gloves-lobster': '#1E1E24', balaclava: '#1E1E24', head: '#2ABCBB', shoes: '#1E1E24', overshoes: '#1E1E24' };
+// each item's own colour (knee grey and the like): the bundle's OUTFIT_LOOK colours, v8's (the covers' COVER #4F6478, the thermal jacket
+// #5B4E9E, the winter jacket #2F6B4F; v7's #1E1E24, #2F3B6E and #1E2A4A went: #1E2A4A was within 10 of the ink, so its count took outline
+// pixels). The gloves keep their fill: v8's #C9D1DA cuff is drawn by all four gloves and the overshoes' hem, so it is no one item's own.
+// The thermal jersey ('jersey-heavy', set where it is judged) is the jersey's colour ('kit': its sleeves) or #FFFFFF, the cuff only it draws
+// (o.cuff, set by jersey-heavy alone when it sets the sleeves). An entry may list several colours: a pixel within 10 of any is the item's
+const OWN = { toes: '#8E949A', knees: '#B9C2CF', skullcap: '#8FA7C4', 'socks-wool': '#8E949A', gaiter: '#2ABCBB', vest: '#BFE6E6', windbreaker: '#DCE1E8', 'jacket-thermal': '#5B4E9E', 'jacket-winter': '#2F6B4F', 'jacket-rain': '#F2D64B',
+  boots: '#3A2F2A', 'tights-heavy': '#14141A', 'tights-light': '#1E1E24', legs: '#1E1E24', arms: '#1E1E24', 'sun-sleeves': '#FFFFFF', gloves: '#2A2A30', 'gloves-finger': '#2A2A30', 'gloves-thermal': '#1E1E24', 'gloves-lobster': '#1E1E24', balaclava: '#1E1E24', head: '#2ABCBB', shoes: '#4F6478', overshoes: '#4F6478' };
+const OWN_HEAVY = { 'jersey-heavy': ['kit', '#FFFFFF'] }; // the thermal jersey's own, where the strip judges it
 // shows: at the strip's size on a 2x screen (100 x 150 CSS px, 200 x 300 device px), at least 120 device px (30 CSS px) changed by more than 48 in
 // a channel (the bundle check's "clearly visible"), and of them at least 40 (10 CSS px) in the item's own colour where it has one (2x: a thin
 // part's own colour is lost to anti-aliasing at 1x)
@@ -1099,8 +1058,8 @@ const pxMany = (p, R, ids, own, box) => p.evaluate(async ([R, ids, own, box]) =>
   const draw = async s => { const img = new Image(), u = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' })); img.src = u; try { await img.decode(); x.fillStyle = '#fff'; x.fillRect(0, 0, W, H); x.drawImage(img, 0, 0, W, H); } finally { URL.revokeObjectURL(u); img.src = ''; } return x.getImageData(0, 0, W, H).data; };
   const hx = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)), res = [];
   for (const r of R) { const mk = L => FW.plain(FW.riderOutfit(r, L)).replace('<svg ', `<svg width="${W}" height="${H}" `), whole = await draw(mk(ids)), out = {};
-    for (const id of new Set(ids)) { const minus = await draw(mk(ids.filter(x => x !== id))), oc = own[id] === 'kit' ? hx(r.kit) : own[id] ? hx(own[id]) : null; let d48 = 0, o = 0, b = 0;
-      for (let i = 0; i < whole.length; i += 4) { const d = Math.max(Math.abs(whole[i] - minus[i]), Math.abs(whole[i + 1] - minus[i + 1]), Math.abs(whole[i + 2] - minus[i + 2])); if (d > 48) { d48++; const q = i / 4, cx = q % W + 0.5, cy = Math.floor(q / W) + 0.5; if (box && cx >= box[0] && cx <= box[2] && cy >= box[1] && cy <= box[3]) b++; if (oc && Math.max(Math.abs(whole[i] - oc[0]), Math.abs(whole[i + 1] - oc[1]), Math.abs(whole[i + 2] - oc[2])) <= 10) o++; } }
+    for (const id of new Set(ids)) { const minus = await draw(mk(ids.filter(x => x !== id))), oc = own[id] ? [].concat(own[id]).map(c => hx(c === 'kit' ? r.kit : c)) : null; let d48 = 0, o = 0, b = 0;
+      for (let i = 0; i < whole.length; i += 4) { const d = Math.max(Math.abs(whole[i] - minus[i]), Math.abs(whole[i + 1] - minus[i + 1]), Math.abs(whole[i + 2] - minus[i + 2])); if (d > 48) { d48++; const q = i / 4, cx = q % W + 0.5, cy = Math.floor(q / W) + 0.5; if (box && cx >= box[0] && cx <= box[2] && cy >= box[1] && cy <= box[3]) b++; if (oc && oc.some(c => Math.max(Math.abs(whole[i] - c[0]), Math.abs(whole[i + 1] - c[1]), Math.abs(whole[i + 2] - c[2])) <= 10)) o++; } }
       out[id] = Object.assign({ d48, own: oc ? o : null }, box ? { box: b } : {}); }
     res.push(out); }
   return res; }, [R, ids, own, box || null]);
@@ -1124,7 +1083,7 @@ const RIDES = [['hot', { lo: 92, hi: 99 }], ['mild', { lo: 59, hi: 63 }], ['cold
   ['hard freezing', { lo: 24, hi: 29 }, 'hard'], ['recovery cold', { lo: 40, hi: 44 }, 'recovery']];
 async function setCloset(p, kind, extra) { await p.evaluate(([kind, extra]) => { const H = window.__q99, mk = id => H.closetItemFromCatalog(H.CLOSET_CATALOG.find(c => c.id === id));
   const L = (kind === 'full' ? H.CLOSET_CATALOG.map(c => c.id) : kind === 'noleg' ? H.CLOSET_CATALOG.map(c => c.id).filter(id => !['legs', 'tights-light', 'tights-heavy', 'knees'].includes(id)) : H.CLOSET_STARTER).map(mk).concat(extra || []); H.settings.closet = L; H.save(H.KEYS.settings, H.settings); H.refreshResults(); }, [kind, extra || null]); await settle(p, 200); }
-const GAPS_SEEN = new Map(), FIXED_SEEN = new Map();
+const FIXED_SEEN = new Map(), FIXED8_SEEN = new Map();
 // the v6 gaps v7 fixed (V6_GAPS and SKIN_GAPS B until v7): each is judged as any item now, and each must be judged somewhere (a ride's
 // list, or the direct lists below where no ride reaches it); the smallest measurement of each is printed
 const FIXED_BY_V7 = [
@@ -1138,6 +1097,19 @@ const FIXED_BY_V7 = [
   { ids: ['head'], when: (L, r) => r.glasses === 'shield', point: 7, what: 'the headband with the shield glasses' },
   { ids: ['legs'], when: (L, r) => ['tan', 'olive', 'brown', 'dark', 'deep'].includes(r.skin) && L.includes('shoes'), point: 'B', what: 'leg warmers with shoe covers on tan to deep brown skin (SKIN_GAPS B)' },
 ];
+// the cases v7 held (V7_GAPS, AWAIT; see PAT_WAS), each answered by v8 and judged in full as any item now: each must be judged on a ride's
+// list (the wide sweep's are rides' lists too), and the least measurement of each (pixels changed, and its own colour) is printed beside v7's.
+// Each 'when' is the entry's width on v7, so the line reads the same cases v7 held
+const DARK_WINTER = { '#1E1E24': ['', '#0B7399', '#212D69', '#1E1E24'], '#212D69': ['', '#212D69', '#5F6A12', '#1E1E24'] }, PLAINISH = ['', 'side'];
+const FIXED_BY_V8 = [
+  { ids: LEG, when: L => L.includes('overshoes'), point: '6 point 1', v7: 'tights-heavy 0 px changed with wool socks (the Hard freezing and Recovery cold full lists); any leg wear with overshoes alone 28 / 0', what: 'leg warmers or tights under overshoes (V7_GAPS 1, held whole)' },
+  { ids: ['shoes'], when: () => true, point: '6 point 2', v7: '202 px changed, 0 in #1E1E24 at the least', what: 'shoe covers, their own colour (V7_GAPS 2, own colour held; v8 #4F6478)' },
+  { ids: ['gloves'], when: (L, r) => r.skin === 'deep', point: '6 point 3', v7: '0 px changed (the wet lists)', what: 'full-finger gloves on deep brown skin (V7_GAPS 3, held whole)' },
+  { ids: ['gloves-finger'], when: (L, r) => r.skin === 'deep', point: '6 point 3', v7: '304 px changed, 8 in #2A2A30', what: 'fingerless gloves on deep brown skin (V7_GAPS 3, own colour held)' },
+  { ids: ['jacket-winter'], when: (L, r) => (DARK_WINTER[r.kit] || []).includes(r.kit2) && ['#1E1E24', '#212D69'].includes(r.shorts) && PLAINISH.includes(r.pattern), point: '6B point 6', v7: '240-276 px changed, 0-36 in #1E2A4A', what: 'the winter jacket on a Black jersey (fade Same, Deep blue, Navy, Black) or a Navy one (Same, Navy, Olive, Black), Black or Navy shorts, plain or the side stripe (AWAIT, own colour held; v8 #2F6B4F)' },
+  { ids: ['jacket-thermal'], when: (L, r) => r.kit === '#212D69' && ['', '#0B7399', '#212D69', '#1E1E24'].includes(r.kit2) && r.shorts === '#212D69' && PLAINISH.includes(r.pattern), point: '6B point 6', v7: '240-290 px changed, 0-29 in #2F3B6E', what: 'the thermal jacket on a Navy jersey with Navy shorts (fade Same, Deep blue, Navy, Black), plain or the side stripe (AWAIT, own colour held; v8 #5B4E9E)' },
+  { ids: ['jersey-heavy'], when: (L, r) => r.kit === '#1E1E24' && L.includes('arms') && L.includes('vest'), point: '6B point 7', v7: '0 px changed with any fade, sleeves, shorts and pattern', what: 'the thermal jersey in Black with arm warmers and the vest (AWAIT, held whole; v8 its white cuff)' },
+];
 // the by-design rules' edges the rides reach, judged as any item and printed with the least measurement; each must be judged on a ride's list
 // (review round 5: wool socks over bare shins with shoe covers or boots, outside the rule, on the cold and freezing rides with a closet that has
 // no leg wear or knee warmers)
@@ -1149,28 +1121,24 @@ const EDGE_SEEN = new Map();
 // varies on every jersey (review round 7)
 const DIRECT = [['windbreaker', 'jacket-rain'], ['jacket-thermal', 'jacket-rain'], ['jacket-winter', 'jacket-rain'], ['jersey-heavy', 'vest', 'jacket-rain'], ['jersey-heavy', 'windbreaker'], ['socks-wool'], ['tights-heavy', 'socks-wool'], ['socks-wool', 'shoes'], ['socks-wool', 'boots']];
 const OUTER = ['vest', 'windbreaker', 'jacket-thermal', 'jacket-winter', 'jacket-rain', 'jersey-heavy'], VARY = ['kit2', 'sleeve', 'shorts', 'pattern'];
-// every rider shown (the default and the built one) is judged; only V7_GAPS' entries (and AWAIT's, before v8) are held, each as measured on v7:
-// what an entry holds that shows (the whole item, or its own colour) fails, the entry being wider than v7 (review round 7: AWAIT's winter
-// jacket held cases where it showed in its own colour). agg (the wide sweep): count and collect rather than one check per item
+// every rider shown (the default and the built one) is judged, nothing held (bundle v8; until v8 V7_GAPS and AWAIT held cases as measured on
+// v7, FIXED_BY_V8). agg (the wide sweep): count and collect rather than one check per item
 function judge(tag, S, px, agg) {
-  const L = S.ids || [], chk = (c, name, d) => { if (!agg) return ok(c, name, d); agg.n++; if (!c) agg.bad.push(name); };
-  for (const id of L) { if (byDesign(id, L)) continue; const v = px[id], gaps = held(id, L, S.r), all = gaps.some(g => g.hold === 'all'), own = gaps.some(g => g.hold === 'own');
-    const d = !!v && v.d48 >= SHOW.d48, o = !!v && (v.own == null || v.own >= SHOW.own), shows = d && o;
-    gaps.forEach(g => { const k = gapOf(g) + ' ' + id + (g.hold === 'all' ? ' (held: ' + (shows ? 'shows)' : 'does not show)') : ' (own colour held: ' + (o ? 'in it' : 'not in it') + '; its pixels changed judged)');
-      if (!GAPS_SEEN.has(k)) GAPS_SEEN.set(k, { g, line: g.what + ' (' + tag + ': ' + JSON.stringify(v) + ')' }); });
-    const wider = gaps.filter(g => g.hold === 'all' ? shows : !!v && v.own != null && v.own >= SHOW.own);
-    if (wider.length) chk(false, 'strip: ' + tag + ': ' + id + ' is held (' + wider.map(gapOf).join(', ') + ') but shows ' + (wider.some(g => g.hold === 'all') ? '' : 'in its own colour ') + '(' + JSON.stringify(v) + '): the entry is wider than v7', { v, L });
-    if (all) continue;
-    chk(d && (own || o), 'strip: ' + tag + ': ' + id + ' shows on the rider (' + (v ? v.d48 + ' device px changed' + (v.own != null ? ', ' + v.own + ' in its own colour' + (own ? ' (held: ' + gaps.filter(g => g.hold === 'own').map(gapOf).join(', ') + ')' : '') : '') : 'not measured') + ')', { v, L });
+  const L = S.ids || [], chk = (c, name, d) => { if (!agg) return ok(c, name, d); agg.n++; if (!c) agg.bad.push(name); }, ride = / ride \(/.test(tag);
+  for (const id of L) { if (byDesign(id, L)) continue; const v = px[id], d = !!v && v.d48 >= SHOW.d48, o = !!v && (v.own == null || v.own >= SHOW.own);
+    chk(d && o, 'strip: ' + tag + ': ' + id + ' shows on the rider (' + (v ? v.d48 + ' device px changed' + (v.own != null ? ', ' + v.own + ' in its own colour' : '') : 'not measured') + ')', { v, L });
     FIXED_BY_V7.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = FIXED_SEEN.get(k);
-      if (!w || v.d48 < w.v.d48) FIXED_SEEN.set(k, { f, id, v, tag, shows: d && (own || o), n: (w ? w.n : 0) + 1 }); else w.n++; });
-    EDGES.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = EDGE_SEEN.get(k), ride = / ride \(/.test(tag) || !!(w && w.ride);
-      if (!w || v.d48 < w.v.d48) EDGE_SEEN.set(k, { f, id, v, tag, shows: d && (own || o), n: (w ? w.n : 0) + 1, ride }); else { w.n++; w.ride = ride; } }); }
+      if (!w || v.d48 < w.v.d48) FIXED_SEEN.set(k, { f, id, v, tag, shows: d && o, n: (w ? w.n : 0) + 1 }); else w.n++; });
+    /* the cases v7 held: the least pixels changed and the least in its own colour, each with where; shows only if every judgement did */
+    FIXED_BY_V8.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = FIXED8_SEEN.get(k) || { f, id, n: 0, shows: true, ride: false };
+      w.n++; w.shows = w.shows && d && o; w.ride = w.ride || ride; if (!w.v || v.d48 < w.v.d48) Object.assign(w, { v, tag }); if (v.own != null && (!w.o || v.own < w.o.v.own)) w.o = { v, tag }; FIXED8_SEEN.set(k, w); });
+    EDGES.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = EDGE_SEEN.get(k), rd = ride || !!(w && w.ride);
+      if (!w || v.d48 < w.v.d48) EDGE_SEEN.set(k, { f, id, v, tag, shows: d && o, n: (w ? w.n : 0) + 1, ride: rd }); else { w.n++; w.ride = rd; } }); }
 }
 section('strip', async () => {
-  const [SKINS, KITS, VER, VOPT] = await (async () => { const x = await openH({ noErrs: true }), v = await x.p.evaluate(V => [Object.keys(FW.SKIN), FW.RIDER_OPTIONS.kit.map(k => [k, FW.RIDER_NAMES.kit[k]]), +FW.version,
+  const [SKINS, KITS, , VOPT] = await (async () => { const x = await openH({ noErrs: true }), v = await x.p.evaluate(V => [Object.keys(FW.SKIN), FW.RIDER_OPTIONS.kit.map(k => [k, FW.RIDER_NAMES.kit[k]]), +FW.version,
     Object.fromEntries(V.map(k => { const o = FW.RIDER_OPTIONS[k]; return [k, Array.isArray(o) ? o.map(v => [v, FW.RIDER_NAMES[k][v]]) : Object.entries(o)]; }))], VARY); await x.close(); return v; })();
-  FWV = VER; const WIDE = new Map(); // the lists a ride gives that carry an outer layer: list -> its ride and closet
+  const WIDE = new Map(); // the lists a ride gives that carry an outer layer: list -> its ride and closet
   for (const [n, wx, eff] of RIDES) for (const rider of [null, RIDER99]) { // every ride, both closets, the default rider and the built one
     const x = await openH({ wx, settings: rider ? { rider } : {}, dpr: 2 }), p = x.p, who = rider ? 'RIDER99' : 'the default rider';
     if (eff) { await p.click('#intensity [data-int=' + eff + ']'); await settle(p, 150); ok(await p.evaluate(e => window.__q99.readInputs().intensity === e, eff), 'strip: ' + n + ' ride: the effort is ' + eff, eff); }
@@ -1184,15 +1152,15 @@ section('strip', async () => {
       ok(S.w === 100 && S.h === 150 && S.mid != null && Math.abs(S.mid) <= 1 && S.inCard && S.above && S.hid === 'true' && S.text === '' && !S.css.length && Math.abs(S.boxH) < 1, 'strip: ' + tag + ': 100 x 150 px, centred (' + S.mid + ' px off its box\'s middle), in the card above the list, aria-hidden, no text (none in its markup, none painted by CSS, its box only the drawing and its padding: items 73, 75, 76)', S);
       ok(S.still && !!S.rec && S.rec.s === true, 'strip: ' + tag + ': still (fwMount o.still: no .fwm-go, nothing running)', S.rec);
       painted(await paintOf(p, '#rRider svg', 'strip'), 'strip: ' + tag + ': the rider shows, whole');
-      judge(tag, S, await pxOf(p, S.r, S.ids || [], Object.assign({}, OWN, { 'jersey-heavy': 'kit' })));
+      judge(tag, S, await pxOf(p, S.r, S.ids || [], Object.assign({}, OWN, OWN_HEAVY)));
       if ((S.ids || []).some(id => OUTER.includes(id)) && !WIDE.has((S.ids || []).join(' '))) WIDE.set(S.ids.join(' '), tag.replace(/, (the default rider|RIDER99)$/, '')); /* the wide sweep's lists (below) */
       // the same list on every other skin (the default rider in that skin): a dark item on dark skin is judged wherever the list has it
       if (!rider) for (const sk of SKINS) { if (sk === S.r.skin) continue; const r = Object.assign({}, S.r, { skin: sk });
-        judge(tag.replace('the default rider', 'the default rider in ' + sk + ' skin'), { ids: S.ids, r }, await pxOf(p, r, S.ids || [], Object.assign({}, OWN, { 'jersey-heavy': 'kit' }))); }
+        judge(tag.replace('the default rider', 'the default rider in ' + sk + ' skin'), { ids: S.ids, r }, await pxOf(p, r, S.ids || [], Object.assign({}, OWN, OWN_HEAVY))); }
       // and in every jersey colour, both riders (review round 4: only Bluebird blue and Coral were judged, and the jersey is what the jackets,
       // the vest and the thermal jersey are drawn over and in)
       for (const [kit, kn] of KITS) { if (kit === S.r.kit) continue; const r = Object.assign({}, S.r, { kit });
-        judge(tag + ' in a ' + kn + ' jersey', { ids: S.ids, r }, await pxOf(p, r, S.ids || [], Object.assign({}, OWN, { 'jersey-heavy': 'kit' }))); }
+        judge(tag + ' in a ' + kn + ' jersey', { ids: S.ids, r }, await pxOf(p, r, S.ids || [], Object.assign({}, OWN, OWN_HEAVY))); }
     }
     if (n === 'hot' && !rider) {
       // the strip is kept by its key: the results drawn again (the same ride, rider and items) leave its drawing as it is
@@ -1267,7 +1235,7 @@ section('strip', async () => {
   // (point 3); the skullcap with glasses none (point 6), which also leaves the eyes alone (v6's band changed 445 px in x 73.5-126.5, y 97-115).
   // And the by-design rule's edge no ride reaches: wool socks with bare shoes (no cover, no toe covers), alone and under tights, must show,
   // and over bare shins with shoe covers or boots (review round 5)
-  { const x = await openH({ noErrs: true }), p = x.p, D = await p.evaluate(() => FW.RIDER_DEFAULT), own = Object.assign({}, OWN, { 'jersey-heavy': 'kit' });
+  { const x = await openH({ noErrs: true }), p = x.p, D = await p.evaluate(() => FW.RIDER_DEFAULT), own = Object.assign({}, OWN, OWN_HEAVY);
     for (const [who, base] of [['the default rider', D], ['RIDER99', RIDER99]]) {
       for (const ids of DIRECT)
         for (const [kit, kn] of [[base.kit, null], ...KITS.filter(k => k[0] !== base.kit)]) { const r = Object.assign({}, base, { kit }); /* every jersey colour (review round 4) */
@@ -1279,17 +1247,18 @@ section('strip', async () => {
   // every fade, sleeves, shorts and pattern on every jersey (review round 7: only each rider's own fade and sleeves were judged, Deep blue and
   // Berry, the two fades on which the dark jackets show, so a strip that left the winter jacket off a Navy jersey with a Navy fade passed): on
   // each list a ride gives that carries an outer layer, and each direct list that does, both riders in each jersey with each other value of
-  // one of those fields; every item judged as on the rides (by design, V7_GAPS, AWAIT as measured), one check per list and rider
-  { const own = Object.assign({}, OWN, { 'jersey-heavy': 'kit' }), lists = [...WIDE].concat(DIRECT.filter(L => L.some(id => OUTER.includes(id))).map(L => [L.join(' '), 'the list ' + L.join(' ')]));
+  // one of those fields; every item judged as on the rides (by design only: nothing held), one check per list and rider
+  { const own = Object.assign({}, OWN, OWN_HEAVY), lists = [...WIDE].concat(DIRECT.filter(L => L.some(id => OUTER.includes(id))).map(L => [L.join(' '), 'the list ' + L.join(' ')]));
     for (const [ls, where] of lists) for (const who of ['the default rider', 'RIDER99']) { const x = await openH({ noErrs: true }), p = x.p, base = who === 'RIDER99' ? RIDER99 : await p.evaluate(() => FW.RIDER_DEFAULT), ids = ls.split(' '), R = []; /* a page each */
       for (const [kit, kn] of KITS) for (const f of VARY) for (const [v, vn] of VOPT[f]) if (v !== base[f]) R.push([Object.assign({}, base, { kit, [f]: v }), kn + ' jersey, ' + f + ' ' + vn]);
       const P = [], agg = { n: 0, bad: [] }; for (let c = 0; c < R.length; c += 40) P.push(...await pxMany(p, R.slice(c, c + 40).map(r => r[0]), ids, own)); /* 40 riders a call (one call for all grew the renderer past 16 GB) */
       R.forEach(([r, what], i) => judge(where + ', ' + who + ' in a ' + what, { ids, r }, P[i], agg));
-      ok(!agg.bad.length, 'strip: ' + where + ', ' + who + ': every item shows on every jersey with every other ' + VARY.map(f => ({ kit2: 'fade', sleeve: 'sleeves', shorts: 'shorts', pattern: 'pattern' })[f]).join(', ') + ' (' + R.length + ' riders, ' + agg.n + ' judgements; by design, V7_GAPS and AWAIT as on the rides)', agg.bad.slice(0, 6)); await x.close(); } }
-  for (const [k, v] of GAPS_SEEN) console.log(v.g.await ? '  skip: ' + k + ': ' + v.line + '; what it holds is neither judged nor passed' : '  note: known v7 gap, ' + k + ': ' + v.line);
-  const unmet = V7_GAPS.concat(FWV < 8 ? AWAIT : []).filter(g => ![...GAPS_SEEN.values()].some(v => v.g === g));
-  ok(!unmet.length, 'strip: each known v7 gap (' + V7_GAPS.length + ' entries) and each case awaiting the app chat (' + (FWV < 8 ? AWAIT.length : 0) + ') is met on a list the strip gets (none held that nothing reaches)', unmet.map(g => gapOf(g) + ' ' + g.what));
-  if (FWV < 8) AWAIT.filter(g => [...GAPS_SEEN.values()].some(v => v.g === g)).forEach(g => AWAIT_MET.add(g));
+      ok(!agg.bad.length, 'strip: ' + where + ', ' + who + ': every item shows on every jersey with every other ' + VARY.map(f => ({ kit2: 'fade', sleeve: 'sleeves', shorts: 'shorts', pattern: 'pattern' })[f]).join(', ') + ' (' + R.length + ' riders, ' + agg.n + ' judgements; by design as on the rides, nothing held)', agg.bad.slice(0, 6)); await x.close(); } }
+  // the cases v7 held, judged in full on v8: each printed with its least (pixels changed; and in its own colour) beside v7's, each judged on a
+  // ride's list (every item of each entry: the leg wear under overshoes is tights-heavy on the rides, the others on direct lists only)
+  for (const [, w] of FIXED8_SEEN) console.log('  note: held on v7, judged on v8 (FROM-APP-CHAT-' + w.f.point + ') ' + w.id + ': ' + w.f.what + ': v7 ' + w.f.v7 + '; v8 judged ' + w.n + ' times, ' + (w.shows ? 'shows every time' : 'DOES NOT SHOW') + ', the least ' + w.v.d48 + ' px changed (' + w.tag + ')' + (w.o ? ', the least in its own colour ' + w.o.v.own + ' (' + w.o.v.d48 + ' changed; ' + w.o.tag + ')' : ''));
+  const v8unmet = FIXED_BY_V8.filter((f, n) => !f.ids.some(id => (FIXED8_SEEN.get(n + ':' + id) || {}).ride)).map(f => f.point + ' ' + f.what);
+  ok(!v8unmet.length, 'strip: each case v7 held (' + FIXED_BY_V8.length + ' entries) is judged in full on a ride\'s list (nothing held)', v8unmet);
   for (const [, w] of FIXED_SEEN) console.log('  note: v6 gap v7 fixed, FROM-APP-CHAT-5 ' + (w.f.point === 'B' ? 'dark-skin note point B' : 'point ' + w.f.point) + ' ' + w.id + ': judged ' + w.n + ' times, ' + (w.shows ? 'shows' : 'does not show') + ', the least ' + JSON.stringify(w.v) + ' (' + w.tag + ')');
   for (const [, w] of EDGE_SEEN) console.log('  note: by-design rule\'s edge, ' + w.f.what + ': judged ' + w.n + ' times, ' + (w.shows ? 'shows' : 'does not show') + ', the least ' + JSON.stringify(w.v) + ' (' + w.tag + ')');
   const noEdge = EDGES.flatMap((f, n) => f.ids.filter(id => !(EDGE_SEEN.get(n + ':' + id) || {}).ride).map(id => id + ': ' + f.what));
@@ -1392,5 +1361,4 @@ const errs = ERRS.flat().filter(e => !/net::ERR|Failed to load resource/.test(e)
 ok(!errs.length, 'no page errors or console errors', errs.slice(0, 8));
 await browser.close();
 for (const f of MADE) fs.rmSync(f, { force: true });
-const AWAITED = FWV < 8 ? AWAIT_MET.size : 0;
-C.done('item 99: Your rider, and the rider on the Closet card' + (AWAITED ? '; ' + AWAITED + ' cases awaiting the app chat, not judged (the skip lines)' : ''));
+C.done('item 99: Your rider, and the rider on the Closet card');

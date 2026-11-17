@@ -1854,3 +1854,25 @@
     plan-avatar-rider's header insert 64.1 ms at 6x, 7.5 at 1x); again `FAIL 4`, the four host-busy self-tests alone (reference 2.0-7.8 ms
     against 1.8): every item rule ok, most FW nodes 234 (plan-avatar-rider), 0 running, slowest fwMount 30.9 ms at 6x. The gate, not the item:
     the app is unchanged since round 6 (`OK (55 checks)` on a quiet host).
+- Bundle v8 (stopped: one former hold still fails; the app chat to decide). The design chat's v8 (FW.version '8', built 2026-11-17 14:45
+  EST; checked on its own in probe99/verify-bundle6.json, FROM-APP-CHAT-6 points 1-5 and 6B points 6-8) is inlined on q99-rider with
+  `node scripts/fw-inline.mjs ~/Dropbox/00_T/handoff` (6a8bb4e, pushed; the handoff files byte-identical to probe99/v8-1445-copy first):
+  only the two bundle blocks change, run again it changes nothing, sw.js CACHE and APP_BUILD stay v123; no console errors in Chromium,
+  WebKit only main's five file:// lines. q99 (kit) now: BUILDS v8 only (css e24007a5..., js 45548763...), the cache check asks v8 (14:45)
+  or later; V7_GAPS, AWAIT, PAT_AWAIT, FWV, the held-but-shows rule and the skip lines are gone; the cases they held are judged in full and
+  printed beside v7's (FIXED_BY_V8 in the strip, PAT_WAS in the sheet, each must be judged on a ride's list); OWN takes v8's colours (covers
+  #4F6478, thermal jacket #5B4E9E, winter jacket #2F6B4F); the gloves keep their fill (the decision: #C9D1DA is every glove's cuff and the
+  overshoes' hem, no one item's own). My decision for the thermal jersey: its own is the jersey's colour (its sleeves: o.armSleeve = o.top)
+  or #FFFFFF (the cuff: o.cuff is set by jersey-heavy alone, when it sets the sleeves; the rain jacket clears it), a pixel within 10 of
+  either; pxMany takes a list of own colours. mut99: c1-nojacket on v8's jacket strings, four new (v8-winterblack, v8-winterv7,
+  v8-heavyblack, v8-bandcoral); all 128 build on the v8 page (DRY), none run yet.
+  - On v8 (fred99/null.html = mknull of 6a8bb4e), one at a time: q99 sheet,strip `FAIL 50` (probe99/v8take/runs/q99-sheet-strip-1.log);
+    the other sections (main second) `OK (209 checks)`. Each former hold, v7 -> v8 least (changed / own): tights-heavy under overshoes
+    0 -> 192 / 144 (850 judgements); shoe covers 202 / 0 in #1E1E24 -> 425 / 340 in #4F6478 (1384); winter jacket on dark jerseys 240-276 /
+    0-36 -> 1909 / 1561 (45); thermal jacket on Navy 240-290 / 0-29 -> 3980 / 3525 (3); thermal jersey in Black with arm warmers and the
+    vest 0 -> 348 / 192 (44); band 0 -> 430, side stripe 0-12 -> 184, splatter 0 -> 474 device px from Plain at the sheet's size. All pass.
+  - Still failing (the 50): V7_GAPS point 3 on deep brown skin, by the own-colour rule only. Full gloves 204 changed, 0 in #2A2A30 (the
+    wet starter and full lists); fingerless 320 changed, 8 in #2A2A30 (the hot and mild full lists); default rider in deep skin and RIDER99,
+    every jersey. #2A2A30 is at most 48 a channel from #5A3622, so no fill pixel can count; the v8 cuff carries them (120 and 152 px in
+    #C9D1DA, probe99/v8take/gloves.mjs). Not held, no work-around: the app chat decides (the cuff as the gloves' own, a by-design rule, or
+    a v9 fill). Not run until then: the mutants, q97, q98, motion, budgets, smoke, inventory, contrast, layout, npm test.
