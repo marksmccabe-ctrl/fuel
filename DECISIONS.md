@@ -1234,3 +1234,49 @@
     overshoes over heavy tights 344 / 34, and leg warmers or tights above boots on RIDER99 (deep brown) 70 / 26 (probe99/v7c/covers.mjs).
     Point 2's own colour for the covers clears the overshoes; the boots and the leg wear above them on deep brown skin are for the app
     chat to add to the note for v8 if it wants them.
+- Review round 3 (6 problems, all real; each reproduced first: q99 as it was, kit2 dca3265's copy in probe99/r3/orig, `OK` on each
+  of the round's mutants, logs in probe99/r3/repro/). One app fix, five test gaps; each gap has a q99 check now and a mutant in
+  q99/mut99.mjs (r3-*), each ending FAIL under the new q99:
+  - A change to a rider already built never reached the other device in any q99 check (only A building from nothing was synced; the
+    'strip by sync' and 'norm' checks write the cloud doc directly). The app was right (the round's probe passes on the real page).
+    q99 sync now goes on: B opens its sheet and taps two choices (Orange jersey, a head covering); B's whole rider must stand on A, on
+    B and in users/u1.settings.rider, with one settingsAt stamp newer than A's, and A's header circle must be FW.riderAvatar of it.
+    Then A changes the skin while B, not yet pulled, saves Same recipe: A's rider must stand on both and in the cloud, and B's setting
+    too. Mutant r3-riderchange (sfNote never queues a change to a rider already built): `FAIL 2`.
+  - The 'later pulls change nothing' check could not see the merge taking the cloud's rider unchecked (syncSetSettings checks it again,
+    so the stored copy and the header stayed equal while every pull applied the raw rider). sfDocMerge is now in the hooked copy, and
+    q99 norm runs it again on the cloud copy just pulled: any settings it applies must carry this device's checked rider, and 'rider'
+    must not be a key to upload. Mutant r3-mergenorm (`cs=syncStrip(c)`, round 1's decision undone): `FAIL 1`.
+  - The header's rider was drawn twice on every signed-in load: renderSyncStatus rebuilt .hav when the initial went from '?' (sync
+    boot, the user not known yet) to the real one at sign-in. Fixed in the app (8201650): .hav is made only when missing and the
+    initial is set through riderAv, which keeps the rider by its key. q99 avatar: a copy that records every drawing put in the header
+    circle's .av-r from the app's first line must see one, the one shown, through sign-in, the first pull and later pulls, with "T"
+    under it. 1bec175 (check3-tests/base) under it: `FAIL 1` (2 drawn, the first not the one shown); mutant r3-hdrtwice (the old
+    line): `FAIL 1`.
+  - Nothing checked the rider as painted (pxOf draws on its own canvas; stripOf, avOf and media look at markup, display and rects), so
+    a strip clipped to the head, a blank sheet rider and blank avatars passed. q99's paintOf: the spot's svg screenshot at dpr 2,
+    set against FW.plain of the same drawing at that size on the colour behind it (the svg's own background first: an avatar's disc
+    is a CSS background, which an <img> does not draw), the pixels more than 48 apart, an avatar inside its circle only; the
+    screenshot takes 2 CSS px more on each side and the drawing is matched at the best device-pixel offset up to 2 each way (#sbAv
+    sits at y .5 and is painted 1 device px lower than its rect: 481 px apart unmatched, 0 matched); at most 0.5% of the pixels apart;
+    and up the tree from the svg, no opacity below 1, hidden visibility, clip-path, filter or mask. Judged on every ride and closet
+    (28), the Clothing-only results (2), the sheet's rider on opening and after a tap, and both avatars (the header at 390 px, on the
+    run, #sbAv on the computer layout). As built: 3 px apart at the most (the sheet's rider, of 86400), 0 on the avatars. Mutants
+    r3-stripclip (clip-path inset(0 0 48% 0) on the strip) `FAIL 30`, 11762 px apart on the hot ride; r3-figblank (the sheet's
+    rider at opacity 0) `FAIL 2`; r3-avblank (both avatars at opacity 0) `FAIL 3`.
+  - The Clothing-only results were never opened. q99 strip now plans Clothing with no gel or drink mix in the library (athlete none),
+    so the Crunch falls back to renderClothingOnly (#results data-wear-only '1'): the strip gets exactly outfit()'s list (the rows),
+    is FW.riderOutfit of it, 100 x 150 in the card above the list, aria-hidden, no text, still and painted; then the full closet
+    (refreshResults' wear-only branch) and the strip wears the new list. Mutant r3-clothonly (riderStrip only in the full plan):
+    `FAIL 7`.
+  - The sheet's live rider was compared only on a sheet just opened. q99 sheet now checks it after each of the 11 jersey taps with
+    the sheet open (the drawing FW.riderOutfit of the rider in that jersey) and as painted after the last; build checks it right after
+    the taps that build the rider. Mutant r3-figstale (#rdFig drawn when the sheet opens, not on each tap): `FAIL 3`.
+  - Proof, one at a time on fred99/null.html (mknull of 8201650), probe99/r3/runs.sh, logs in probe99/r3/runs/: q99 (main second)
+    `OK: item 99: Your rider, and the rider on the Closet card (950 checks)` (252 s); V7_GAPS and the v6 gaps v7 fixed print as before.
+    All 80 mutants in q99/mut99.mjs each FAIL (probe99/w/mutants.log "review round 3, every mutant"; 2984 s), the 8 new ones as above.
+    q97 (main second, Q97_REPO wt-q99, no FW_HANDOFF) `OK (127 checks)`; q98 in its Q98_ONLY parts `OK (253)`, `OK (49)`, `OK (21)`
+    (main's check skipped with its note); motion `OK (26 checks)`; budgets `OK (45 checks)` on the 16 rider screens (host reference
+    1.32 ms, no host busy line; most FW nodes 234, plan-avatar-rider; 0 running; slowest fwMount 24.6 ms at 6x); smoke `OK (14
+    checks)`; inventory `OK (7 checks)`; contrast `OK (58 checks)`; layout 320 and 390 px `OK` (LAYOUT_ONLY=rider); npm test 1820
+    tests, 1773 pass, 0 fail, 47 todo.
