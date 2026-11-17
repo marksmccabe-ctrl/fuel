@@ -1451,9 +1451,9 @@
     r4-pair `FAIL 2`.
   - The strip was judged in two jerseys only. q99 strip now judges every jersey colour (FW.RIDER_OPTIONS.kit, 11) for both riders on every
     ride's lists and on the direct lists. Two misses, both on a Black jersey (#1E1E24), as the check found:
-    - the winter jacket (#1E2A4A, at most 12 a channel from the jersey) over a Black jersey with sleeves Same as jersey: 240 px changed, 0
+    - the winter jacket (#1E2A4A, at most 12 a channel from the jersey [wrong: blue is 38 apart; review round 7]) over a Black jersey with sleeves Same as jersey: 240 px changed, 0
       in its colour (only its seams read; the freezing and Hard freezing full lists, the default rider; the check saw it on all 8 skins).
-      With RIDER99's white sleeves it shows (2189 / 1954);
+      With RIDER99's white sleeves it shows (2189 / 1954) [review round 7: RIDER99's Berry fade and dots make it show, never the sleeves];
     - the thermal jersey in Black with arm warmers and the vest: 0 px changed (its sleeves the arm warmers' black, its body under the
       vest; the cold, freezing, Hard freezing and Recovery cold starter lists, both riders).
     Neither is in FROM-APP-CHAT-6. The app chat has not decided them, so q99 holds both in V7_GAPS as a proposed point 4 (each as wide as
@@ -1647,3 +1647,64 @@
     rule): r4-figscroll `FAIL 19`, r4-focushide `FAIL 1` (as in round 5), r5-landside `FAIL 1`, r5-tapjump `FAIL 4`, r5-shortfig `FAIL 14`. The
     whole mutant set (120 in q99/mut99.mjs) was not run again this round; every check this round adds is new, and the one rule eased (a
     control taller than the free view fills it) is covered by the figView mutants above.
+- Review round 7 (5 problems, all real; each reproduced first: q99 as it was, kit2 1904afa's copy in probe99/r7/orig, ends `OK` on each of the
+  acceptance check's mutants in the sections that guard them (probe99/r7/repro.sh, logs in probe99/r7/repro/): mut-c7-othcount (row) `OK (18
+  checks)`, mut-c7-wordkeys (sheet) `OK (77 checks)`, mut-c7-avmove (avatar, sync, still, backup, sheet) `OK (131 checks)`, mut-c7-darkkit2
+  (strip) `OK (2713 checks)`). No app change: the app was right in each; the gaps were q99's, and v7's dark jackets are the design chat's.
+  - The dark jackets (problems 1 and 2, one cause). q99's strip judged each list for two riders in every jersey and every skin, but never
+    varied the fade, the sleeves, the shorts or the pattern, and the two riders' fades (Deep blue, Berry) and patterns (plain, dots) hid the
+    misses. Measured on v7 over the full product jersey x fade x sleeves x shorts x pattern, both riders, every list with an outer layer
+    (probe99/r7/p/outer.mjs, outer2.mjs, fields.mjs; outer2.json, analyze2.log: 55,440 judgements, every other field aside):
+    - the winter jacket (#1E2A4A): 240-276 device px changed, 0-36 in its own colour (only its seams read), on a Black jersey with a fade Same
+      as jersey, Deep blue, Navy or Black, and on a Navy one with a fade Same as jersey, Navy, Olive or Black, each with Black or Navy shorts
+      and no pattern or the side stripe, any sleeves (the freezing and Hard freezing full lists); 32 cases x 6 sleeves, both riders;
+    - the thermal jacket (#2F3B6E): 240-290 / 0-29 on a Navy jersey with Navy shorts, a fade Same as jersey, Deep blue, Navy or Black, no
+      pattern or the side stripe, any sleeves (the cold, Recovery cold and Hard freezing full lists); 8 cases x 6 sleeves;
+    - the thermal jersey in Black with arm warmers and the vest: 0 px with every fade, sleeves, shorts and pattern (AWAIT's entry, exact).
+    A pattern (dots, chevron, splatter, the band), Royal blue or Pink shorts, or the other fades show the jackets in their own colour (616 /
+    389 and more); the windbreaker, the vest and the rain jacket show on every rider. So the cause is the jersey with its fade, the shorts
+    and the pattern, never the sleeves: round 4's "with RIDER99's white sleeves it shows (2189 / 1954)" was RIDER99's Berry fade and dots,
+    and its "#1E2A4A at most 12 a channel from #1E1E24" is wrong (blue is 38 apart; from Navy at most 31). Corrected there (marked).
+    The acceptance check's figures agree (Navy 240 / 0 with fades Same, Navy, Olive, Black; Black with Same, Deep blue, Navy, Black; its
+    sweep held the shorts and pattern at the default rider's, Black and plain).
+    Not in FROM-APP-CHAT-6, so for the app chat's next note (v8: the winter and thermal jackets want a colour of their own or a lighter edge
+    that reads over Black and Navy jerseys, their fades and dark shorts); no work-around in the app. q99:
+    - AWAIT's winter-jacket entry (held by sleeves Same as jersey) is replaced by the two measured entries (DARK_WINTER, the thermal jacket);
+      each holds only the own colour, the pixels changed still judged. AWAIT now has 3 entries; with PAT_AWAIT's 3 the last line counts 6.
+    - judge: what an entry holds that shows (the whole item for hold 'all', its own colour for 'own') fails, the entry being wider than v7,
+      for V7_GAPS and AWAIT alike (before, a held case that showed passed unseen: the old entry held RIDER99's Black jersey, which shows).
+    - The wide sweep: each list a ride gives that carries an outer layer (vest, windbreaker, thermal / winter / rain jacket, thermal jersey;
+      9 lists) and each direct list that does (5), both riders, in each of the 11 jerseys with each other value of the fade, the sleeves, the
+      shorts and the pattern (198 riders a list and rider): every item judged as on the rides, one check per list and rider. pxMany draws many
+      riders per call (pxOf is pxMany of one); the images go through blob URLs revoked once drawn and each list gets a page of its own (the
+      first try, with data: URLs on one page, closed the page after 17 lists).
+    - The strip as the app draws it for three dark riders (a Navy jersey with a Navy fade and a Black one with a Black fade and white sleeves,
+      freezing full; a Navy jersey with Navy shorts, cold full): exactly the list's items, the jackets too, as painted.
+    Mutants: r7-darkkit2 (the checker's: the app wraps FW.riderOutfit and drops the jackets for those riders, the bundle blocks byte for
+    byte) `FAIL 12` (the sweep's checks on the jackets' lists); r7-stripdark (riderStrip leaves the winter jacket off a Navy jersey with a Navy
+    fade) `FAIL 1`. And q99 with round 6's AWAIT entry put back (probe99/r7/oldawait, Q99_ONLY=strip) `FAIL 9`: the Navy riders not held, and
+    RIDER99's Black jersey with sleeves Same as jersey held although it shows (too narrow and too wide at once).
+  - The arrow keys (problem 3): only the jersey's were pressed. q99 sheet now presses, in every other field shown (all 12 with RIDER99 and a
+    pair of glasses, More colours open: the word groups hair style, face, glasses and pattern, and every colour field), from its first
+    choice ArrowLeft (wraps to the last), ArrowRight (back to the first), ArrowDown, ArrowUp, ArrowRight, each focused, pressed, stored and named (the label's name as the
+    bundle's for the rider stored), then the rider's own choice again. Mutant r7-wordkeys (the keydown handler finds '.rd-c' only) `FAIL 1`.
+  - Stillness after a change (problem 4): the avatars' stillness was read on first drawings only. New watchStill / stillRead: an in-page
+    watch every 100 ms from before the change (its first tick at once: a tap redraws within 100 ms) until 4 s after, each spot drawn anew (a
+    new svg) with no .fwm-go, nothing running, its fwMount record still, and html.fw-anim on every tick (motion on: Reduce Motion off, the
+    switch on). q99 avatar: on the computer layout a tap in the sheet (Orange jersey: #rdFig and #sbAv beside it) and a restore bringing
+    another rider (#sbAv); at 390 px a restore (the header circle). q99 sync: A's header circle while B's rider reaches it. Mutant r7-avmove
+    (the checker's avmove: a new look mounted without o.still) `FAIL 4` (all four).
+  - The other side's count (problem 5): q99 row, at 390 px and on the computer layout, on Running searches "closet" (Your rider and Closet
+    under Cycling): the line reads "No Running settings match “closet”. 2 under Cycling ›" with a 44 px button "2 under Cycling ›", which
+    turns Settings to Cycling with both rows found (rider, closet) and the first focused. Mutant r7-othcount `FAIL 2`.
+  - Proof, one at a time on fred99/null.html (mknull of e778443, the same page as the checker's), probe99/r7/runs.sh, logs in probe99/r7/runs/:
+    q99 (main second) `OK: item 99: Your rider, and the rider on the Closet card; 6 cases awaiting the app chat, not judged (the skip lines)
+    (3032 checks)` (683 s; the strip section alone 223 s); V7_GAPS prints points 1-3 as before (tights-heavy under overshoes 0 px; the shoe
+    covers 202 / 0 at the least; full-finger gloves on deep brown 0; fingerless 304 / 8), AWAIT and PAT_AWAIT their six skip lines. The five
+    r7-* mutants each FAIL (probe99/w/mutants.log "review round 7"). q97 (main second, Q97_REPO wt-q99, no FW_HANDOFF) `OK (127 checks)`; q98
+    in its Q98_ONLY parts `OK (253)`, `OK (49)`, `OK (21)`; motion `OK (26 checks)`; smoke `OK (14 checks)`; inventory `OK (7 checks)`; contrast
+    `OK (58 checks)`; layout 320 and 390 px `OK` (LAYOUT_ONLY=rider); npm test 1824 tests, 1777 pass, 0 fail. Budgets (kit2 a602834's, run only)
+    on the 16 rider screens: the first run `FAIL 5` at load average 6 (four self-tests "host busy, not judged", reference 2.9-6.6 ms, and
+    plan-avatar-rider's header insert 64.1 ms at 6x, 7.5 at 1x); again `FAIL 4`, the four host-busy self-tests alone (reference 2.0-7.8 ms
+    against 1.8): every item rule ok, most FW nodes 234 (plan-avatar-rider), 0 running, slowest fwMount 30.9 ms at 6x. The gate, not the item:
+    the app is unchanged since round 6 (`OK (55 checks)` on a quiet host).
