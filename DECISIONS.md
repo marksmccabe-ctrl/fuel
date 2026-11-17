@@ -850,6 +850,138 @@
     (547 s)`; the reference at the walk's start 1.82 then 1.23 (20 s later), 20 screens judged, none read again, costliest 1.58 ms
     (run-wx-fred-snow); the two-scene self-test judged next to 1.45/1.69 and failed at 5.78-5.97 ms, its list through the report
     "FAIL 1". The page is fred98/null.html, main 8c19078 (item 98 merged, v122). No app change.
+  - Fix 5 (a skeptic, round 5): four gaps at 329b3aa, each a one-line break that passed all 38 self-tests. None gave a wrong verdict
+    on the page (the skeptic's run of the committed kit: OK, 20 screens judged, costliest 1.49 ms), and no rule or limit changed in
+    the fix (4 ms, 6x, 1,200, 30, 50 ms, REF_MS 1.8, the 20 s waits, 3 reads, 3 windows).
+    (1) nolight: walkFrame's skip test (`> 0` FW animations running) had only been run on probes with 82 and 164 running. As `>
+    BUDGET.anims`, every weather screen (3-7 running) went unmeasured: the frame rule printed "no screen had any running" and the walk
+    of the 21 screens where FW animations run ended OK.
+    (2) judgefirst: screenFrame judging the first read's windows (`frameOver(H.reads[0].F, L)`, taken next to a busy reference) while
+    it reports the quiet read's passed, because the busy-then-quiet self-test ran at frameMs 1e9; at 4 ms its screen, 9.36 ms on the
+    quiet read, passed on the busy read's 2.27.
+    (3) rate5: BUDGET.rate 5, not QUEUE.md's 6, passed (the only slowdown self-test asked for more than 2.5x; the two scenes still
+    read over 4 at 5x), and the last line, written by hand, still said "at 6x".
+    (4) insskip: each()'s `if (was && !INS_ALL)` as `if (!INS_ALL)` opened no screen again at 6x; the insert rule printed ok having
+    measured nothing (at a 1 ms insert budget, plan-results-weather, whose call reads 4.3 ms at 6x, passed). Fix 4's open walkdropcall
+    (each()'s walkFrame call given []) is the same kind: nothing ran each() itself, and report() never held what the walk saw against
+    what it was handed.
+    budgets.test.mjs (3922207, then d7c87f9 after a pass of mutants on the first version; the fix ran over five sessions, the first
+    four cut off by a session end, a usage limit, a restart and the app quitting, so this entry, the last mutant runs, a second proof
+    and RESUME's note came last):
+    - The limits are QUEUE.md's: RULE_TEXT is its budgets line word for word (main 8c19078, line 1870); a self-test reads the numbers
+      out of it (ruleNums: 1,200, 30, 4 ms at 6x, 50 ms at 6x), holds BUDGET's nodes, anims, frameMs, rate and insMs to them, and,
+      when git can show main's QUEUE.md (git show main:QUEUE.md from the kit's folder: the kit is a worktree of the fred repo), its
+      line must be RULE_TEXT. The last line is written from BUDGET (summary()); a self-test gives it other limits and finds their
+      numbers in it and none of the rule's. Every CPU slowdown the kit gives a page is logged (RATES, from the page's CDP session):
+      the frame instrument must give the screen and the host reference the rule's 6 for its window and 1 after, and a page opened at
+      6x (the self-test's and the walker's re-open) must get 6 before it loads.
+    - The report holds the walk's state against its failures (gaps()): a rule gets its ok only when nothing failed it and nothing the
+      walk saw contradicts that, and each contradiction is a FAIL line of its own (sel "the walk"): on a screen, a number over its
+      limit with no failure under that rule there (nodes, running, unmounted art, off-screen groups, running hidden, the frame judged,
+      the slowest call at 6x); FW animations that ran where the frame rule measured nothing (the screens the walk lists as having them
+      running and, whatever that list says, the screen with the most running: the skeptic's S.max.running cross-check); a window kept
+      without the screen moving and no frame failure; a screen or a self-test the host stayed busy for with no host busy line; fwMount
+      spots never read at 6x (the skeptic's "S.ins > 0 needs a call measured at 6x", made per group of spots). The walk keeps what it
+      saw per screen for this (S.by; S.ran, S.insFrom, S.insSeen, S.insDone). The skeptic's checks on the maxima (S.max.ins6 over
+      insMs, S.max.frame over frameMs) are made on every screen's own numbers (S.by), so a screen over a limit that is not the
+      costliest is held too.
+    - The same for what else the walk hands the report: a self-test the host stayed busy for (busyOr, the reference read alone) is put
+      in the walk's state (S.selfBusy) beside its host busy line; each screen's error lists (as opened, and the 6x re-open's) are kept
+      in its record (S.by: errs, errs6) as well as handed on, and the errors check takes them from both (each list once). So a list
+      dropped in walk()'s own calls still fails the step on what it held, and a state dropped there (a fresh walkState()) fails "every
+      screen reached (0)".
+    - The walk's work on one screen is walker(B, HOOKED, REF, S, FAILS, ERRS, L, reopen) (it was each(), inside walk()), and a
+      self-test runs it: a page of its own of plan-before with a bird in a spot and, far below, a bird put in with innerHTML with a
+      fw- loop no app rule reaches, under limits every probe is over (1 node, 1 animation, 0.01 ms a frame, 0.01 ms an insert), with a
+      state and lists of its own, the screen opened again at 6x by a reopen that mounts the same bird there (plan-before makes no
+      fwMount call of its own). Each rule (nodes, running, not mounted, off screen, background, frame or, the host busy, host busy,
+      insert) must have its failure and its line through the report, every FAIL line the walk's own (no gap line), "FAIL n", no OK
+      title; the walk's record of the screen (FW ran, measured, its spots read at 6x, its two error lists kept and handed on), held
+      against no failures, a gap under each of those rules; and the page opened again slowed to 6 from its start.
+    - walkFrame on one bird (2 animations, a light screen as the weather screens are) under the committed limits: measured (a reading,
+      the screen in the state's frames, its info number) and judged with no failure (or, on a busy host, a host busy line when the
+      reference alone reads busy too).
+    - Busy then quiet is judged at a frame budget of the stand-in's own added work (FRAME4 = SPIN4 = 7 ms), between its two reads:
+      only a window that had the screen's 7 ms more work a frame can be over it (the scene alone reads 2.1-4 ms there on a quiet host
+      and 3.8-6.5 next to a busy one; with the 7 ms, 9.1-10.8 quiet and 10.6-13.7 busy). It must be judged on the second read with
+      exactly one 'frame' failure, on that read's reading next to that read's reference, "FAIL 1" through the report, the first read's
+      windows under the budget, and listed as read again. It has a scene of its own and runs after the one-scene self-test (a failure
+      measures ownCost, which leaves a probe's loops off their CSS play state). Like the other self-tests that need a quiet host, when
+      the second read's reference is over the committed 1.8 and the case is not met, it reads the reference alone (busyOr): busy too,
+      a host busy line (the step fails, no verdict). The skeptic suggested 4 or 5 ms; the first version (3922207) took 6 ms with no
+      fallback and failed as a self-test on a busy host (kit98/fix4/fix5/self3.out: the first read's windows 6.34/5.89 next to
+      10.96/10.81, the second read's reference 3.77/3.76), hence the stand-in's own 7 ms. This is the self-test's own budget for a
+      made-up case, not the rule's 4 ms.
+    - The paused screen's window, kept without motion, is in the walk's state (a frame gap held against no failures): the first pass
+      of mutants found nomotionoff (screenFrame not recording it) passing every self-test.
+    - busyOr on the busy stand-in (3 reads alone, a host busy line, the self-test in the state, a gap without the line) and on a quiet
+      host (a limit no reading reaches: 1 read, nothing). The report's gaps on made-up walks: each of the gaps above, the screen with
+      the most running though unlisted and a self-test host busy among them, ends "FAIL 1" with a line of its own, and with its
+      failure that line only; a made-up walk with errors in its record and not handed on fails the errors check with them (handed on
+      too: each once).
+    45 checks.
+    Mutants (s3/mkmut.py builds them from the committed file, one line changed in each; run one at a time on plan-before with
+    s5/runmut8.sh in the fifth session, outputs and summary.txt in kit98/fix4/fix5/s5/out; 45 checks in each run). The skeptic's four,
+    each with the skeptic's own line on the new file: nolight fails the one-bird self-test ("not measured (walkFrame gave no
+    reading)") and walker's ("no failure or no line for frame", the report's own line "frame · the walk · FW animations ran on it and
+    the frame rule did not measure it"); judgefirst fails busy then quiet (8.86/8.4 -> 2.78, then 1.45/1.36 -> 9.89/10.26/9.78:
+    "judged on the second read, 9.78 ms ... next to that read's reference 1.45/1.36, 0 failures", the windows judged being the first
+    read's 2.78 ms, taken next to 8.86/8.4; its report still ended "FAIL 1", on the report's own line "frame · the walk · judged at
+    9.78 ms a frame (budget 7 ms) with no frame failure"); rate5 fails five: the rule's numbers ("rate 5 but the rule says 6"), the
+    last line from the limits, the frame instrument ("CPU slowdown given: 5, 1; to the host reference 5, 1"), walker's (its page
+    opened again at 5x) and the 6x open ("a page opened at 5x (the rule's 6x)"); insskip fails walker's ("no failure or no line for
+    insert", the report's line "insert · the walk · its fwMount calls (div#fwkW) were never read at 6x", "slowed to undefinedx": no
+    page was opened again). Fix 4's open walkdropcall (walker's own walkFrame call given [] instead of FAILS) now fails walker's ("no
+    failure or no line for frame", the report's line "judged at 0.26 ms a frame (budget 0.01 ms) with no frame failure"). nomotionoff
+    (screenFrame not recording a window kept without motion) fails the paused screen's ("with no failures, no gap"). nolight, rate5,
+    insskip, walkdropcall and nomotionoff ran beside item 99's mutant run (4 other test processes), which none of their failures
+    needs; insskip's run also had the one-scene self-test "host busy" (the reference 1.96-2.29 next to the screen and 2.07-2.29 alone)
+    and the one-bird self-test failed as "the screen pushed it up" (the reference 1.46-2.1 next to it, then 2.14 and 1.63 alone: the
+    host turned quiet between the two reads alone), a self-test that falls back on busyOr blaming the screen for a host that settled;
+    the step fails either way and a quiet host does not give it, so it is left as it is (not one of round 5's findings).
+    The walk demos at d7c87f9 (BUDGETS_SELF=0; s3/out, the fourth session, other agents' tests running): nolight on the skeptic's 21
+    screens (-wx-fred-, plan-results-weather, run-results) "FAIL 19", one line "frame · the walk · FW animations ran on it and the
+    frame rule did not measure it" for each screen with FW animations running (the two night screens run none), where the skeptic's
+    walk ended OK; insskip on plan-results-weather, the line "insert · the walk · its fwMount calls (section#rWeather.r-wx
+    div.rwx-fred.rwx-keep) were never read at 6x" (beside a host busy line); walkdropcall at a 0.1 ms budget on plan-wx-fred-snow, the
+    host busy there, the line "host busy · the walk · the host stayed busy for it with no host busy failure" (its frame line dropped,
+    the walk's record still fails it). On a quiet host (kit98/fix4/fix5/mut/pass2, on 3922207, the same gaps code) walkdropcall01 gave
+    "frame · the walk · judged at 0.46 ms a frame (budget 0.1 ms) with no frame failure".
+    The earlier mutants (round 4's three, fix 3's ten, fix 2's eleven) and fix 5's own first ones (gapsnone, gapsok, norecord, ranoff,
+    insdoneoff, frame5, walkrate1, summary6x) ran on the first version 3922207 (kit98/fix4/fix5/mut/pass1/table.txt): each failed a
+    self-test. d7c87f9 kept every condition of the self-tests they fail and added some (the paused screen's gap, walker's error lists,
+    more made-up gaps), but for busy then quiet (its 7 ms budget, and its busyOr fallback, which gives a host busy line in its place
+    on a busy host), and none of them failed that one alone (firstwin, noreplay0, stillstuck, noreread, nowait and quietalways also
+    fail frameHost's or the busy stand-in's), so they were not run again. Fix 5's later ones ran on d7c87f9 (mut/summary.txt, a quiet
+    host, 2026-11-08; mut/final, 2026-11-13): maxrunoff (the screen with the most running no longer counted) fails the gaps self-test,
+    selfbusyoff (busyOr not putting the self-test in the state) busyOr's, selfbusygap (the gaps ignoring S.selfBusy) busyOr's and the
+    gaps', errskeptoff (the errors check ignoring the record) the errors-from-the-record self-test, errspush (walker handing on no
+    list as opened) and errs6off (no record of the list at 6x) walker's.
+    Not closed: walk()'s own two calls (walker with ST, FAILS and ERRS; report(C, FAILS, ST, ERRS)) are still run by no self-test.
+    What fix 5 closes is that a list dropped there is backed by the walk's state: reportdrop (report(C, [], ST, ERRS)) passes the
+    self-tests (OK, 45 checks, the host quiet: the reference 1.32-1.55 alone just before), and on the walk at a 0.1 ms budget
+    (reportdrop01, BUDGETS_SELF=0, plan-wx-fred-snow; another agent's layout test running, the reference 1.6/1.45 next to the screen)
+    it fails: "FAIL 1", the line "frame · the walk · judged at 1.75 ms a frame (budget 0.1 ms) with no frame failure". Also left
+    alone, as in fix 4: REF_MS itself (a self-test cannot pin the host limit without restating it).
+    Proof at the committed kit d7c87f9 (budgets.test.mjs unchanged since; the kit's HEAD was item 99's e697b67), the step as runkit
+    runs it (kit98/fix4/fix5/step.sh, runkit's own step(); s5/proofwait7.sh: polls every 5 minutes, up to 3 hours, until no other
+    headless Chromium or node test runs and the reference alone reads quiet; logs runkit-20261116-194400-53294). Item 99's mutant run
+    and other agents' probes (and, 18:07-18:28, this session's mutants that need no quiet host) kept 2-11 test processes running from
+    17:53 to 19:39; at 19:44 none ran and the reference read 1.21-1.34: `budgets: OK: fred world budgets: 129 screens (31 with fred
+    world art), at most 1,200 FW nodes and 30 running FW animations, nothing running off screen or hidden, 4 ms a frame (host
+    reference 1.17-1.75 ms, quiet at most 1.8) and 50 ms an insert at 6x; self-tests on plan-before (45 checks) (596 s)`. The
+    reference at the walk's start 1.47; 20 screens judged, none read again, costliest 1.39 ms (run-wx-fred-snow; the others
+    0.45-1.35); another agent's test started in the last 90 s of the walk, its last screens still next to 1.23-1.42. The self-tests:
+    the limits "main's QUEUE.md line word for word"; the frame instrument "CPU slowdown given: 6, 1; to the host reference 6, 1"; one
+    bird 0.16 ms next to 1.22/1.49, no failure; one scene 3.09 ms next to 1.61/1.47 (its first read 1.84/1.49, read again); busy then
+    quiet 9.09/8.57 -> 2.68, then 1.26/1.59 -> 10.05/9.93/9.94, judged on the second read at 9.93 ms, one frame failure, "FAIL 1"
+    through the report; two scenes judged next to 1.29/1.64 and failed at 5.67-6.06 ms (0.2 paused), "FAIL 1" through the report;
+    walker "FAIL 8" with the walk's own failures only; the busy stand-in 2.81-3.91, busyOr beside it 3.47, 3.37, 3.42; a page opened
+    at 6x 2.5 -> 15.3 ms. The page is fred98/null.html, main 8c19078 (v122). No app change.
+    An earlier proof at d7c87f9 in the fourth session (s3/proofwait6.sh, logs runkit-20261116-150432-96862), after other agents' tests
+    from 12:49 to 15:04: OK (45 checks, 647 s), the reference 1.25-1.79, 20 screens judged, costliest 2.04 ms (run-wx-fred-snow);
+    tests started during that walk and three screens were read again after a reading over 1.8, then judged next to a quiet one
+    (plan-wx-fred-heat 1.54/1.81 then 1.66/1.67, plan-wx-fred-fog 1.71/2 then 1.56/1.72, plan-wx-fred-rain 1.77/1.94 then 1.51/1.63).
 
 ## Item 99 · Your rider, and the rider on the Closet card (cache v123)
 - Built on q99-rider (worktree wt-q99, from main 8c19078). Bundle: the design chat's v6 (FW.version '6', built 2026-11-07 22:08 EST),

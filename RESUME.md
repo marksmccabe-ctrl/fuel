@@ -167,8 +167,16 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   walkFrame, which the two-scene self-test runs with a list of its own and passes through report(): FAIL 1, no ok for the frame
   rule, no OK title; a made-up walk with two frame failures: FAIL 2), and frameHost's made-up windows read differently by read (the
   read judged is the one returned), with a host busy on the first read only on the real path, judged on the second read's windows.
-  Proof at kit 329b3aa (about 9 min): OK (38 checks, the reference 1.22-1.67, costliest 1.58 ms, 547 s). Not self-tested: each()'s
-  and walk()'s own calls that hand the walk's failure list on (see DECISIONS, fix 4).
+  Proof at kit 329b3aa (about 9 min): OK (38 checks, the reference 1.22-1.67, costliest 1.58 ms, 547 s).
+  Fifth fix (45 checks): the limits are QUEUE.md's (RULE_TEXT, main's budgets line word for word; BUDGET held to its numbers, the last
+  line written from them, every CPU slowdown the kit gives logged and held to the rule's 6x); the report holds the walk's state
+  against its failures (a number over its limit, FW running where the frame was not measured, a screen or self-test the host stayed
+  busy for, fwMount spots never read at 6x, each with no failure, is a FAIL line of its own, "· the walk ·"); the walk's work on one
+  screen is walker(), self-tested with probes under tiny limits; walkFrame self-tested on one bird (2 running); busy then quiet judged
+  at a 7 ms budget (one frame failure on the second read's reading). Proof at kit d7c87f9 (about 10 min, once other agents' browser
+  tests had finished: wait for them): OK (45 checks, the reference 1.17-1.75, costliest 1.39 ms, 596 s). Not self-tested: walk()'s own
+  two calls (walker with the walk's state and lists, and report()), but a list dropped there is backed by the walk's state, so the
+  walk still fails on what it found (see DECISIONS, fix 5).
   Proof on q98-wx-fred (38abbd6, v122), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 2f8c5c9, v121), Mac Studio:
   `kit: OK: 17 steps passed, 0 item tests skipped (7150 s)`; answer 1763 pass, contrast 129 screens (4 known
   on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed, motion 137, budgets 129 (31 with
