@@ -1045,3 +1045,60 @@
     contrast `OK (58 checks)`, layout 320 and 390 px `OK` on the 16 rider screens; smoke `OK (14 checks)`; npm test 1820 tests, 1773
     pass, 0 fail. Budgets on the rider screens: every rule ok (most FW nodes 234, 0 running, slowest fwMount 27.8 ms at 6x) but
     `FAIL 4`, the frame self-tests "host busy, not judged" (the reference 2.7-3.75 ms a frame against 1.8): the gate, not the item.
+- Bundle v7 (the app chat's decisions, followed; the design chat's v7, FW.version '7', built 2026-11-08 09:29 EST, checked on its own
+  in probe99/verify-bundle5.json; FROM-APP-CHAT-6.md asks for v8, points 1-3):
+  - The app: `node scripts/fw-inline.mjs ~/Dropbox/00_T/handoff` (1bec175, pushed): only the two bundle blocks change; run again it
+    changes nothing. The page loads with no console errors in Chromium; WebKit shows only "Not allowed to load local resource" for
+    the manifest, fonts and Strava art beside null.html, the same five as main's page (the test folder, not the app). sw.js CACHE and
+    APP_BUILD stay v123. q99's BUILDS holds v7 only (sha1 of each handoff file trimmed, as fw-inline inlines it: css 71e5e2c4...,
+    js fa84301f..., computed here); v6 went with it, since the strip check holds only v7's gaps. q97 needs no FW_HANDOFF now: its
+    byte check runs against the handoff folder (v7) and passes.
+  - What v7 changed for the strip (verify-bundle5): the rain jacket outermost, a thermal jersey under the jackets (new order), the
+    knee warmers and the headband read, the skullcap off the eyes with glasses none, wool socks drawn over leg wear, shoe covers a
+    cuff from y 266 (#1E1E24, an ink outline and a light hem over it), overshoes a cuff from y 256. Every other drawing is unchanged.
+  - V6_GAPS and SKIN_GAPS are gone; one list, V7_GAPS (q99.test.mjs), each entry tied to its FROM-APP-CHAT-6 point and as wide as
+    measured on v7 (the default rider on all 8 skins and RIDER99, every ride's list, both closets), printed as notes; any other listed
+    item that does not show fails, and each entry must be met on a list the strip gets:
+    1. leg warmers and tights under overshoes, held whole: tights-heavy 0 px changed on the Hard freezing and Recovery cold full-closet
+       lists (with wool socks); any leg wear with overshoes alone 28 px, 0 in its colour.
+    2. the shoe covers' own colour, held as their own colour only: 0 device px of #1E1E24 on all 45 judgements (the cuff is covered by
+       its ink outline, the hem and the shoe's outline); their pixels changed are still judged and pass, 202 at the least (the cold
+       starter list), 324 over tights. OWN.shoes stays #1E1E24, what the item is meant to show.
+    3. dark gloves on deep brown skin (#5A3622; once SKIN_GAPS A, now here: one place only): full-finger 'gloves' (#2A2A30) held whole,
+       0 px changed (the wet lists); fingerless 'gloves-finger' held as their own colour only, 304 px changed (judged, pass), 8 in
+       #2A2A30 (the hot and mild full lists). Narrower than A was, as measured.
+  - The v6 gaps v7 fixed, each judged now and printed with its least measurement (FIXED_BY_V7; a test fails if any is never judged),
+    on rides or, where no ride reaches it, on direct lists for both riders: shoe covers with leg wear 202 px (45 judgements); overshoes
+    with leg wear 608 / 276 own (18); the rain jacket with a windbreaker, a jacket or the vest 4673 / 3979 (17, direct lists too);
+    a windbreaker over a thermal jersey 4303 / 3763 (2, direct lists); the thermal and winter jackets over one 4115 / 3606 and
+    3939 / 3699 (18 each); wool socks under leg wear with toe covers or bare shoes 262 / 236 (11); knee warmers 450 / 196 (18); the
+    skullcap with glasses none 1064 / 371, and 0 px changed over the eyes (x 73.5-126.5, y 97-115; v6's band changed 445 there); the
+    headband with the shield 965 / 122 (32); SKIN_GAPS B, leg warmers with shoe covers on tan to deep brown skin, 200 / 104 at the
+    least (deep brown, 24 judgements). The jackets' bodies and the rain jacket's sleeves (round 1's c1-nojacket entries, "what the
+    point leaves must show") are now judged whole: the check guards more than it did, and c1-nojacket still fails (53 lines).
+  - By-design under-layers new with v7, each exactly as wide as stated: wool socks under shoe covers, overshoes or boots (the shin has
+    about 18 units between the shorts and the shoe, and a real cover hides the sock; with toe covers or bare shoes they are judged:
+    the wet full list, and the direct lists socks-wool and tights-heavy + socks-wool); everything under the rain jacket when it is
+    listed (the vest, the windbreaker, the thermal and winter jackets, a thermal jersey: it is outermost, as asked); a thermal jersey
+    under a windbreaker or a thermal, winter or rain jacket (with the vest alone it is judged: the cold starter lists). Joined to the
+    earlier ones (the light and mid jerseys, bibs, the four base layers, summer socks; arm warmers and sun sleeves under sleeves).
+  - The detector's self-test: bib shorts (nothing in every version) with leg warmers is judged as not showing; the leg warmers (in their
+    colour) and the toe covers show. v6's negative case (shoe covers under leg warmers) shows on v7.
+  - Proof, one at a time on fred99/null.html (mknull of 1bec175), probe99/v7c/runs.sh, logs in probe99/v7c/runs/: q99 (main second)
+    `OK: item 99: Your rider, and the rider on the Closet card (904 checks)` (206 s). Each held entry dropped in a scratch copy
+    (probe99/v7-holds/, Q99_ONLY=strip) ends FAIL: point 1 `FAIL 18` (tights-heavy 0 px on the Hard freezing and Recovery lists),
+    point 2 `FAIL 45` (shoes 202 px, 0 own), point 3 gloves `FAIL 4` (0 px, deep brown, the wet lists), fingerless `FAIL 4` (304 / 8).
+    All 72 mutants in q99/mut99.mjs each FAIL (probe99/w/mutants.log "bundle v7, every mutant"; 1899 s), the 10 new ones too:
+    v7-woolbare (wool socks dropped with toe covers) `FAIL 9`, v7-woolnone (with bare shoes) `FAIL 31`, v7-vestdry (the vest with no
+    rain jacket) `FAIL 45`, v7-heavyvest (a thermal jersey under the vest only) `FAIL 36`, v7-rainunder `FAIL 11`, v7-raindrop
+    `FAIL 6`, v7-windheavy `FAIL 2`, v7-skullband (the band over the eyes) `FAIL 2`, v7-legcover (SKIN_GAPS B's width) `FAIL 24`,
+    v7-covernone (shoe covers drawn as nothing: point 2 holds only their colour) `FAIL 45`. q97 (main second, Q97_REPO wt-q99, no
+    FW_HANDOFF) `OK (127 checks)`, its byte check run; q98 Q98_ONLY parts `OK (253)`, `OK (49)`, `OK (21)` (main's check skipped with
+    its note); motion `OK (26 checks)`, budgets `OK (45 checks)` on the 16 rider screens (no host busy line this time: the reference
+    1.31 ms; most FW nodes 234, plan-avatar-rider; 0 running; slowest fwMount 24.6 ms at 6x); smoke `OK (14 checks)`; inventory `OK:
+    inventory nothing removed (7 checks)`; contrast `OK (58 checks)`; layout 320 and 390 px `OK`; npm test 1820 tests, 1773 pass, 0 fail.
+  - Found, not held (no ride with the starter or full closet lists them; a rider's own closet without wool socks would): with no wool
+    socks under them, boots over any leg wear change 192 px but only 18 in #3A2F2A (#3A2F2A on #14141A is 38 at most a channel),
+    overshoes over heavy tights 344 / 34, and leg warmers or tights above boots on RIDER99 (deep brown) 70 / 26 (probe99/v7c/covers.mjs).
+    Point 2's own colour for the covers clears the overshoes; the boots and the leg wear above them on deep brown skin are for the app
+    chat to add to the note for v8 if it wants them.
