@@ -22,17 +22,26 @@
 //            colours: Rust and Gold, not Auburn and Blond, in the buttons' names, the field's name and the summary); no glasses: the Gear
 //            summary says so; a typical rider's summaries are one line at 390 px (RIDER99's, the default's), the longest choices wrap to
 //            two lines at most and are never cut (no ellipsis, nothing hidden: the round's 150% and 200% text); each swatch's edge stands out from the sheet (it, or the swatch, 3:1 against the panel: a White one on white);
-//            the live rider follows each tap with the sheet still open (every jersey) and shows as painted (see "painted" below)
+//            the live rider follows each tap with the sheet still open (every jersey) and shows as painted (see "painted" below);
+//            (review round 4) the live rider stays in view while choosing (stuck under the title bar: after a tap in each field, every
+//            group open, it is wholly in view, redrawn, the button not under it; Tab and Shift+Tab never leave focus under it; at 390 px,
+//            320 px with 200% text and the computer layout); with Covered the colour field and the Look summary name what it colours
+//            ("Covering and beard colour", "black head covering and beard"); the glasses 'pair' reads "glasses" in the Gear summary; each
+//            label is the bundle's name of the choice pressed; the pressed mark can be seen (the ring 3:1 on the panel, a word's fill 3:1
+//            against an unpressed one and its words 4.5:1); the live rider is kept by its key (reopened, re-tapped, riderApply)
 //   build    99.2: settings.rider absent until built (opening and closing the sheet stores nothing; no DEFAULT_SETTINGS entry: absent at
 //            boot, in the stored copy and in a fresh page's settings); a tap stores the whole rider (every bundle field, checked);
 //            a rider built, closed (Done) and reopened is the same (every pressed swatch, summary and the live rider), and after a reload;
 //            the row then names the jersey; right after the taps the live rider is the rider built; tapping the choice already pressed builds the rider (the default rider stored); not built,
-//            the sheet names the default rider's choices (each field's name, the three summaries: face none, a plain jersey, shield glasses)
+//            the sheet names the default rider's choices (each field's name, the three summaries: face none, a plain jersey, shield glasses);
+//            right after the taps each label is the bundle's name of the choice made
 //   norm     99.2: riderNorm with tampered values for every field (a number, null, an object, an unknown string, '__proto__',
 //            'constructor', 'toString', a near-miss colour) and a rider that is not an object: on load (stored on the device), on
 //            restore (a backup) and when synced settings arrive (the cloud, the q91 Firebase stand-in): each tampered field is its
 //            default, the others are kept, keys the bundle has no field for are gone; the sheet and the avatar draw that rider; no errors;
-//            the merge itself (sfDocMerge) run again on the cloud copy pulled brings nothing new for the rider and queues no rider upload
+//            the merge itself (sfDocMerge) run again on the cloud copy pulled brings nothing new for the rider and queues no rider upload;
+//            (review round 4) and a rider whose fields hold values another field offers (BAD_X: a jersey colour for the skin and the
+//            helmet, a sleeve colour for the frame, a hair style for the glasses ...) is each field's default on load, restore and sync
 //   backup   99.5: a backup made here carries the rider (backupData, the app's own export) and brings it to a fresh page; a backup
 //            from before item 99 (no settings.rider) restores without losing this device's rider (as birthday and gender);
 //            a backup with a rider brings it; a tampered one draws the default
@@ -42,8 +51,9 @@
 //            B and in the cloud, one stamp newer than A's, A's header circle redrawn; then A changes it while B (not pulled) saves an
 //            unrelated setting: A's rider stands on both
 //   private  99.5: the troubleshooting copy leaves the rider out (no rider key, none of its values, no strip); no AI prompt has it (every
-//            prompt kind, and a static scan: the prompt builder reads no settings.rider); the privacy note's "What's stored" names
-//            "your rider's look"
+//            prompt kind, and a static scan: the prompt builder reads no settings.rider); (review round 4) nor by name: every prompt is the
+//            same with the rider as without it and holds none of its summaries or chosen names, and outside the rider's own code only the
+//            functions RIDER_USERS names read it or call into it; the privacy note's "What's stored" names "your rider's look"
 //   avatar   99.3: signed out: the outline (header) and the empty circle (#sbAv), built or not; signed in, not built: the initial; signed
 //            in and built: the rider (FW.riderAvatar of the rider, ids aside) in the header circle at 32 px and in #sbAv at 30 px on the
 //            computer layout, the initial kept under it (print and forced colours show it, no art); the same on the run (graphite);
@@ -58,17 +68,21 @@
 //            layers drawn by design as nothing aside (with v7 also wool socks under any foot cover, everything under the rain jacket,
 //            a thermal jersey under any sleeved outer piece) and the known v7 gaps (V7_GAPS, each tied to its FROM-APP-CHAT-6 point and
 //            as wide as measured on v7: 1 leg wear under overshoes, 2 the shoe covers' own colour (their pixels changed still judged),
-//            3 dark gloves on deep brown skin, the fingerless ones' own colour only) printed as notes; every v6 gap v7 fixed is judged
+//            3 dark gloves on deep brown skin, the fingerless ones' own colour only; and, held until the app chat decides, a proposed point
+//            4: the winter jacket's own colour on a Black jersey, the thermal jersey in Black under the vest with arm warmers) printed as
+//            notes; every v6 gap v7 fixed is judged
 //            (a ride or a direct list where no ride reaches it: the rain jacket over the jackets, a windbreaker over a thermal jersey,
 //            the skullcap with glasses none, which leaves the eyes alone) and printed with its least measurement, and so is each
 //            by-design rule's edge (wool socks with toe covers or bare shoes, the vest and a thermal jersey with no rain jacket or
 //            sleeves over them); the detector's self-test: bib shorts (nothing in every version) not showing; the built rider and
-//            every other skin are judged on the same lists (the default rider in that skin); the strip
+//            every other skin are judged on the same lists (the default rider in that skin), and every jersey colour (both riders, the
+//            direct lists too: review round 4); the strip
 //            is kept by its key (re-rendered results draw nothing again); a rider changed while the results are up (in the sheet, by sync,
 //            by a restore) redraws
 //            the strip shown; a ride that warms (items shed on the way) lists them all; a closet item of your own and a tampered '__proto__' /
 //            'constructor' closet id never reach the strip and never break it; the Clothing-only results (renderClothingOnly) have the strip
-//            too, and it follows a closet change there; on every ride and closet the strip shows as painted
+//            too, and it follows a closet change there; on every ride and closet the strip shows as painted (and on the computer layout);
+//            a rider arriving by sync with the sheet open: the sheet (pressed, names, summaries, its live rider) and the row follow
 //   painted  (review round 3) the strip, the sheet's live rider and both avatars as the page paints them: the spot's svg screenshot at dpr 2
 //            against FW.plain of the same drawing at that size on the colour behind it (at most 0.5% of the pixels more than 48 apart;
 //            an avatar inside its circle) and nothing up the tree that hides or cuts it (opacity, visibility, clip-path, filter, mask)
@@ -78,7 +92,7 @@
 //            every swatch keeps its colour with a CanvasText edge (the pressed one a Highlight ring), "Same as jersey" its ring, the pressed one ringed, the word buttons' pressed one marked
 //   fit      320 px and 200% text: the sheet (every group open, More colours) has no sideways scroll, every button 44 px or more, nothing
 //            past the sheet, no summary cut; the strip inside its card; the computer layout: the sheet is the pane beside the list, the strip in the
-//            results column
+//            results column; the sheet's rider and the strip as painted at each of these sizes (review round 4)
 //   main     (with [main null.html]) main has no Your rider row and no strip (the row check fails there)
 // Q99_ONLY=section,section runs some sections.
 import fs from 'node:fs';
@@ -100,7 +114,7 @@ async function until(fn, ms = 15000, step = 100) { const t = Date.now(); let v; 
 const browser = await chromium.launch();
 
 // the hooked copy (the rider's code lives inside the app's strict-mode function; this copy hands some of it out, as q97 and q98 do)
-const HOOK = "\nObject.defineProperty(window,'__q99',{configurable:true,get(){ return {FWM, AOPEN, riderNorm, riderNow, riderIds, outfit, readInputs, dbgDump, aiFill, AI_CARD, backupData, closetItemFromCatalog, CLOSET_CATALOG, CLOSET_STARTER, refreshResults, sbAcctRender, sfDocMerge, save, KEYS, DEFAULT_SETTINGS, get lastResult(){ return lastResult; }, get settings(){ return settings; }, set settings(v){ settings=v; }}; }});\n";
+const HOOK = "\nObject.defineProperty(window,'__q99',{configurable:true,get(){ return {FWM, AOPEN, riderNorm, riderNow, riderIds, riderApply, outfit, readInputs, dbgDump, aiFill, AI_CARD, backupData, closetItemFromCatalog, CLOSET_CATALOG, CLOSET_STARTER, refreshResults, sbAcctRender, sfDocMerge, save, KEYS, DEFAULT_SETTINGS, get lastResult(){ return lastResult; }, get settings(){ return settings; }, set settings(v){ settings=v; }}; }});\n";
 function hooked(page, name = 'q99-hook.html', hook = HOOK) { const src = fs.readFileSync(page, 'utf8'), k = src.indexOf("\n'use strict';\n"); if (k < 0) throw new Error("no 'use strict' line in " + page);
   const f = path.join(path.dirname(page), name), at = k + "\n'use strict';".length; fs.writeFileSync(f, src.slice(0, at) + hook + src.slice(at)); return f; }
 const HOOKED = hooked(PAGE), MADE = [HOOKED];
@@ -148,8 +162,10 @@ const sheetOf = p => p.evaluate(F => { const pressed = {}, names = {};
 // a head covering's colours are plain colours (the bundle's names are hair names: no "blond head covering")
 const COVER = { '#C8743C': 'Rust', '#E9C46A': 'Gold' };
 const sumsOf = (p, r) => p.evaluate(([r, COVER]) => { const n = k => { const o = FW.RIDER_OPTIONS[k]; return k === 'hair' && r.hairStyle === 'covered' && COVER[r[k]] || (Array.isArray(o) ? FW.RIDER_NAMES[k][r[k]] : o[r[k]]); }, lc = s => s.charAt(0).toLowerCase() + s.slice(1);
-  const hs = r.hairStyle, hc = lc(n('hair')), hair = hs === 'covered' ? hc + ' head covering' : hs === 'pony' || hs === 'braids' ? hc + ' ' + lc(n('hairStyle')) : lc(n('hairStyle')) + ' ' + hc + ' hair';
-  return [`${n('skin')} skin · ${hair}${r.face !== 'none' ? ' · ' + lc(n('face')) : ''}`, `${n('helmet')} helmet · ${r.glasses === 'none' ? 'no glasses' : lc(n('glasses')) + ' · ' + lc(n('lens')) + ' lens'}`, `${n('kit')} jersey · ${lc(n('pattern'))} · ${lc(n('shorts'))} shorts`]; }, [r, COVER]);
+  // with Covered the bundle draws a beard or mustache in the covering's colour: "gold head covering and beard" (review round 4); the glasses
+  // 'pair' is "glasses" ("pair" alone names nothing, folded or read out: review round 4)
+  const hs = r.hairStyle, hc = lc(n('hair')), fc = r.face !== 'none' ? lc(n('face')) : '', cov = hs === 'covered', hair = cov ? hc + ' head covering' + (fc ? ' and ' + fc : '') : hs === 'pony' || hs === 'braids' ? hc + ' ' + lc(n('hairStyle')) : lc(n('hairStyle')) + ' ' + hc + ' hair';
+  return [`${n('skin')} skin · ${hair}${fc && !cov ? ' · ' + fc : ''}`, `${n('helmet')} helmet · ${r.glasses === 'none' ? 'no glasses' : (r.glasses === 'pair' ? 'glasses' : lc(n('glasses'))) + ' · ' + lc(n('lens')) + ' lens'}`, `${n('kit')} jersey · ${lc(n('pattern'))} · ${lc(n('shorts'))} shorts`]; }, [r, COVER]);
 // each field's chosen name for a rider (the bundle's names; a covering's colour plain)
 const namesOf = (p, r) => p.evaluate(([r, F, COVER]) => Object.fromEntries(F.map(k => { const o = FW.RIDER_OPTIONS[k]; return [k, k === 'hair' && r.hairStyle === 'covered' && COVER[r[k]] || (Array.isArray(o) ? FW.RIDER_NAMES[k][r[k]] : o[r[k]])]; })), [r, FIELDS, COVER]);
 // in the page: WCAG contrast (rgbOf an rgb()/rgba() string; over: a on b; bgOf: the first opaque background up the tree)
@@ -191,6 +207,35 @@ async function paintOf(p, sel, what) {
       if (bad.length) hide.push((t.id ? '#' + t.id : t.tagName.toLowerCase() + (t.classList.length ? '.' + [...t.classList].join('.') : '')) + ': ' + bad.join(', ')); }
     return { W, H, n, apart, at: best.at, ink, share: Math.round(apart / n * 10000) / 10000, hide, ok: dpr === 2 && ink > n * 0.05 && apart <= n * lim && !hide.length }; }, [sel, what, shot, PAINT, rc]); }
 const painted = (P, tag) => ok(!!P && !P.none && P.ok, tag + ' (as painted at dpr 2: ' + (P && !P.none ? P.apart + ' of ' + P.n + ' device px more than 48 apart from FW.plain of it' + (P.at[0] || P.at[1] ? ', matched ' + P.at.join(', ') + ' device px off' : '') + (P.hide.length ? '; hidden up the tree: ' + P.hide.join('; ') : '') : 'no svg') + ')', P);
+
+// the live rider stays in view while the rider chooses (review round 4: it scrolled away with the groups, so a tap showed no change on
+// screen): every group open and More colours (the folds stay as opened), each field's buttons brought into view the way the page does it
+// (scrollIntoView nearest: the scroller's own padding), a real tap on a choice not pressed; then the rider must be wholly in the sheet's view
+// (under its title bar, above its bottom and the tab bar), redrawn in that choice, and the button tapped not under it. And the keyboard:
+// Tab forward and back (Shift+Tab: the page scrolls up to what it focuses) through the sheet never leaves the focused control under the
+// rider or the title bar
+async function figView(p, where) {
+  await allOpen(p); await settle(p, 100);
+  const view = () => p.evaluate(() => { const sc = document.querySelector('#setSheet .set-sheet'), S = sc.getBoundingClientRect(), tb = document.querySelector('nav.tabs'), T = tb && tb.getClientRects().length ? tb.getBoundingClientRect() : null, F = document.querySelector('#rdFig svg').getBoundingClientRect();
+    return { top: Math.max(S.top, document.querySelector('#setSheet .set-top').getBoundingClientRect().bottom), bot: Math.min(S.bottom, innerHeight, T && T.top > innerHeight / 2 ? T.top : 1e9) /* the phone's tab bar at the bottom (on the computer layout nav.tabs is the side bar) */, F: { top: F.top, bottom: F.bottom, height: F.height }, figB: document.getElementById('rdFig').getBoundingClientRect().bottom }; });
+  const fields = await p.evaluate(() => [...document.querySelectorAll('#rdGroups .rd-f')].filter(f => f.getClientRects().length).map(f => f.dataset.rdF)), bad = [], seen = [];
+  for (const k of fields) {
+    const v = await p.evaluate(k => { const f = document.querySelector(`#rdGroups [data-rd-f="${k}"]`), b = [...f.querySelectorAll('[data-rd]')].find(b => b.getAttribute('aria-pressed') !== 'true'); f.querySelector('.rd-sw').scrollIntoView({ block: 'nearest' }); return b ? b.dataset.v : null; }, k);
+    if (v == null) continue; await settle(p, 60);
+    await p.click(`#rdGroups [data-rd="${k}"][data-v="${v}"]`, { timeout: 5000 }).catch(e => bad.push({ k, v, click: String(e).split('\n')[0] })); await settle(p, 80);
+    const V = await view(), m = await p.evaluate(([k, v]) => { const b = document.querySelector(`#rdGroups [data-rd="${k}"][data-v="${v}"]`).getBoundingClientRect(), r = window.__q99.riderNow(), nm = h => String(h).replace(/\b(fw-[a-z]+)\d+/g, '$1#');
+      return { btn: [b.top, b.bottom], chose: r[k] === v, same: nm(document.getElementById('rdFig').innerHTML) === nm(Object.assign(document.createElement('div'), { innerHTML: FW.riderOutfit(r) }).innerHTML) }; }, [k, v]);
+    const vis = Math.max(0, Math.min(V.F.bottom, V.bot) - Math.max(V.F.top, V.top)) / V.F.height, clear = m.btn[0] >= V.figB - 0.5 && m.btn[1] <= V.bot + 0.5;
+    seen.push(k + ' ' + Math.round(vis * 100) + '%'); if (vis < 0.99 || !clear || !m.chose || !m.same) bad.push({ k, v, vis: Math.round(vis * 1000) / 1000, fig: [Math.round(V.F.top), Math.round(V.F.bottom)], view: [Math.round(V.top), Math.round(V.bot)], btn: m.btn.map(Math.round), clear, chose: m.chose, same: m.same }); }
+  ok(fields.length >= 12 && seen.length === fields.length && !bad.length, 'sheet: ' + where + ': the live rider stays in view while the rider chooses: after a tap in each field (every group open), it is wholly in the sheet\'s view, redrawn in the choice, and the button tapped is not under it (' + seen.join(', ') + ')', { bad: bad.slice(0, 4), fields });
+  // the keyboard: forward from the first group's chosen button, then back
+  const hid = [], walked = [];
+  for (const key of ['Tab', 'Shift+Tab']) { await p.evaluate(back => { const sc = document.querySelector('#setSheet .set-sheet'); sc.scrollTop = back ? sc.scrollHeight : 0; const L = [...document.querySelectorAll('#rdGroups [aria-pressed="true"]')].filter(b => b.getClientRects().length); (back ? L[L.length - 1] : L[0]).focus(); }, key !== 'Tab'); await settle(p, 60);
+   for (let i = 0; i < 40; i++) { await p.keyboard.press(key); await settle(p, 40);
+    const V = await view(), f = await p.evaluate(() => { const e = document.activeElement; if (!e || !e.closest('#prowB-rider')) return null; const r = e.getBoundingClientRect(); return { n: e.dataset.rd ? e.dataset.rd + ' ' + e.getAttribute('aria-label') : e.textContent.trim().slice(0, 20), top: r.top, bottom: r.bottom }; });
+    if (!f) break; walked.push(f.n); if (f.top < V.figB - 1 || f.bottom > V.bot + 1) hid.push(Object.assign({ key, figB: V.figB, bot: V.bot }, f)); } } /* 1 px: the scroll lands on whole pixels */
+  ok(walked.length >= 20 && !hid.length, 'sheet: ' + where + ': Tab and Shift+Tab through the sheet never leave the focused control under the live rider or past the view\'s bottom (' + walked.length + ' stops)', { hid: hid.slice(0, 4), walked: walked.length });
+}
 
 const sections = [];
 const section = (n, f) => sections.push([n, f]);
@@ -263,6 +308,12 @@ section('sheet', async () => {
   const S = await sheetOf(p), want = await sumsOf(p, RIDER99);
   ok(S.sums.join('|') === want.join('|'), '99.1: folded, each group shows its one-line summary naming the choices (' + S.sums.join(' / ') + ')', { S: S.sums, want });
   ok(S.sums[2] === 'Coral jersey · dots · navy shorts', '99.1: the Kit summary reads as the spec\'s ("Coral jersey · dots · navy shorts" for this rider)', S.sums[2]);
+  // the glasses 'pair' reads "glasses" in the Gear summary and in the fold button's name (review round 4: "pair" alone, read out, named nothing)
+  const GN = await p.evaluate(() => document.querySelector('#rdGroups [data-fold="rider-gear"] .v-fold-h').textContent.replace(/\s+/g, ' ').trim());
+  ok(S.sums[1] === 'Coral helmet · glasses · green lens' && GN === 'Gear' + S.sums[1] && !/(^|· )pair( ·|$)/.test(S.sums[1]), 'sheet: the Gear summary names the glasses ("' + S.sums[1] + '": never "pair" alone), folded and as the fold button\'s name', { sum: S.sums[1], name: GN });
+  // each field's label shows the bundle's name of the value pressed (review round 4: the names were compared only with each other after a change)
+  const N99 = await namesOf(p, RIDER99);
+  ok(FIELDS.every(k => S.names[k] === N99[k] && S.pressed[k].length === 1 && S.pressed[k][0] === RIDER99[k]), 'sheet: each field\'s label shows the bundle\'s name of the choice pressed (' + FIELDS.map(k => S.names[k]).join(', ') + ')', { names: S.names, want: N99 });
   ok(S.fig && S.figSame, '99.1: the live rider on top is FW.riderOutfit of the rider shown (ids aside)', S);
   painted(await paintOf(p, '#rdFig svg', 'fig'), 'sheet: the live rider shows');
   const FG = await p.evaluate(() => { const f = document.getElementById('rdFig'), g = document.getElementById('rdGroups'), g1 = g.querySelector('.rd-g'), rec = window.__q99.FWM.get(f);
@@ -320,12 +371,31 @@ section('sheet', async () => {
       out.push({ k: on.dataset.rd, sw: on.classList.contains('rd-c'), on: cs(on), off: cs(off) }); }); return out; });
   const pvBad = PV.filter(x => x.sw ? !(x.on.sh !== 'none' && x.on.sh !== x.off.sh) : !(x.on.bg !== x.off.bg && x.on.co !== x.off.co));
   ok(PV.filter(x => x.sw).length >= 8 && PV.filter(x => !x.sw).length >= 4 && !pvBad.length, 'sheet: the pressed choice is marked in normal colours: a ring on the pressed swatch, a fill and colour on the pressed word button (' + PV.length + ' groups)', { pvBad, sample: PV.slice(0, 2) });
+  // and the mark can be seen (review round 4: a ring in the panel's own colour passed; WCAG 1.4.11, as the swatches' edges): the pressed
+  // swatch's outer ring (its widest shadow, wider than the rest) 3:1 against the panel; the pressed word button's fill 3:1 against the
+  // unpressed one's (or the panel), its words 4.5:1 on it
+  const PC = await p.evaluate(() => { const C = window.__c, out = [], parts = s => s === 'none' ? [] : s.split(/,(?![^(]*\))/).map(x => { const c = (x.match(/rgba?\([^)]*\)/) || [''])[0], n = x.replace(c, '').trim().split(/\s+/).map(parseFloat); return { c: C.rgbOf(c), spread: n[3] || 0 }; }), r2 = v => Math.round(v * 100) / 100;
+    document.querySelectorAll('#rdGroups .rd-sw').forEach(g => { if (!g.getClientRects().length) return; const on = g.querySelector('[aria-pressed="true"]'), off = g.querySelector('[aria-pressed="false"]'); if (!on || !off) return;
+      const panel = C.bgOf(g), c = getComputedStyle(on), co = getComputedStyle(off), k = on.dataset.rd;
+      if (on.classList.contains('rd-c')) { const L = parts(c.boxShadow), o = L.reduce((a, b) => !a || b.spread > a.spread ? b : a, null), wider = !!o && L.every(x => x === o || x.spread <= o.spread - 1.5);
+        out.push({ k, sw: true, shadow: c.boxShadow, ring: o && o.c.length >= 3 ? r2(C.ratio(C.over(o.c, panel), panel)) : 0, wider }); }
+      else { const fon = C.over(C.rgbOf(c.backgroundColor), panel), foff = C.over(C.rgbOf(co.backgroundColor), panel), tx = C.over(C.rgbOf(c.color), fon);
+        out.push({ k, sw: false, fill: r2(Math.max(C.ratio(fon, foff), C.ratio(fon, panel))), text: r2(C.ratio(tx, fon)) }); } }); return out; });
+  const pcBad = PC.filter(x => x.sw ? !(x.wider && x.ring >= 3) : !(x.fill >= 3 && x.text >= 4.5));
+  ok(PC.filter(x => x.sw).length >= 8 && PC.filter(x => !x.sw).length >= 4 && !pcBad.length, 'sheet: the pressed mark can be seen: each pressed swatch\'s outer ring 3:1 against the panel (' + [...new Set(PC.filter(x => x.sw).map(x => x.ring))].join(', ') + ':1), each pressed word button\'s fill 3:1 against an unpressed one (' + [...new Set(PC.filter(x => !x.sw).map(x => x.fill))].join(', ') + ':1) and its words 4.5:1 on it (' + [...new Set(PC.filter(x => !x.sw).map(x => x.text))].join(', ') + ':1)', { pcBad, sample: PC.slice(0, 2) });
   // the Look summary per hair style (the bundle draws 'covered' as a head covering in the colour: its field is then "Covering colour")
   const HS = [];
   for (const v of ['pony', 'braids', 'covered', 'short']) { await tap(p, 'hairStyle', v); await settle(p, 60); HS.push(await p.evaluate(() => [document.getElementById('rdS-look').textContent, document.getElementById('rdL-hair').textContent, document.getElementById('rdL-hair').closest('.rd-f').querySelector('[role=group]').getAttribute('aria-labelledby')])); }
   await tap(p, 'hairStyle', RIDER99.hairStyle); await settle(p, 60);
-  ok(HS.map(h => h[0]).join('|') === 'Deep brown skin · black ponytail · beard|Deep brown skin · black braids · beard|Deep brown skin · black head covering · beard|Deep brown skin · short black hair · beard' && HS.map(h => h[1]).join() === 'Hair colour,Hair colour,Covering colour,Hair colour' && HS.every(h => h[2] === 'rdL-hair'),
-    'sheet: the Look summary reads per hair style ("black ponytail", "black braids", "black head covering", "short black hair"); with Covered the colour field is "Covering colour" (its group named so)', HS);
+  ok(HS.map(h => h[0]).join('|') === 'Deep brown skin · black ponytail · beard|Deep brown skin · black braids · beard|Deep brown skin · black head covering and beard|Deep brown skin · short black hair · beard' && HS.map(h => h[1]).join() === 'Hair colour,Hair colour,Covering and beard colour,Hair colour' && HS.every(h => h[2] === 'rdL-hair'),
+    'sheet: the Look summary reads per hair style ("black ponytail", "black braids", "black head covering and beard", "short black hair"); with Covered and a beard the colour field is "Covering and beard colour" (its group named so: the bundle draws the beard in the covering\'s colour)', HS);
+  // with Covered, the colour field and the summary say what it colours: the covering alone with no face, the mustache too with one
+  // (review round 4: "Covering colour" hid that it sets the beard's colour too)
+  const CF = []; await tap(p, 'hairStyle', 'covered');
+  for (const f of ['none', 'stache', 'beard']) { await tap(p, 'face', f); await settle(p, 60); CF.push(await p.evaluate(() => [document.getElementById('rdL-hair').textContent, document.getElementById('rdS-look').textContent, document.getElementById('rdL-hair').closest('.rd-f').querySelector('[role=group]').getAttribute('aria-labelledby')])); }
+  await tap(p, 'hairStyle', RIDER99.hairStyle); await tap(p, 'face', RIDER99.face); await settle(p, 60);
+  ok(CF.map(c => c[0]).join() === 'Covering colour,Covering and mustache colour,Covering and beard colour' && CF.map(c => c[1]).join('|') === 'Deep brown skin · black head covering|Deep brown skin · black head covering and mustache|Deep brown skin · black head covering and beard' && CF.every(c => c[2] === 'rdL-hair'),
+    'sheet: with Covered the colour field names what it colours ("Covering colour"; with a mustache or a beard "Covering and mustache colour", "Covering and beard colour"), and so does the Look summary ("black head covering and beard")', CF);
   // with Covered the six colours are a covering's: plain colour names (Rust and Gold, not Auburn and Blond) in the buttons, the field's name
   // and the summary; back to hair, the hair names
   const hairNames = () => p.evaluate(() => [...document.querySelectorAll('#rdGroups [data-rd="hair"]')].map(b => b.getAttribute('aria-label')));
@@ -334,7 +404,7 @@ section('sheet', async () => {
     CV.each.push(await p.evaluate(() => [document.getElementById('rdS-look').textContent, document.getElementById('rdN-hair').textContent])); }
   const CVw = await p.evaluate(([r, COVER]) => FW.RIDER_OPTIONS.hair.map(h => COVER[h] || FW.RIDER_NAMES.hair[h]), [RIDER99, COVER]);
   await tap(p, 'hairStyle', RIDER99.hairStyle); await tap(p, 'hair', RIDER99.hair); await settle(p, 60); const CV1 = await hairNames(), HN = await p.evaluate(() => FW.RIDER_OPTIONS.hair.map(h => FW.RIDER_NAMES.hair[h]));
-  ok(CV.names.join() === CVw.join() && CVw.join() === 'Black,Dark brown,Brown,Rust,Gold,Grey' && CV.each.map(e => e[0]).join('|') === CVw.map(c => 'Deep brown skin · ' + c.toLowerCase() + ' head covering · beard').join('|') && CV.each.map(e => e[1]).join() === CVw.join() && CV1.join() === HN.join(),
+  ok(CV.names.join() === CVw.join() && CVw.join() === 'Black,Dark brown,Brown,Rust,Gold,Grey' && CV.each.map(e => e[0]).join('|') === CVw.map(c => 'Deep brown skin · ' + c.toLowerCase() + ' head covering and beard').join('|') && CV.each.map(e => e[1]).join() === CVw.join() && CV1.join() === HN.join(),
     'sheet: with Covered the colours are a covering\'s (' + CV.names.join(', ') + '): the buttons\' names, the field\'s chosen name and the summary ("rust head covering", never "blond head covering"); back to hair, the hair names (' + CV1.join(', ') + ')', { CV, CVw, CV1 });
   // the accessibility tree (what VoiceOver reads): each group by its label, each swatch by its name, the chosen one pressed
   const snap = await p.locator('#rdGroups').ariaSnapshot();
@@ -370,6 +440,13 @@ section('sheet', async () => {
   for (const k of FIELDS) await tap(p, k, LONG[k]);
   const LS1 = await p.evaluate(() => ['look', 'gear', 'kit'].map(g => { const s = document.getElementById('rdS-' + g), h = s.closest('.v-fold-h'); const c = getComputedStyle(s); return { t: s.textContent, lines: Math.round(s.getBoundingClientRect().height / parseFloat(c.lineHeight)), cut: c.textOverflow === 'ellipsis' || s.scrollWidth > s.clientWidth + 1 || s.scrollHeight > s.clientHeight + 1, name: h.textContent.replace(/\s+/g, ' ').trim() }; })), LW = await sumsOf(p, LONG);
   ok(LS1.every((s, i) => s.t === LW[i] && s.lines >= 1 && s.lines <= 2 && !s.cut && s.name.includes(LW[i])), 'sheet: the longest choices (' + LW.join(' / ') + ') take two lines at most at 390 px, never cut, the whole summary the fold button\'s name', LS1);
+  await figView(p, '390 px');
+  // the sheet's live rider is kept by its key (review round 4: only the strip and the avatars were checked): closed, reopened, the pressed
+  // choice tapped again and riderApply (what every synced settings change runs) leave the same drawing, nothing redrawn
+  await p.evaluate(() => { const f = document.getElementById('rdFig'); f.querySelector('svg').__q99 = 1; window.__q99fig = 0; new MutationObserver(r => { window.__q99fig += r.length; }).observe(f, { subtree: true, childList: true }); });
+  await done(p); await sheet(p); await group(p, 'kit'); await p.click('#rdGroups [data-rd="kit"][aria-pressed="true"]'); await settle(p, 100); await p.evaluate(() => window.__q99.riderApply()); await settle(p, 100);
+  const FK = await p.evaluate(() => { const s = document.querySelector('#rdFig svg'); return { same: !!s && s.__q99 === 1, muts: window.__q99fig }; });
+  ok(FK.same && FK.muts === 0, 'sheet: the live rider is kept by its key: the sheet closed and reopened, the pressed choice tapped again and riderApply run leave the same drawing (nothing redrawn)', FK);
   await x.close();
   // the folds are remembered on this device: Look opened stays open (closed, reopened, after a reload), Gear and Kit stay closed
   { const y = await openH({ settings: { rider: RIDER99 } }), q = y.p, fo = () => q.evaluate(() => ['look', 'gear', 'kit'].map(g => document.querySelector(`#rdGroups [data-fold="rider-${g}"] .v-fold-h`).getAttribute('aria-expanded')).join());
@@ -406,6 +483,8 @@ section('build', async () => {
   ok(S1.figSame && J(S1.r) === J(Object.assign({}, await p.evaluate(() => FW.RIDER_DEFAULT), B)), '99.1: right after the taps, the sheet still open, the live rider is the rider built (FW.riderOutfit of it)', { figSame: S1.figSame, r: S1.r });
   ok(JSON.stringify(st1) === JSON.stringify(Object.assign({}, await p.evaluate(() => FW.RIDER_DEFAULT), B)), 'build: every tap is stored (settings.rider is the rider built)', st1);
   ok(S1.sums.join('|') === want.join('|'), 'QA: the summaries name the choices (' + S1.sums.join(' / ') + ')', { S: S1.sums, want });
+  const NB = await namesOf(p, B); /* review round 4: after a change the names were compared only with each other */
+  ok(FIELDS.every(k => S1.names[k] === NB[k] && !!NB[k]), 'build: right after the taps each field\'s label shows the bundle\'s name of the choice made (' + FIELDS.map(k => S1.names[k]).join(', ') + ')', { names: S1.names, want: NB });
   await done(p);
   const row = await p.evaluate(() => document.getElementById('prowV-rider').textContent);
   ok(row === 'Teal jersey', 'build: the row names the rider\'s jersey once built ("Teal jersey")', row);
@@ -426,26 +505,43 @@ section('build', async () => {
 const BAD_R = { skin: '__proto__', hairStyle: 7, hair: null, face: { beard: true }, helmet: '#F26B5B', glasses: 'constructor', lens: 'toString', frame: '#ffffff', kit: '#179bcc ', kit2: ['#0B7399'], sleeve: true, pattern: 'hasOwnProperty', shorts: 'valueOf', extra: 'x', html: '<img src=x onerror=alert(1)>' };
 const wantNorm = p => p.evaluate(() => Object.assign({}, FW.RIDER_DEFAULT, { helmet: '#F26B5B' }));
 const BAD_NOT = ['a rider', 42, true, ['#F26B5B']]; // not riders at all: the default rider
+// a rider with every field but one (lens, a real choice) set to a value ANOTHER field offers (review round 4: the bad values above are offered
+// by no field, so a riderNorm that took any field's value passed): a jersey colour for the skin, the helmet and the shorts, a sleeve colour
+// for the frame and the fade, a fade colour for the sleeves, a shorts colour for the jersey, a hair style for the glasses, a face or glasses
+// value for the hair style, the pattern and the face
+const BAD_X = { skin: '#F26B5B', hairStyle: 'none', hair: '#F28C28', face: 'shield', helmet: '#F28C28', glasses: 'covered', lens: '#3FA66B', frame: '#E06AAE', kit: '#3048B4', kit2: '#E06AAE', sleeve: '#D94F92', pattern: 'beard', shorts: '#F26B5B' };
+const wantX = p => p.evaluate(() => Object.assign({}, FW.RIDER_DEFAULT, { lens: '#3FA66B' }));
 section('norm', async () => {
   const W = await (async () => { const x = await openH({ noErrs: true }); const w = await wantNorm(x.p); await x.close(); return w; })();
+  const WX = await (async () => { const x = await openH({ noErrs: true }), p = x.p, w = await wantX(p);
+    // the premise: each BAD_X value is offered by some other field and not by its own (lens: its own real choice)
+    const P = await p.evaluate(X => Object.keys(X).filter(k => k !== 'lens').map(k => { const has = (f, v) => { const o = FW.RIDER_OPTIONS[f]; return Array.isArray(o) ? o.includes(v) : Object.prototype.hasOwnProperty.call(o, v); };
+      return { k, v: X[k], own: has(k, X[k]), other: Object.keys(FW.RIDER_OPTIONS).filter(f => f !== k && has(f, X[k])) }; }), BAD_X);
+    ok(P.length === 12 && P.every(x => !x.own && x.other.length), 'norm: each of BAD_X\'s values is offered by another field and not by its own (' + P.map(x => x.k + ' ' + x.v + ' from ' + x.other.join('/')).join(', ') + ')', P);
+    await x.close(); return w; })();
   // on load: stored on the device
   { const x = await openH({ settings: { rider: BAD_R } }), p = x.p, mem = await p.evaluate(() => window.__q99.settings.rider);
     ok(JSON.stringify(mem) === JSON.stringify(W), '99.2: riderNorm on load: a stored rider with every field tampered (a number, null, an object, an array, true, a near-miss colour, \'__proto__\', \'constructor\', \'toString\', \'hasOwnProperty\', \'valueOf\') is each field\'s default, the real choice kept (helmet), the extra keys gone', mem);
-    await sheet(p); const S = await sheetOf(p);
-    ok(FIELDS.every(k => S.pressed[k].length === 1 && S.pressed[k][0] === W[k]) && S.figSame, 'norm: on load: the sheet and the live rider draw that rider', S.pressed);
+    await sheet(p); const S = await sheetOf(p), NW = await namesOf(p, W);
+    ok(FIELDS.every(k => S.pressed[k].length === 1 && S.pressed[k][0] === W[k] && S.names[k] === NW[k]) && S.figSame, 'norm: on load: the sheet and the live rider draw that rider (each field\'s label the bundle\'s name of it)', { pressed: S.pressed, names: S.names });
     await done(p); await sleep(300);
     const st = (await stored(p)).rider; ok(JSON.stringify(st) === JSON.stringify(W), 'norm: on load: the stored copy is the checked rider', st);
+    await x.close(); }
+  { const x = await openH({ settings: { rider: BAD_X } }), p = x.p, mem = await p.evaluate(() => window.__q99.settings.rider);
+    ok(J(mem) === J(WX), '99.2: riderNorm on load: a stored rider whose fields hold values other fields offer (a jersey colour for the skin and the helmet, a sleeve colour for the frame, a hair style for the glasses, \'none\' for the hair style, \'beard\' for the pattern ...) is each field\'s default, the real choice kept (lens)', mem);
+    await sheet(p); const S = await sheetOf(p), NX = await namesOf(p, WX);
+    ok(FIELDS.every(k => S.pressed[k].length === 1 && S.pressed[k][0] === WX[k] && S.names[k] === NX[k]) && S.figSame && S.sums.join('|') === (await sumsOf(p, WX)).join('|'), 'norm: on load: the sheet draws that rider: one choice pressed in each field, its name and the summaries the default\'s (no "#F28C28 helmet")', { pressed: S.pressed, names: S.names, sums: S.sums });
     await x.close(); }
   for (const v of BAD_NOT) { const x = await openH({ settings: { rider: v } }), mem = await x.p.evaluate(() => window.__q99.settings.rider), D = await x.p.evaluate(() => FW.RIDER_DEFAULT);
     ok(JSON.stringify(mem) === JSON.stringify(D), 'norm: on load: a rider that is no rider (' + JSON.stringify(v) + ') is the default rider', mem); await x.close(); }
   { const x = await openH({ settings: { rider: null } }), mem = await x.p.evaluate(() => 'rider' in window.__q99.settings); ok(!mem, 'norm: on load: rider null is no rider (absent)', mem); await x.close(); }
   // on restore: a backup file
-  for (const [tag, r, want] of [['tampered', BAD_R, W], ['not a rider', 'x', null]]) {
+  for (const [tag, r, want] of [['tampered', BAD_R, W], ['values other fields offer', BAD_X, WX], ['not a rider', 'x', null]]) {
     const x = await openH(), p = x.p, D = await p.evaluate(() => FW.RIDER_DEFAULT);
     const bk = await p.evaluate(r => { const d = JSON.parse(JSON.stringify(window.__q99.backupData())); d.settings.rider = r; return d; }, r);
     await restore(p, bk); const mem = await p.evaluate(() => window.__q99.settings.rider);
     ok(JSON.stringify(mem) === JSON.stringify(want || D), 'QA: a tampered rider value in a backup draws the default: riderNorm on restore (' + tag + ')', mem);
-    await sheet(p); const S = await sheetOf(p); ok(S.figSame && FIELDS.every(k => S.pressed[k][0] === (want || D)[k]), 'norm: on restore (' + tag + '): the sheet draws it', S.pressed);
+    await sheet(p); const S = await sheetOf(p), NR = await namesOf(p, want || D); ok(S.figSame && FIELDS.every(k => S.pressed[k].length === 1 && S.pressed[k][0] === (want || D)[k] && S.names[k] === NR[k]), 'norm: on restore (' + tag + '): the sheet draws it (each label the bundle\'s name of it)', { pressed: S.pressed, names: S.names });
     await x.close(); }
   // when synced settings arrive: the cloud's rider tampered (a newer stamp), pulled by a signed-in device
   { const be = new Backend(), A = await synced(be, { label: 'A' }); await ready(be, A);
@@ -465,6 +561,11 @@ section('norm', async () => {
     await nudge([A.p], async () => false, 6000);
     const after = JSON.stringify(await stored(A.p)), n = await A.p.evaluate(() => window.__q99n);
     ok(before === after && n === 0, 'norm: synced: later pulls of the same cloud copy change nothing here (the rider kept as checked, the avatar not drawn again)', { same: before === after, n });
+    // values other fields offer, arriving from the cloud (a newer stamp)
+    const now2 = Date.now() + 9000, d2 = JSON.parse(JSON.stringify(doc(be))); d2.settings.rider = BAD_X; d2.settings.updatedAt = now2; d2.settingsAt = Object.assign({}, d2.settingsAt, { rider: now2, _u: now2 }); be.fs.set('users/u1', d2);
+    const got2 = await nudge([A.p], () => A.p.evaluate(() => window.__q99.settings.rider && window.__q99.settings.rider.lens === '#3FA66B'));
+    const mem2 = await A.p.evaluate(() => window.__q99.settings.rider), st2 = (await stored(A.p)).rider;
+    ok(!!got2 && J(mem2) === J(WX) && J(st2) === J(WX), 'QA: a rider in the cloud whose fields hold values other fields offer draws the default for each (riderNorm when synced settings arrive; the real choice, lens, kept)', { mem2, st2 });
     await A.close(); }
 });
 async function restore(p, d) {
@@ -479,8 +580,8 @@ section('backup', async () => {
   { const x = await openH({ settings: { rider: RIDER99 } }), ex = await x.p.evaluate(() => JSON.parse(JSON.stringify(window.__q99.backupData()))); await x.close();
     ok(!!ex.settings && J(ex.settings.rider) === J(RIDER99), '99.5: a backup made here carries the rider (backupData().settings.rider is the rider built)', ex.settings && ex.settings.rider);
     const y = await openH(), q = y.p; await restore(q, ex); const r = await q.evaluate(() => window.__q99.settings.rider);
-    await sheet(q); const S = await sheetOf(q);
-    ok(J(r) === J(RIDER99) && S.figSame && FIELDS.every(k => S.pressed[k][0] === RIDER99[k]) && S.r.kit === RIDER99.kit, 'backup: that export restored on a fresh page with no rider brings the rider (stored, the sheet and its live rider)', r);
+    await sheet(q); const S = await sheetOf(q), N = await namesOf(q, RIDER99);
+    ok(J(r) === J(RIDER99) && S.figSame && FIELDS.every(k => S.pressed[k][0] === RIDER99[k] && S.names[k] === N[k]) && S.r.kit === RIDER99.kit, 'backup: that export restored on a fresh page with no rider brings the rider (stored, the sheet, each label the bundle\'s name, and its live rider)', { r, names: S.names });
     await y.close(); }
   // a backup from before item 99: the backup format with no settings.rider (as main writes it)
   const x = await openH({ settings: { rider: RIDER99, birthday: '1980-05-04' } }), p = x.p;
@@ -492,7 +593,7 @@ section('backup', async () => {
   const nr = Object.assign({}, RIDER99, { kit: '#F28C28', skin: 'fair' }), bk = await p.evaluate(r => { const d = JSON.parse(JSON.stringify(window.__q99.backupData())); d.settings.rider = r; return d; }, nr);
   await restore(p, bk); const r2 = await p.evaluate(() => window.__q99.settings.rider);
   ok(J(r2) === J(nr), '99.5: a backup with a rider brings its rider', r2);
-  await sheet(p); const S = await sheetOf(p); ok(S.pressed.kit[0] === '#F28C28' && S.figSame, 'backup: the sheet and the live rider show the restored rider', S.pressed);
+  await sheet(p); const S = await sheetOf(p), NR = await namesOf(p, nr); ok(S.pressed.kit[0] === '#F28C28' && S.figSame && FIELDS.every(k => S.names[k] === NR[k]), 'backup: the sheet (each label the bundle\'s name) and the live rider show the restored rider', { pressed: S.pressed, names: S.names });
   await x.close();
   // a device with no rider and a backup with none: still none
   const y = await openH(), o = await y.p.evaluate(() => { const d = JSON.parse(JSON.stringify(window.__q99.backupData())); delete d.settings.rider; return d; });
@@ -549,6 +650,22 @@ section('private', async () => {
   // static: the AI prompt builder reads no settings.rider (and nothing that builds the troubleshooting copy does but to drop it)
   const ms = SRC.replace(/<script id="fwJs">[\s\S]*?<\/script>/, ''), body = n => { const i = ms.indexOf('\nfunction ' + n + '('); return i < 0 ? '' : ms.slice(i, ms.indexOf('\nfunction ', i + 10)); };
   ok(['aiFill', 'aiAthleteName', 'aiLatestWorkout'].every(n => body(n) && !/rider/i.test(body(n))) && !/settings\.rider|riderNow|riderNorm/.test(body('dbgDump')), 'private: the prompt builders (aiFill and its helpers) and dbgDump never read the rider', null);
+  // the rider by its names (review round 4: the search above held ids and hex values only, case-sensitive, so a prompt carrying the Kit and
+  // Gear summaries passed): for a rider of unusual names, every prompt kind with the rider and without it (the same page, settings.rider
+  // taken out) must be the same, and none may hold a summary or a chosen name (case aside) that the prompt without the rider does not
+  const RA = Object.assign({}, RIDER99, { skin: 'olive', hairStyle: 'braids', hair: '#E9C46A', face: 'stache', helmet: '#8D949A', glasses: 'pair', lens: '#F2763A', frame: '#179BCC', kit: '#F27FB4', pattern: 'splatter', shorts: '#3048B4', kit2: '#D94F92', sleeve: '#BECC41' });
+  const NA = await namesOf(p, RA), SA = await sumsOf(p, RA);
+  const AN = await p.evaluate(RA => { const H = window.__q99, s0 = H.settings, kinds = Object.keys(H.AI_CARD); H.settings = Object.assign({}, s0, { rider: RA }); const w = kinds.map(k => H.aiFill(k)); const o = Object.assign({}, s0); delete o.rider; H.settings = o; const wo = kinds.map(k => H.aiFill(k)); H.settings = s0; return { kinds, w, wo }; }, RA);
+  const terms = [...new Set([...SA, ...SA.flatMap(s => s.split(' · ')), ...Object.values(NA)].filter(Boolean))], lo = s => s.toLowerCase();
+  const inW = terms.filter(n => AN.w.some(s => lo(s).includes(lo(n)))), base = inW.filter(n => AN.wo.some(s => lo(s).includes(lo(n)))), named = inW.filter(n => !base.includes(n)), diff = AN.kinds.filter((k, i) => AN.w[i] !== AN.wo[i]);
+  ok(AN.kinds.length >= 4 && !diff.length && !named.length, '99.5: no AI prompt has the rider by name: every prompt kind (' + AN.kinds.join(', ') + ') is the same with the rider as without it, and none holds its summaries or chosen names (' + SA.join(' / ') + ')' + (base.length ? '; in the prompts either way, so not the rider: ' + base.join(', ') : ''), { diff, named });
+  // and in the source: outside the rider's own code (rider* and rd* functions), only these functions call into it or read settings.rider,
+  // each for a reason the decisions name; any other (an AI helper, a copy, a share) fails. The comments are left out of the scan
+  const RIDER_USERS = { vN: 'the load line after `let settings` (riderSetNorm)', setSheetOpen: 'opens the sheet (riderSheet)', renderProfileRows: 'the row\'s value (riderRowV)', renderWear: 'the strip (riderStrip)', restoreAll: 'restore keeps or checks the rider', sfDocMerge: 'the cloud copy checked (riderSetNorm)', syncSetSettings: 'synced settings checked (riderSetNorm)', syncRender: 'a synced rider redrawn (riderApply)', renderSyncStatus: 'the header circle (riderHdr)', sbAcctRender: '#sbAv (riderAv)' };
+  const code = ms.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[\s;{}(),])\/\/[^\n]*/g, '$1'), RU = /\b(riderNow|riderNorm|riderSetNorm|rdSum|rdNm|rdName|riderBuilt|riderIds|riderRowV|riderAv|riderStrip|riderHdr|riderApply|riderPut|riderSheet|riderSheetSync|riderOutfit|riderAvatar|RIDER_[A-Z]+)\b|\.rider\b|\[['"]rider['"]\]/;
+  const users = [...code.matchAll(/\nfunction ([A-Za-z0-9_$]+)\(/g)].map((m, i, L) => [m[1], code.slice(m.index, i + 1 < L.length ? L[i + 1].index : code.length)]).filter(([n, b]) => !/^(rider|rd)[A-Z]/.test(n) && RU.test(b)).map(([n]) => n);
+  const stray = users.filter(n => !Object.prototype.hasOwnProperty.call(RIDER_USERS, n));
+  ok(users.length >= 8 && !stray.length, 'private: outside the rider\'s own code only ' + Object.keys(RIDER_USERS).length + ' functions read the rider or call into it, each for its reason (' + users.join(', ') + '): no prompt or copy helper does', { stray, users });
   await x.close();
   // the privacy note's "What's stored" line
   const y = await openH(), pv = await y.p.evaluate(() => { const b = document.getElementById('privacyBody'), h = [...b.querySelectorAll('h3')].find(e => /What.s stored/.test(e.textContent)); return h && h.nextElementSibling ? h.nextElementSibling.textContent : null; });
@@ -627,7 +744,8 @@ const COVERS = ['shoes', 'overshoes', 'boots'], UNDER_RAIN = ['vest', 'windbreak
 const byDesign = (id, L) => UNDER.has(id) || ((id === 'arms' || id === 'sun-sleeves') && L.some(x => SLEEVED.includes(x)))
   || (id === 'socks-wool' && L.some(x => COVERS.includes(x))) || (UNDER_RAIN.includes(id) && L.includes('jacket-rain'))
   || (id === 'jersey-heavy' && L.some(x => JACKETS.includes(x)));
-// the known v7 gaps (decision; the design chat is asked for v8 in FROM-APP-CHAT-6.md points 1-3): the one list of items the strip lists
+// the known v7 gaps (decision; the design chat is asked for v8 in FROM-APP-CHAT-6.md points 1-3, and review round 4 holds a proposed point 4
+// the app chat has not decided yet): the one list of items the strip lists
 // that v7 draws as nothing or without their own colour, each tied to its point, as wide as measured on v7 (the default rider on all 8
 // skins and RIDER99, every ride's list: probe99/v7/m-v7.json) and no wider; printed as notes. The item that takes v8 empties it.
 // hold 'all': only a note (the point says the item draws nothing there); hold 'own': the pixels changed are judged as any item's, only
@@ -646,7 +764,16 @@ const V7_GAPS = [
   // fingerless ones 304 px, 8 of them in #2A2A30 (only the light cuff reads: the hot and mild full lists); dark brown and lighter pass
   { ids: ['gloves'], when: (L, r) => r.skin === 'deep', point: 3, hold: 'all', what: 'full-finger gloves (#2A2A30) on deep brown skin (#5A3622): no pixel changed by more than 48' },
   { ids: ['gloves-finger'], when: (L, r) => r.skin === 'deep', point: 3, hold: 'own', what: 'fingerless gloves (#2A2A30) on deep brown skin: 304 px changed, 8 in their own colour (only the light cuff reads)' },
+  // review round 4 (every jersey colour judged): on a Black jersey (#1E1E24) two items read poorly. Not in FROM-APP-CHAT-6: held here until
+  // the app chat decides (a point for the v8 note, or a by-design rule), each as wide as measured on v7. The winter jacket (#1E2A4A, at most
+  // 12 a channel from #1E1E24) over a Black jersey with sleeves Same as jersey: 240 px changed, 0 in its colour (the freezing and Hard
+  // freezing full-closet lists, the default rider; the acceptance check saw the same on all 8 skins); with white sleeves (RIDER99) it shows
+  // (2189 / 1954). The thermal jersey in Black with arm warmers and the vest (the cold, freezing, Hard freezing and Recovery cold starter
+  // lists, both riders): 0 px changed, its sleeves the arm warmers' black and its body under the vest
+  { ids: ['jacket-winter'], when: (L, r) => r.kit === '#1E1E24' && r.sleeve === '', point: '4', note: 'proposed point 4 (not in FROM-APP-CHAT-6: the app chat to decide)', hold: 'own', what: 'the winter jacket (#1E2A4A) over a Black jersey with sleeves Same as jersey: 240 px changed, 0 in its own colour (only its seams read)' },
+  { ids: ['jersey-heavy'], when: (L, r) => r.kit === '#1E1E24' && L.includes('arms') && L.includes('vest'), point: '4', note: 'proposed point 4 (not in FROM-APP-CHAT-6: the app chat to decide)', hold: 'all', what: 'the thermal jersey in Black with arm warmers and the vest: 0 px changed (its sleeves the arm warmers\' black, its body under the vest)' },
 ];
+const gapOf = g => g.note || 'FROM-APP-CHAT-6 point ' + g.point; // where a held entry is asked for
 // each item's own colour (knee grey and the like): the bundle's OUTFIT_LOOK colours
 const OWN = { toes: '#8E949A', knees: '#B9C2CF', skullcap: '#8FA7C4', 'socks-wool': '#8E949A', gaiter: '#2ABCBB', vest: '#BFE6E6', windbreaker: '#DCE1E8', 'jacket-thermal': '#2F3B6E', 'jacket-winter': '#1E2A4A', 'jacket-rain': '#F2D64B',
   boots: '#3A2F2A', 'tights-heavy': '#14141A', 'tights-light': '#1E1E24', legs: '#1E1E24', arms: '#1E1E24', 'sun-sleeves': '#FFFFFF', gloves: '#2A2A30', 'gloves-finger': '#2A2A30', 'gloves-thermal': '#1E1E24', 'gloves-lobster': '#1E1E24', balaclava: '#1E1E24', head: '#2ABCBB', shoes: '#1E1E24', overshoes: '#1E1E24' };
@@ -695,15 +822,15 @@ function judge(tag, S, px) {
   const L = S.ids || [];
   for (const id of L) { if (byDesign(id, L)) continue; const v = px[id], gaps = V7_GAPS.filter(g => g.ids.includes(id) && g.when(L, S.r)), all = gaps.some(g => g.hold === 'all'), own = gaps.some(g => g.hold === 'own');
     const d = !!v && v.d48 >= SHOW.d48, o = !!v && (v.own == null || v.own >= SHOW.own), shows = d && o;
-    gaps.forEach(g => { const k = 'FROM-APP-CHAT-6 point ' + g.point + ' ' + id + (g.hold === 'all' ? ' (held: ' + (shows ? 'shows)' : 'does not show)') : ' (own colour held: ' + (o ? 'in it' : 'not in it') + '; its pixels changed judged)');
+    gaps.forEach(g => { const k = gapOf(g) + ' ' + id + (g.hold === 'all' ? ' (held: ' + (shows ? 'shows)' : 'does not show)') : ' (own colour held: ' + (o ? 'in it' : 'not in it') + '; its pixels changed judged)');
       if (!GAPS_SEEN.has(k)) GAPS_SEEN.set(k, g.what + ' (' + tag + ': ' + JSON.stringify(v) + ')'); });
     if (all) continue;
-    ok(d && (own || o), 'strip: ' + tag + ': ' + id + ' shows on the rider (' + (v ? v.d48 + ' device px changed' + (v.own != null ? ', ' + v.own + ' in its own colour' + (own ? ' (held: v7 point ' + gaps.filter(g => g.hold === 'own').map(g => g.point).join(', ') + ')' : '') : '') : 'not measured') + ')', { v, L });
+    ok(d && (own || o), 'strip: ' + tag + ': ' + id + ' shows on the rider (' + (v ? v.d48 + ' device px changed' + (v.own != null ? ', ' + v.own + ' in its own colour' + (own ? ' (held: ' + gaps.filter(g => g.hold === 'own').map(gapOf).join(', ') + ')' : '') : '') : 'not measured') + ')', { v, L });
     FIXED_BY_V7.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = FIXED_SEEN.get(k);
       if (!w || v.d48 < w.v.d48) FIXED_SEEN.set(k, { f, id, v, tag, shows: d && (own || o), n: (w ? w.n : 0) + 1 }); else w.n++; }); }
 }
 section('strip', async () => {
-  const SKINS = await (async () => { const x = await openH({ noErrs: true }), v = await x.p.evaluate(() => Object.keys(FW.SKIN)); await x.close(); return v; })();
+  const [SKINS, KITS] = await (async () => { const x = await openH({ noErrs: true }), v = await x.p.evaluate(() => [Object.keys(FW.SKIN), FW.RIDER_OPTIONS.kit.map(k => [k, FW.RIDER_NAMES.kit[k]])]); await x.close(); return v; })();
   for (const [n, wx, eff] of RIDES) for (const rider of [null, RIDER99]) { // every ride, both closets, the default rider and the built one
     const x = await openH({ wx, settings: rider ? { rider } : {}, dpr: 2 }), p = x.p, who = rider ? 'RIDER99' : 'the default rider';
     if (eff) { await p.click('#intensity [data-int=' + eff + ']'); await settle(p, 150); ok(await p.evaluate(e => window.__q99.readInputs().intensity === e, eff), 'strip: ' + n + ' ride: the effort is ' + eff, eff); }
@@ -721,6 +848,10 @@ section('strip', async () => {
       // the same list on every other skin (the default rider in that skin): a dark item on dark skin is judged wherever the list has it
       if (!rider) for (const sk of SKINS) { if (sk === S.r.skin) continue; const r = Object.assign({}, S.r, { skin: sk });
         judge(tag.replace('the default rider', 'the default rider in ' + sk + ' skin'), { ids: S.ids, r }, await pxOf(p, r, S.ids || [], Object.assign({}, OWN, { 'jersey-heavy': 'kit' }))); }
+      // and in every jersey colour, both riders (review round 4: only Bluebird blue and Coral were judged, and the jersey is what the jackets,
+      // the vest and the thermal jersey are drawn over and in)
+      for (const [kit, kn] of KITS) { if (kit === S.r.kit) continue; const r = Object.assign({}, S.r, { kit });
+        judge(tag + ' in a ' + kn + ' jersey', { ids: S.ids, r }, await pxOf(p, r, S.ids || [], Object.assign({}, OWN, { 'jersey-heavy': 'kit' }))); }
     }
     if (n === 'hot' && !rider) {
       // the strip is kept by its key: the results drawn again (the same ride, rider and items) leave its drawing as it is
@@ -747,9 +878,17 @@ section('strip', async () => {
     const bk = await p.evaluate(() => { const d = JSON.parse(JSON.stringify(window.__q99.backupData())); d.settings.rider = Object.assign({}, d.settings.rider, { kit: '#F28C28' }); return d; });
     await restore(p, bk); await stripNow(p, '#F28C28', 'by a restore');
     await x.close(); }
-  { const be = new Backend(), A = await synced(be, { label: 'ap', wx: { lo: 40, hi: 44 }, settings: { rider: RIDER99 } }), p = A.p; await ready(be, A); await crunch(p); await toY(p, '#rWearCard'); await settle(p, 300);
-    const now = Date.now() + 5000, d = JSON.parse(JSON.stringify(doc(be))); d.settings.rider = Object.assign({}, RIDER99, { kit: '#2ABCBB' }); d.settings.updatedAt = now; d.settingsAt = Object.assign({}, d.settingsAt, { rider: now, _u: now }); be.fs.set('users/u1', d);
-    await nudge([p], () => p.evaluate(() => window.__q99.settings.rider && window.__q99.settings.rider.kit === '#2ABCBB')); await stripNow(p, '#2ABCBB', 'by sync');
+  // by sync, with the sheet open (review round 4: only the strip and the header were looked at after a sync): the sheet follows too, each
+  // field's pressed choice and name, the three summaries and its live rider (drawn and painted), and the row names the new jersey
+  { const be = new Backend(), A = await synced(be, { label: 'ap', dpr: 2, wx: { lo: 40, hi: 44 }, settings: { rider: RIDER99 } }), p = A.p; await ready(be, A); await crunch(p); await toY(p, '#rWearCard'); await settle(p, 300);
+    await sheet(p); await allOpen(p);
+    const NR = Object.assign({}, RIDER99, { kit: '#2ABCBB', skin: 'tan', face: 'stache', glasses: 'shield', pattern: 'band', shorts: '#3048B4' });
+    const now = Date.now() + 5000, d = JSON.parse(JSON.stringify(doc(be))); d.settings.rider = NR; d.settings.updatedAt = now; d.settingsAt = Object.assign({}, d.settingsAt, { rider: now, _u: now }); be.fs.set('users/u1', d);
+    await nudge([p], () => p.evaluate(() => window.__q99.settings.rider && window.__q99.settings.rider.kit === '#2ABCBB')); await settle(p, 200);
+    const S = await sheetOf(p), N = await namesOf(p, NR), U = await sumsOf(p, NR), row = await p.evaluate(() => document.getElementById('prowV-rider').textContent);
+    ok(J(S.r) === J(NR) && FIELDS.every(k => S.pressed[k].length === 1 && S.pressed[k][0] === NR[k] && S.names[k] === N[k]) && S.sums.join('|') === U.join('|') && S.figSame && row === 'Teal jersey', 'strip: a rider arriving by sync with the sheet open: the sheet follows (each field\'s pressed choice and name, the summaries "' + S.sums.join(' / ') + '", its live rider) and the row names the new jersey ("' + row + '")', { pressed: S.pressed, names: S.names, sums: S.sums, figSame: S.figSame, row });
+    painted(await paintOf(p, '#rdFig svg', 'fig'), 'strip: by sync with the sheet open: the sheet\'s live rider shows');
+    await done(p); await stripNow(p, '#2ABCBB', 'by sync');
     await A.close(); }
   // a ride that warms (items shed on the way): the strip lists every item the list does, the shed ones too
   { const x = await openH({ wx: { lo: 40, hi: 80 } }), p = x.p; await crunch(p); await toY(p, '#rWearCard'); await settle(p, 300); const S = await stripOf(p);
@@ -768,8 +907,9 @@ section('strip', async () => {
       if (kind === 'starter') first = S.list; else ok(!!S.ids && J(S.list) !== J(first), 'strip: the Clothing-only results follow a closet change (the full closet lists other items, and the strip wears them)', { first, now: S.ids }); }
     await x.close(); }
   // the computer layout: the strip in the results column
-  { const x = await openH({ wx: { lo: 53, hi: 57, rain: 80 }, width: 1440, height: 900, settings: { rider: RIDER99 } }), p = x.p; await crunch(p); await toY(p, '#rWearCard'); await settle(p, 300); const S = await stripOf(p), dk = await p.evaluate(() => document.documentElement.classList.contains('dk'));
+  { const x = await openH({ wx: { lo: 53, hi: 57, rain: 80 }, width: 1440, height: 900, dpr: 2, settings: { rider: RIDER99 } }), p = x.p; await crunch(p); await toY(p, '#rWearCard'); await settle(p, 300); const S = await stripOf(p), dk = await p.evaluate(() => document.documentElement.classList.contains('dk'));
     ok(dk && S.svg && S.same && S.w === 100 && S.inCard && JSON.stringify(S.ids) === JSON.stringify(S.list), 'strip: the computer layout (1440 x 900): the strip in the Closet card of the results column, the list\'s items', S);
+    painted(await paintOf(p, '#rRider svg', 'strip'), 'strip: the computer layout (1440 x 900): the rider shows, whole'); /* review round 4: only the 390 px path was looked at as painted */
     await x.close(); }
   // the v6 gaps v7 fixed that no ride reaches, judged on lists that name them (the default rider and RIDER99): the rain jacket over a
   // windbreaker, a thermal or a winter jacket, and over the vest with a thermal jersey (point 2, 2+3); a windbreaker over a thermal jersey
@@ -778,13 +918,14 @@ section('strip', async () => {
   { const x = await openH({ noErrs: true }), p = x.p, D = await p.evaluate(() => FW.RIDER_DEFAULT), own = Object.assign({}, OWN, { 'jersey-heavy': 'kit' });
     for (const [who, base] of [['the default rider', D], ['RIDER99', RIDER99]]) {
       for (const ids of [['windbreaker', 'jacket-rain'], ['jacket-thermal', 'jacket-rain'], ['jacket-winter', 'jacket-rain'], ['jersey-heavy', 'vest', 'jacket-rain'], ['jersey-heavy', 'windbreaker'], ['socks-wool'], ['tights-heavy', 'socks-wool']])
-        judge('the list ' + ids.join(' ') + ', ' + who, { ids, r: base }, await pxOf(p, base, ids, own));
+        for (const [kit, kn] of [[base.kit, null], ...KITS.filter(k => k[0] !== base.kit)]) { const r = Object.assign({}, base, { kit }); /* every jersey colour (review round 4) */
+          judge('the list ' + ids.join(' ') + ', ' + who + (kn ? ' in a ' + kn + ' jersey' : ''), { ids, r }, await pxOf(p, r, ids, own)); }
       const r = Object.assign({}, base, { glasses: 'none' }), px = await pxOf(p, r, ['skullcap'], own, [73.5, 97, 126.5, 115]);
       judge('the list skullcap, glasses none, ' + who, { ids: ['skullcap'], r }, px);
       ok(px.skullcap.box === 0, 'strip: the skullcap with glasses none leaves the eyes alone (' + who + ': ' + px.skullcap.box + ' device px changed in x 73.5-126.5, y 97-115)', px.skullcap); }
     await x.close(); }
   for (const [k, v] of GAPS_SEEN) console.log('  note: known v7 gap, ' + k + ': ' + v);
-  const unmet = V7_GAPS.filter(g => !g.ids.some(id => [...GAPS_SEEN.keys()].some(k => k.startsWith('FROM-APP-CHAT-6 point ' + g.point + ' ' + id + ' '))));
+  const unmet = V7_GAPS.filter(g => !g.ids.some(id => [...GAPS_SEEN.keys()].some(k => k.startsWith(gapOf(g) + ' ' + id + ' '))));
   ok(!unmet.length, 'strip: each known v7 gap (' + V7_GAPS.length + ' entries) is met on a list the strip gets (none held that nothing reaches)', unmet.map(g => g.point + ' ' + g.what));
   for (const [, w] of FIXED_SEEN) console.log('  note: v6 gap v7 fixed, FROM-APP-CHAT-5 ' + (w.f.point === 'B' ? 'dark-skin note point B' : 'point ' + w.f.point) + ' ' + w.id + ': judged ' + w.n + ' times, ' + (w.shows ? 'shows' : 'does not show') + ', the least ' + JSON.stringify(w.v) + ' (' + w.tag + ')');
   const unseen = FIXED_BY_V7.flatMap((f, n) => f.ids.filter(id => !FIXED_SEEN.has(n + ':' + id)).map(id => f.point + ' ' + id));
@@ -833,19 +974,24 @@ section('media', async () => {
 
 section('fit', async () => {
   for (const [w, sc] of [[320, 1], [320, 2], [390, 2], [390, 1.5]]) {
-    const x = await openH({ width: w, scale: sc, settings: { rider: RIDER99 } }), p = x.p; await sheet(p); await allOpen(p); await settle(p, 200);
+    const x = await openH({ width: w, scale: sc, dpr: 2, settings: { rider: RIDER99 } }), p = x.p; await sheet(p); await allOpen(p); await settle(p, 200);
     const F = await p.evaluate(() => { const sh = document.querySelector('#setSheet .set-sheet'), b = sh.getBoundingClientRect(), bad = [...document.querySelectorAll('#prowB-rider *')].filter(e => e.getClientRects().length).map(e => [e, e.getBoundingClientRect()]).filter(([e, r]) => r.right > b.right + 0.5 || r.left < b.left - 0.5).map(([e]) => e.className || e.tagName);
       const small = [...document.querySelectorAll('#prowB-rider button')].filter(e => e.getClientRects().length).map(e => e.getBoundingClientRect()).filter(r => r.width < 44 || r.height < 44).length;
       const sum = ['look', 'gear', 'kit'].map(g => { const s = document.getElementById('rdS-' + g), c = getComputedStyle(s); return c.textOverflow === 'ellipsis' || s.scrollWidth > s.clientWidth + 1 || s.scrollHeight > s.clientHeight + 1 ? 'cut' : 'whole'; });
       return { sx: document.documentElement.scrollWidth > innerWidth, shx: sh.scrollWidth > sh.clientWidth + 1, bad: bad.slice(0, 5), small, sum }; });
     ok(!F.sx && !F.shx && !F.bad.length && !F.small && F.sum.every(n => n === 'whole'), 'fit: ' + w + ' px, ' + (sc * 100) + '% text: the sheet (every group open, More colours) fits: no sideways scroll, nothing past the sheet, every button 44 px or more, no summary cut', F);
+    painted(await paintOf(p, '#rdFig svg', 'fig'), 'fit: ' + w + ' px, ' + (sc * 100) + '% text: the sheet\'s live rider shows');
+    if (w === 320 && sc === 2) await figView(p, '320 px, 200% text');
     await done(p); await p.click('nav.tabs button[data-view=plan]'); await settle(p, 200); await crunch(p); await toY(p, '#rWearCard');
     const S = await stripOf(p); ok(S.svg && S.inCard && S.w === 100 && !(await p.evaluate(() => document.documentElement.scrollWidth > innerWidth)), 'fit: ' + w + ' px, ' + (sc * 100) + '% text: the strip inside its card, no sideways scroll', S);
+    painted(await paintOf(p, '#rRider svg', 'strip'), 'fit: ' + w + ' px, ' + (sc * 100) + '% text: the strip\'s rider shows, whole');
     await x.close(); }
   // the computer layout: the sheet is the pane beside the settings list
-  const x = await openH({ width: 1280, height: 800, settings: { rider: RIDER99 } }), p = x.p; await sheet(p); await allOpen(p);
+  const x = await openH({ width: 1280, height: 800, dpr: 2, settings: { rider: RIDER99 } }), p = x.p; await sheet(p); await allOpen(p);
   const D = await p.evaluate(() => { const l = document.getElementById('setList').getBoundingClientRect(), s = document.querySelector('#setSheet .set-sheet').getBoundingClientRect(); return { dk: document.documentElement.classList.contains('dk'), side: s.left >= l.right - 1, list: !document.getElementById('setList').inert }; });
   ok(D.dk && D.side && D.list, 'fit: the computer layout: the sheet is the pane beside the settings list (the list stays usable)', D);
+  painted(await paintOf(p, '#rdFig svg', 'fig'), 'fit: the computer layout: the sheet\'s live rider shows');
+  await figView(p, 'the computer layout (1280 x 800)');
   await x.close();
 });
 
