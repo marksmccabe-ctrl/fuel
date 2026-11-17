@@ -6371,7 +6371,9 @@ html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html
    The Closet card's strip: the rider, 100 x 150 px, centred over the list (no text). The avatars: the rider's circle over the initial.
    Print: no strip, the initials. Forced colours: no strip, the initials; the swatches keep their colours (a colour picker's case for
    forced-color-adjust) with an edge, the pressed one ringed in Highlight */
-.rd-fig{display:flex;justify-content:center;margin:0 0 12px} .rd-fig svg{display:block;width:120px;height:180px}
+.rd-fig{position:sticky;top:var(--set-top-h,0px);z-index:1;display:flex;justify-content:center;margin:0 -16px;padding:6px 16px 12px;background:inherit} .rd-fig svg{display:block;width:120px;height:180px} /* kept in view under the sheet's title while the groups scroll under it, so a tap shows its change (setTopFit gives --set-top-h); still, no size change as it sticks */
+#setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 198px)} /* a button the keyboard focuses or a tap scrolls to is never under the rider */
+@media (max-height:700px){ .rd-fig svg{width:80px;height:120px} #setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 138px)} } /* a short screen keeps room for the choices */
 .rd-g.v-fold{margin:0 0 10px} .rd-gh{margin:0;font:inherit;letter-spacing:inherit;text-transform:none}
 .rd-g .v-fold-h{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px;row-gap:2px}
 .rd-g .v-fold-t{grid-column:1;grid-row:1} .rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;overflow-wrap:anywhere} /* never cut (320 px, 200% text): a typical rider's summary is one line at 390 px, the longest choices wrap to a second */ .rd-g .v-fold-h>.v-caret{grid-column:2;grid-row:1/3}
@@ -10107,9 +10109,9 @@ function rdNm(k, v, r){ return k==='hair' && r && r.hairStyle==='covered' && Obj
 function rdSwatch(k){ return k==='skin' || Array.isArray(FW.RIDER_OPTIONS[k]); }
 function rdColour(k, v, r){ return k==='skin' ? ((FW.SKIN||{})[v]||[])[0]||'' : v || r.kit; } /* '' (Same as jersey): the jersey's colour */
 function rdSum(g, r){ const n=k=>rdNm(k, r[k], r), lc=s=>s.charAt(0).toLowerCase()+s.slice(1);
-  const hs=r.hairStyle, hc=lc(n('hair')), hair=hs==='covered' ? hc+' head covering' : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair'; /* "dark brown ponytail", "dark brown head covering" (the bundle draws 'covered' as a covering in that colour), "short dark brown hair" */
-  return g==='look' ? `${n('skin')} skin · ${hair}${r.face!=='none' ? ' · '+lc(n('face')) : ''}`
-    : g==='gear' ? `${n('helmet')} helmet · ${r.glasses==='none' ? 'no glasses' : lc(n('glasses'))+' · '+lc(n('lens'))+' lens'}`
+  const hs=r.hairStyle, hc=lc(n('hair')), fc=r.face!=='none' ? lc(n('face')) : '', cov=hs==='covered', hair=cov ? hc+' head covering'+(fc ? ' and '+fc : '') : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair'; /* "dark brown ponytail", "dark brown head covering" (the bundle draws 'covered' as a covering in that colour, and a beard or mustache in it too: "gold head covering and beard"), "short dark brown hair" */
+  return g==='look' ? `${n('skin')} skin · ${hair}${fc && !cov ? ' · '+fc : ''}`
+    : g==='gear' ? `${n('helmet')} helmet · ${r.glasses==='none' ? 'no glasses' : (r.glasses==='pair' ? 'glasses' : lc(n('glasses')))+' · '+lc(n('lens'))+' lens'}` /* "pair" alone names nothing, folded or read out */
     : `${n('kit')} jersey · ${lc(n('pattern'))} · ${lc(n('shorts'))} shorts`; }
 function riderRowV(){ return riderBuilt() && window.FW ? rdName('kit', riderNow().kit)+' jersey' : 'Not set'; }
 function riderSheet(){ const box=$('rdGroups'), F=window.FW; if(!box || !F) return;
@@ -10120,7 +10122,7 @@ function riderSheet(){ const box=$('rdGroups'), F=window.FW; if(!box || !F) retu
 function riderSheetSync(){ const F=window.FW, box=$('rdGroups'); if(!F || !box || !box.firstChild) return; const r=riderNow();
   box.querySelectorAll('[data-rd]').forEach(b=>{ const k=b.dataset.rd, v=b.dataset.v, on=r[k]===v; if(b.getAttribute('aria-pressed')!==String(on)) b.setAttribute('aria-pressed', String(on)); b.tabIndex=on ? 0 : -1; if(b.classList.contains('rd-c')) b.style.setProperty('--sw', rdColour(k, v, r)); if(k==='hair'){ const t=rdNm(k, v, r); if(b.getAttribute('aria-label')!==t) b.setAttribute('aria-label', t); } });
   Object.keys(RD_LABEL).forEach(k=>{ const n=$('rdN-'+k), t=rdNm(k, r[k], r); if(n && n.textContent!==t) n.textContent=t; });
-  { const l=$('rdL-hair'), t=r.hairStyle==='covered' ? 'Covering colour' : RD_LABEL.hair; if(l && l.textContent!==t) l.textContent=t; } /* the group's name too (aria-labelledby) */
+  { const l=$('rdL-hair'), t=r.hairStyle!=='covered' ? RD_LABEL.hair : r.face==='none' ? 'Covering colour' : 'Covering and '+rdName('face', r.face).toLowerCase()+' colour'; if(l && l.textContent!==t) l.textContent=t; } /* the group's name too (aria-labelledby); with Covered the bundle draws the beard or mustache in the covering's colour, so the field says it sets both */
   RD_GROUPS.forEach(([g])=>{ const s=$('rdS-'+g), t=rdSum(g, r); if(s && s.textContent!==t) s.textContent=t; });
   ['lens','frame'].forEach(k=>{ const f=box.querySelector(`[data-rd-f="${k}"]`); if(f) f.hidden=r.glasses==='none'; });
   fwMount($('rdFig'), ()=>F.riderOutfit(r), 'fig:'+JSON.stringify(r), {still:true}); }
@@ -10933,7 +10935,8 @@ function flWidth(inp){ inp.style.width=(Math.max(1, (inp.value||'').length)+1.4)
 function flHighlight(){ const hl=FL.moved||FL.focus; ['min','max'].forEach(k=>$('flBox-'+k).classList.toggle('on', hl===k)); }
 // the sheet's top: Cancel · title · Done on one row while the title fits there, else the title under them (checked whenever the top resizes)
 function setTopFit(){ const t=document.querySelector('#setSheet .set-top'), h=$('setSheetTitle'); if(!t || !h) return;
-  t.classList.remove('stack'); if(t.closest('.set-edit') && h.scrollWidth>h.clientWidth+1) t.classList.add('stack'); }
+  t.classList.remove('stack'); if(t.closest('.set-edit') && h.scrollWidth>h.clientWidth+1) t.classList.add('stack');
+  const sh=t.closest('.set-sheet'), th=t.offsetHeight+'px'; if(sh && sh.style.getPropertyValue('--set-top-h')!==th) sh.style.setProperty('--set-top-h', th); } /* item 99: the rider's sheet keeps its rider stuck right under this bar */
 if(window.ResizeObserver){ const t=document.querySelector('#setSheet .set-top'); if(t) new ResizeObserver(roDefer(()=>setTopFit())).observe(t); }
 function flStepBy(k, dir){ const x=FL[k==='min' ? 'lo' : 'hi']; if(!x.on) return; const st=flStep();
   x.v = st>1 ? (dir>0 ? (Math.floor(x.v/st+1e-9)+1)*st : (Math.ceil(x.v/st-1e-9)-1)*st) : x.v+dir; FL.focus=k; flFix(k); flRender(); }

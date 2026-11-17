@@ -37,8 +37,10 @@ before(async () => {
 });
 after(async () => { if (browser) await browser.close(); });
 
-// values no field offers: not strings, near misses, and the names every object has
-const BAD = [42, 0, null, true, false, {}, [], ['#179BCC'], 'nope', '', ' ', '__proto__', 'constructor', 'toString', 'hasOwnProperty', 'valueOf', '#179bcc', ' #179BCC', '#FFFFFE', 'Light'];
+// values a field does not offer: not strings, near misses, the names every object has, and values ANOTHER field offers (a jersey colour,
+// a sleeve or fade colour, a shorts colour, a hair style, a face, glasses, skin or pattern id); each is skipped for the field that offers it
+const BAD = [42, 0, null, true, false, {}, [], ['#179BCC'], 'nope', '', ' ', '__proto__', 'constructor', 'toString', 'hasOwnProperty', 'valueOf', '#179bcc', ' #179BCC', '#FFFFFE', 'Light',
+  '#F26B5B', '#F28C28', '#E06AAE', '#D94F92', '#3048B4', '#2A2A30', '#5E4FA8', '#E9C46A', 'covered', 'none', 'beard', 'stache', 'shield', 'pair', 'dots', 'deep', 'short'];
 
 test('every rider field is offered and every option has a name', async () => {
   const r = await page.evaluate(() => { const F = FW, out = [];
@@ -152,6 +154,18 @@ test('a head covering is named in plain colours (no "blond head covering"); hair
   const r = await page.evaluate(() => FW.RIDER_OPTIONS.hair.map(h => [window.__rider.rdSum('look', Object.assign({}, FW.RIDER_DEFAULT, { hairStyle: 'covered', hair: h })), window.__rider.rdSum('look', Object.assign({}, FW.RIDER_DEFAULT, { hairStyle: 'long', hair: h }))]));
   assert.deepEqual(r.map(x => x[0]), ['black', 'dark brown', 'brown', 'rust', 'gold', 'grey'].map(c => 'Light skin · ' + c + ' head covering'));
   assert.deepEqual(r.map(x => x[1]), ['black', 'dark brown', 'brown', 'auburn', 'blond', 'grey'].map(c => 'Light skin · long ' + c + ' hair'));
+});
+
+test('with Covered the Look summary says the beard or mustache is in the covering\'s colour (the bundle draws it so)', async () => {
+  const r = await page.evaluate(() => ['none', 'stache', 'beard'].map(f => window.__rider.rdSum('look', Object.assign({}, FW.RIDER_DEFAULT, { hairStyle: 'covered', hair: '#E9C46A', face: f }))));
+  assert.deepEqual(r, ['Light skin · gold head covering', 'Light skin · gold head covering and mustache', 'Light skin · gold head covering and beard']);
+  const h = await page.evaluate(() => window.__rider.rdSum('look', Object.assign({}, FW.RIDER_DEFAULT, { hairStyle: 'long', hair: '#E9C46A', face: 'beard' })));
+  assert.equal(h, 'Light skin · long blond hair · beard');
+});
+
+test('the Gear summary names the glasses: "glasses" for a pair (never "pair" alone), "shield", "no glasses"', async () => {
+  const r = await page.evaluate(() => ['pair', 'shield', 'none'].map(g => window.__rider.rdSum('gear', Object.assign({}, FW.RIDER_DEFAULT, { glasses: g }))));
+  assert.deepEqual(r, ['Black helmet · glasses · purple lens', 'Black helmet · shield · purple lens', 'Black helmet · no glasses']);
 });
 
 test('no page errors', () => { assert.deepEqual(errors, []); });
