@@ -1870,9 +1870,56 @@
     the other sections (main second) `OK (209 checks)`. Each former hold, v7 -> v8 least (changed / own): tights-heavy under overshoes
     0 -> 192 / 144 (850 judgements); shoe covers 202 / 0 in #1E1E24 -> 425 / 340 in #4F6478 (1384); winter jacket on dark jerseys 240-276 /
     0-36 -> 1909 / 1561 (45); thermal jacket on Navy 240-290 / 0-29 -> 3980 / 3525 (3); thermal jersey in Black with arm warmers and the
-    vest 0 -> 348 / 192 (44); band 0 -> 430, side stripe 0-12 -> 184, splatter 0 -> 474 device px from Plain at the sheet's size. All pass.
+    vest 0 -> 348 / 192 (44); band 0 -> 430, side stripe 0-12 -> 184, splatter 0 -> 474 device px from Plain at the sheet's size. All pass
+    as judged then (corrected in v8 check round 1: point 1 was judged on tights-heavy with wool socks only; leg wear under overshoes without
+    wool socks fails on brown to deep skin, and AWAIT's widths were judged on a few riders each).
   - Still failing (the 50): V7_GAPS point 3 on deep brown skin, by the own-colour rule only. Full gloves 204 changed, 0 in #2A2A30 (the
     wet starter and full lists); fingerless 320 changed, 8 in #2A2A30 (the hot and mild full lists); default rider in deep skin and RIDER99,
     every jersey. #2A2A30 is at most 48 a channel from #5A3622, so no fill pixel can count; the v8 cuff carries them (120 and 152 px in
     #C9D1DA, probe99/v8take/gloves.mjs). Not held, no work-around: the app chat decides (the cuff as the gloves' own, a by-design rule, or
     a v9 fill). Not run until then: the mutants, q97, q98, motion, budgets, smoke, inventory, contrast, layout, npm test.
+- v8 check round 1 (5 problems: 2 in the art, 3 test gaps; none app-side, so no app change, q99-rider stays at 6a8bb4e). Each reproduced first
+  on fred99/null.html (mknull of 6a8bb4e; the handoff files still byte-identical to probe99/v8-1445-copy), probe99/v8fix1/m.mjs, cuff2.mjs,
+  reach.mjs, logs in probe99/v8fix1/runs/; the old q99 (f7d609a) passes each checker mutant with exactly the baseline's 50 failures
+  (probe99/v8check1-tests/runs/strip-summary.log; sockover FAIL 82, caught only through tights-heavy).
+  - Full-finger and fingerless gloves on deep brown (problem 1, the open decision): real, in the art. #2A2A30 on #5A3622: full gloves 204 px
+    changed, 0 in the fill, 120 in the #C9D1DA cuff; fingerless 320 / 8 / 152; on dark brown 516 / 312 and 376 / 64 (both riders, runs/m1.log).
+    Not held, not worked around, SHOW and OWN unchanged: still the 50 failures, for the app chat (the cuff as own, a by-design rule, or a v9 fill).
+  - The thermal jersey's white cuff over the vest (problem 2): real, in the art (round caps on a 10-wide stroke across a 21-wide sleeve): on
+    the cold starter list the cuff changes 348-483 px, 41 of them on the vest (x 70-129, y 198-204), every jersey; 0 with no vest
+    (runs/cuff2.log). For the design chat's next note (end the cuff at the sleeve); nothing in the app.
+  - Point 1's width (problem 3): real, a test gap. FIXED_BY_V8's leg-wear entry was judged on tights-heavy with wool socks only (v8unmet took
+    any one item). On v8, legs, tights-light and tights-heavy under overshoes without wool socks: 110-118 changed / 42-50 own on brown, dark
+    and deep skin (under SHOW.d48 120), 192 / 144 with wool socks (runs/m1.log; the app reaches them: starter closet plus overshoes, full
+    closet less wool socks, runs/reach.log). q99: an entry may list parts (point 1: with and without wool socks), each judged on a ride's
+    list with every item of the entry (v8unmet: every item, every part); six more closets on the Hard freezing and Recovery cold rides
+    (closetsOf: starter plus overshoes; full less socks-wool, less tights-heavy, less both, less tights-heavy and tights-light, less those
+    and socks-wool; setCloset takes '+id' / '~id'), not in the wide sweep (they change only the legs); direct lists each leg wear under
+    overshoes with and without wool socks, every direct list now in every jersey and every skin. The comment that said "the others on direct
+    lists only" (no direct list had overshoes) and this item's "all pass" above are corrected. This turns q99 red on that case: 156 more
+    failures (legs 72, tights-light 44, tights-heavy 40; the least 110 / 42 on deep skin). A former hold failing on v8: not held, for the
+    app chat with the gloves (a by-design rule, a v9 drawing, or accept).
+  - AWAIT's widths (problem 4): real, a test gap (the wide sweep varies one field from two riders: the thermal jacket was judged on 3
+    riders, the winter jacket on 45, the thermal jersey on 44). An entry held by a rider's fields lists its width (prod of its fields: the
+    winter jacket 192 riders, DARK_WINTER x Black and Navy shorts x plain and side x 6 sleeves; the thermal jacket 48; the thermal jersey in
+    Black 864, every fade, sleeves, shorts and pattern), set on the default rider and RIDER99, judged on every list a ride gave where the
+    entry holds (RIDELISTS; only the entry's items measured: pxMany's 'only'), one check per list and rider, and a check that every rider
+    of the width is judged on a ride's list. v8 passes: winter least 1909 / 1561 (9 lists), thermal 3965 / 3525 (9 lists), the thermal
+    jersey 348 / 192 (2 lists).
+  - The wool-sock rule (problem 5): real, a test gap. Measured on v8 over every cover and shin, both riders, all 8 skins (runs/m1.log): with
+    knee warmers under any cover 0-28 / 0, with leg wear under overshoes 28 / 0 or boots 16 / 0; but over leg wear above shoe covers 128 /
+    64 (v7 96 / 32) and over bare shins under overshoes 196 / 164 (v7 0). Decision: the rule keeps round 5's principle (by design only
+    where it holds as measured), so on v8 it narrows to knee warmers under any cover and leg wear under overshoes or boots (judging more,
+    never less). Two EDGES added (the socks over bare shins under overshoes: the noleg closet now on Hard freezing and Recovery cold too;
+    over leg wear above shoe covers: the cold full list), and direct lists for both; on v8 they show, the least 196 / 164 and 128 / 64.
+  - Mutants (q99/mut99.mjs; Q99_BASELINE: the page is red, so a mutant is caught by a FAIL line the page's own strip log lacks), the
+    checkers' seven as v8c1-<name> (cmp-identical to their mut8-<name> pages) and the v8 ones, against runs/strip-v8-1.log
+    (probe99/w/mutants.log "v8 check round 1"): v8c1-legover FAIL 390 (340 new), v8c1-thermalnavy 224 (18 new: the width checks), v8c1-
+    winternavy 224 (18), v8c1-heavynavy 210 (4), v8c1-sockcover 273 (67), v8c1-sockover 450 (244), v8c1-sockskin 304 (98); v8-winterblack
+    237 (31), v8-winterv7 246 (40), v8-heavyblack 224 (18), v8-bandcoral (sheet) FAIL 2, c1-nojacket 962 (757). The rest of the 135 not run
+    again this round (no app change; the checks this round adds are each shown by these).
+  - Proof, one at a time on fred99/null.html (probe99/v8fix1/runs.sh, logs in probe99/v8fix1/runs/): q99 strip `FAIL 206` (302 s): the
+    gloves' 50 and the leg wear's 156, nothing else; q99 (main second) `FAIL 206` (775 s, 6348 ok), the same 206 lines. q97 (main second)
+    `OK (127 checks)`; q98 in its parts `OK (253)`, `OK (49)`, `OK (21)`; motion `OK (26 checks)`; budgets `OK (62 checks)` on the 16 rider
+    screens (host reference 1.69 ms, no host busy line); smoke `OK (14 checks)`; inventory `OK (7 checks)`; contrast `OK (58 checks)`;
+    layout 320 and 390 px `OK` (LAYOUT_ONLY=rider); npm test 1824 tests, 1777 pass, 0 fail.
