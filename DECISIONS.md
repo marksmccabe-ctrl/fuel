@@ -1524,7 +1524,8 @@
     socks under them, boots over any leg wear change 192 px but only 18 in #3A2F2A (#3A2F2A on #14141A is 38 at most a channel),
     overshoes over heavy tights 344 / 34, and leg warmers or tights above boots on RIDER99 (deep brown) 70 / 26 (probe99/v7c/covers.mjs).
     Point 2's own colour for the covers clears the overshoes; the boots and the leg wear above them on deep brown skin are for the app
-    chat to add to the note for v8 if it wants them.
+    chat to add to the note for v8 if it wants them. (Corrected in v8 check round 2: "no ride lists them" held only for q99's closets; a
+    closet without wool socks on the freezing ride gives the boots over leg wear, so the strip gets them; judged now, FOUND.)
 - Review round 3 (6 problems, all real; each reproduced first: q99 as it was, kit2 dca3265's copy in probe99/r3/orig, `OK` on each
   of the round's mutants, logs in probe99/r3/repro/). One app fix, five test gaps; each gap has a q99 check now and a mutant in
   q99/mut99.mjs (r3-*), each ending FAIL under the new q99:
@@ -1703,7 +1704,8 @@
     covers (300 / 268) or boots (156 / 136) they are judged. The cold and freezing rides add a closet with every catalog item but leg wear and
     knee warmers (the check's 40-44 F and 24-29 F lists), and the direct lists socks-wool + shoes and + boots; EDGES prints that edge (judged
     102 times, the least 156 / 136, the freezing list with boots) and requires it on a ride. Found, not held: knee warmers with wool socks and
-    toe covers or bare shoes leave the socks 92-114 px; no list the strip gets has them. Mutant r5-sockbare `FAIL 8`.
+    toe covers or bare shoes leave the socks 92-114 px; no list the strip gets has them (corrected in v8 check round 2: a closet without leg
+    warmers gives them, on the wet ride and dry 50-60 F rides; judged now, FOUND). Mutant r5-sockbare `FAIL 8`.
   - Words painted by CSS: stripOf reads every pseudo-element's content in #rRider (none allowed) and its box (the drawing and its padding
     only); the row check adds every ::before / ::after with letters or digits in #prowB-rider. Mutant r5-csstext `FAIL 35`.
   - Moved onto the new code with the same intent: restore-drop, hairsum, r4-coverbeard (each FAIL).
@@ -1923,3 +1925,63 @@
     `OK (127 checks)`; q98 in its parts `OK (253)`, `OK (49)`, `OK (21)`; motion `OK (26 checks)`; budgets `OK (62 checks)` on the 16 rider
     screens (host reference 1.69 ms, no host busy line); smoke `OK (14 checks)`; inventory `OK (7 checks)`; contrast `OK (58 checks)`;
     layout 320 and 390 px `OK` (LAYOUT_ONLY=rider); npm test 1824 tests, 1777 pass, 0 fail.
+- v8 check round 2 (3 problems, all real and all in the art; two were test gaps too; none app-side, so no app change: q99-rider stays at
+  6a8bb4e). Each reproduced first on fred99/null.html (mknull of 6a8bb4e; the handoff files still byte-identical to probe99/v8-1445-copy,
+  their trimmed sha1s BUILDS'), probe99/v8fix2/repro.mjs (runs/repro.log: each closet's list from the app's strip, equal to outfit()'s, and
+  each item measured with q99's rules on the default rider in 8 skins and RIDER99, Chromium and WebKit at 2x and 3x). The old q99 (8ebe0b1)
+  passed the checkers' two mutants with exactly the page's own 206 failures (probe99/v8check2-tests/runs/summary.txt). Round 1's "the strip
+  fails on exactly two cases" was wrong: this round adds three more cases, and Safari's and an iPhone's readings.
+  - Boots with no wool socks (problem 2): real, a test gap; in the art. On the freezing ride (25-26 F at the ride's hour) the full closet less
+    wool socks gives "jersey-heavy base-thermal jacket-winter arms tights-heavy gloves-lobster balaclava gaiter boots" (less tights-heavy too:
+    tights-light; less tights-light as well: legs; the starter closet plus boots: "jersey-heavy vest arms legs gloves-thermal head boots").
+    On v8 (Chromium 2x): over leg wear the boots change 192-193 px but only 18-19 in #3A2F2A, every rider (over bare shins 506 / 192); the
+    leg wear above them is under SHOW on olive to deep skin for tights-heavy (90 / 44 to 74 / 28) and tan to deep for legs and tights-light
+    (116 / 38 to 70 / 26); the same on v7. q99 never judged them: the freezing ride had no closet without wool socks and no direct list had
+    boots without them. Bundle v7's "found, not held ... no ride lists them" is corrected in place.
+  - Wool socks under knee warmers with toe covers or bare shoes (problem 3): real, a test gap; in the art. The wet ride with the full closet
+    less leg warmers gives "jersey-med base-ss vest jacket-rain arms knees gloves cap socks-wool toes" (less toe covers too: no toes); a dry
+    ride at 50-51 F (forecast 50-54 F) and a Recovery one at 56-57 F give the same with a thermal jersey. On v8 the socks read 92 / 50 with
+    toe covers and 114 / 52 with bare shoes on every rider (WebKit 2x 90 / 48 and 114 / 48), under 120. q99 never judged them (the wet ride
+    ran the starter and full closets only; no direct list had knee warmers). Review round 5's "no list the strip gets has them" is corrected
+    in place.
+  - q99 for both: FOUND, a list beside FIXED_BY_V8 and EDGES (boots with no wool socks; leg warmers or tights above them; wool socks under
+    knee warmers with no foot cover, in two parts, toe covers and bare shoes): judged as any item (nothing held), every item and part must be
+    judged on a ride's list (one check), each printed with its least. The freezing ride adds LEGBOOT (full~socks-wool,
+    full~tights-heavy~socks-wool, full~tights-heavy~tights-light~socks-wool, starter+boots); the wet ride and a new cool ride (forecast 50-54
+    F, Steady, run with these two closets only) add KNEESOCK (full~legs, full~legs~toes). Direct lists in every jersey and skin, both riders:
+    boots alone, each leg wear over boots, knees + socks-wool + toes, knees + socks-wool. FIXED_BY_V8's and FOUND's records share one
+    function (track).
+  - Safari and an iPhone (problem 1): real, in the art; a gap in how q99 measured (Chromium at 2x only). Reproduced (repro.log): legs under
+    overshoes in WebKit 2x tan 116 / 52, olive 116 / 52, brown 115 / 52, dark 110 / 45, deep 103 / 39 (Chromium 2x: tan 156 / 54, olive 120
+    / 50, brown 118 / 50, dark 116 / 46, deep 110 / 42); heavy tights there 116 / 51 on dark in WebKit (Chromium 120 / 50); the socks over
+    light tights above shoe covers 264 / 148 in WebKit at 3x and 260 / 148 in Chromium at 3x, against 270 (Chromium 2x 128 / 64). My decision:
+    SHOW is an area, 30 CSS px changed and 10 in the item's own colour, so at 3x it is 270 / 90 device px. Every item stays judged at Chromium
+    2x (the decided measure), and every item that showed there within half again of SHOW (under 180 changed or 60 own; every judgement, the
+    sweeps too) is measured again as Chromium at 3x (Android phones), WebKit at 2x (Safari on a Mac or iPad) and WebKit at 3x (an iPhone)
+    draw it, on a canvas as pxMany does (pxMany takes the scale; the checkers' canvas runs matched their painted screenshots), one check per
+    screen, list and item; and a check that the band is wide enough (no item reads under two thirds, by area, of its Chromium 2x number on
+    another screen; the widest gap is 74%: legs over overshoes on tan skin, 156 -> 116 in WebKit at 2x). Half again, not the checkers' "about
+    10%": a quarter (my first try) missed that tan rider. Nothing held; 1x stays out (the decided 2x: a thin part's own colour is lost to
+    anti-aliasing at 1x; the checkers' 1x run fails only the known cases). The socks over leg wear above shoe covers are round 1's open
+    decision 3 (the narrowed wool-sock rule): at 3x they read under SHOW on both engines.
+  - q99 strip on v8 now (runs/strip-new2.log, 393 s): `FAIL 801`, every failure in the art: the gloves on deep brown 98 (72 full gloves, 24
+    fingerless, 2 wide-sweep checks); leg wear under overshoes without wool socks 156 (as round 1); boots over leg wear with no wool socks
+    224 (own colour 18-19); leg wear above them 121 (legs 52, tights-light 36, tights-heavy 33); wool socks under knee warmers 188 (92 / 50,
+    114 / 52); other screens 14 (WebKit 2x: leg wear under overshoes on tan to deep, heavy tights from dark, 10 checks; at 3x the socks over
+    leg wear above shoe covers, 260 in Chromium and 264 in WebKit, 4). Each check of this round's (FOUND on a ride's list, the band, the
+    other screens found) passes; every former hold's numbers as round 1.
+  - For the design chat's next note (art, not app): boots over dark leg wear need a lighter boot or a light cuff (#3A2F2A on #14141A is 38 a
+    channel at most); the leg wear above boots and overshoes needs more height above the cuff (y 262), more on dark skin; the wool sock under
+    knee warmers needs more height or a colour of its own past the knee warmer; the sock band above the shoe-cover cuff (y 266) taller than
+    about 4 units clears 3x; the thermal jersey's white cuff over the vest (round 1).
+  - Mutants (q99/mut99.mjs, against runs/strip-new2.log as Q99_BASELINE; probe99/w/mutants.log "v8 check round 2"): the checkers' two as
+    v8c2-bootsnosock (cmp-identical to mut8-bootsnosock) `FAIL 940` (484 new) and v8c2-kneesock (mut8-kneesock) `FAIL 801` (188 new: the
+    socks' lines read 0 px where the page reads 92 and 114); v8c2-wksock (on Safari only, wool socks over leg wear above shoe covers drawn as
+    nothing) `FAIL 804` (5 new, all from the other screens' pass), and the old q99 (8ebe0b1) passes it with the page's own 206 lines
+    (runs/strip-old-wksock.log, 0 new); v8c1-legover `FAIL 975` (340 new) and v8c1-sockover `FAIL 1051` (250 new) still caught. The other 133
+    not run again (no app change; the checks they guard are unchanged).
+  - Proof, one at a time on fred99/null.html (probe99/v8fix2/runs.sh and chain.sh, logs in probe99/v8fix2/runs/): q99 strip `FAIL 801`
+    (393 s); q99 (main second) `FAIL 801` (865 s, 7738 ok), the same 801 lines; q97 (main second) `OK (127 checks)`; q98 in its parts
+    `OK (253)`, `OK (49)`, `OK (21)`; motion `OK (26 checks)`; budgets `OK (62 checks)` on the 16 rider screens (host reference 1.32 ms, no
+    host busy line); smoke `OK (14 checks)`; inventory `OK (7 checks)`; contrast `OK (58 checks)`; layout 320 and 390 px `OK`
+    (LAYOUT_ONLY=rider); npm test 1824 tests, 1777 pass, 0 fail.

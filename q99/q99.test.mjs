@@ -115,7 +115,12 @@
 //            (v8 check round 1) each former hold over its whole v7 width: every item of an entry and each part judged on a ride's list (each leg
 //            wear under overshoes with and without wool socks: six more closets on the Hard freezing and Recovery cold rides, and direct lists in
 //            every jersey and skin), and every rider of AWAIT's widths (the product of the fields it held: 192, 48 and 864 riders on each of the
-//            default rider and RIDER99) on every list a ride gave where it holds
+//            default rider and RIDER99) on every list a ride gave where it holds; (v8 check round 2) the cases found on v7 and left unjudged
+//            because no ride's list had them, which the app's strip gets (FOUND: boots with no wool socks and the leg wear above them, on the
+//            freezing ride with closets without wool socks; wool socks under knee warmers with toe covers or bare shoes, on the wet ride and
+//            a cool dry one with closets without leg warmers; direct lists for each in every jersey and skin), each judged on a ride's list;
+//            and every item that shows within half again of SHOW (Chromium at 2x) measured again as other screens draw it (Chromium at 3x,
+//            WebKit at 2x and 3x: Safari, an iPhone), against SHOW in CSS px (30 / 10 CSS px: 270 / 90 device px at 3x)
 //   painted  (review round 3) the strip, the sheet's live rider and both avatars as the page paints them: the spot's svg screenshot at dpr 2
 //            against FW.plain of the same drawing at that size on the colour behind it (at most 0.5% of the pixels more than 48 apart, the
 //            strip at most 24 device px: a fifth of what an item needs to show, review round 5;
@@ -133,7 +138,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { chromium } from 'playwright';
+import { chromium, webkit } from 'playwright';
 import { checker, open, reload } from '../lib/open.mjs';
 import { crunch, toY, settle, weatherRouteFor, RIDER99 } from '../lib/screens.mjs';
 import { Backend, syncPageSource } from '../q91/fbmock.mjs';
@@ -1057,8 +1062,9 @@ const OWN_HEAVY = { 'jersey-heavy': ['kit', '#FFFFFF'] }; // the thermal jersey'
 // part's own colour is lost to anti-aliasing at 1x)
 const SHOW = { d48: 120, own: 40 };
 // in the page: the rider at strip size on a canvas (FW.plain), whole and with each item left out; per item the pixels changed and those in its own colour
-// (box: [x0, y0, x1, y1] in the drawing's units, 1:1 here: also the changed pixels whose centres are inside it; only: the items measured, else all)
-const pxMany = (p, R, ids, own, box, only) => p.evaluate(async ([R, ids, own, box, only]) => { const W = 200, H = 300, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d', { willReadFrequently: true });
+// (box: [x0, y0, x1, y1] in the drawing's units, 1:1 at 2x: also the changed pixels whose centres are inside it; only: the items measured, else all;
+// sc: device px per CSS px, 2 unless given: v8 check round 2 measures 3x too)
+const pxMany = (p, R, ids, own, box, only, sc = 2) => p.evaluate(async ([R, ids, own, box, only, sc]) => { const W = 100 * sc, H = 150 * sc, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d', { willReadFrequently: true });
   /* a blob URL, revoked once drawn: the page keeps no decoded image (thousands of data: URLs crashed the page in the wide sweep) */
   const draw = async s => { const img = new Image(), u = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' })); img.src = u; try { await img.decode(); x.fillStyle = '#fff'; x.fillRect(0, 0, W, H); x.drawImage(img, 0, 0, W, H); } finally { URL.revokeObjectURL(u); img.src = ''; } return x.getImageData(0, 0, W, H).data; };
   const hx = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)), res = [];
@@ -1067,7 +1073,7 @@ const pxMany = (p, R, ids, own, box, only) => p.evaluate(async ([R, ids, own, bo
       for (let i = 0; i < whole.length; i += 4) { const d = Math.max(Math.abs(whole[i] - minus[i]), Math.abs(whole[i + 1] - minus[i + 1]), Math.abs(whole[i + 2] - minus[i + 2])); if (d > 48) { d48++; const q = i / 4, cx = q % W + 0.5, cy = Math.floor(q / W) + 0.5; if (box && cx >= box[0] && cx <= box[2] && cy >= box[1] && cy <= box[3]) b++; if (oc && oc.some(c => Math.max(Math.abs(whole[i] - c[0]), Math.abs(whole[i + 1] - c[1]), Math.abs(whole[i + 2] - c[2])) <= 10)) o++; } }
       out[id] = Object.assign({ d48, own: oc ? o : null }, box ? { box: b } : {}); }
     res.push(out); }
-  return res; }, [R, ids, own, box || null, only || null]);
+  return res; }, [R, ids, own, box || null, only || null, sc]);
 const pxOf = (p, r, ids, own, box) => pxMany(p, [r], ids, own, box).then(a => a[0]); // one rider (pxMany: many riders on one list in one call, review round 7)
 // the strip as shown: its ids (the app's own record), its drawing against FW.riderOutfit(rider, ids), and outfit()'s list for the ride shown
 const stripOf = p => p.evaluate(() => { const H = window.__q99, el = document.getElementById('rRider'), i = H.lastResult && H.lastResult.i || H.readInputs(), minF = i.wxMinF != null ? i.wxMinF : i.tempF, maxF = i.wxMaxF != null ? i.wxMaxF : null;
@@ -1083,9 +1089,10 @@ const stripOf = p => p.evaluate(() => { const H = window.__q99, el = document.ge
     inCard: !!rc && rc.left >= card.left && rc.right <= card.right && rc.bottom <= wear.top + 1, above: !!rc && rc.bottom <= wear.top + 1, hid: el && el.getAttribute('aria-hidden'), text: el ? el.textContent.trim() : null, css: pz, boxH, mid, still: !!el && !el.classList.contains('fwm-go') && !el.getAnimations({ subtree: true }).some(a => a.playState === 'running'),
     rec: H.FWM.get(el) ? { s: H.FWM.get(el).s, k: H.FWM.get(el).k.slice(0, 40) } : null }; });
 // the rides: [name, forecast, effort tapped before the Crunch (else the athlete's Steady)]. Hard and Recovery pick other items than Steady
-// (the full closet: tights-heavy and overshoes on a Hard freezing and a Recovery cold ride)
+// (the full closet: tights-heavy and overshoes on a Hard freezing and a Recovery cold ride); a cool dry ride (50-51 F at the ride's hour), where
+// a closet without leg warmers gives knee warmers with wool socks and toe covers (v8 check round 2: its closets only, see closetsOf)
 const RIDES = [['hot', { lo: 92, hi: 99 }], ['mild', { lo: 59, hi: 63 }], ['cold', { lo: 40, hi: 44 }], ['freezing', { lo: 24, hi: 29 }], ['wet', { lo: 53, hi: 57, rain: 80 }],
-  ['hard freezing', { lo: 24, hi: 29 }, 'hard'], ['recovery cold', { lo: 40, hi: 44 }, 'recovery']];
+  ['hard freezing', { lo: 24, hi: 29 }, 'hard'], ['recovery cold', { lo: 40, hi: 44 }, 'recovery'], ['cool', { lo: 50, hi: 54 }]];
 // a closet: 'starter', 'full' or 'noleg', then items added ('+id') or taken out ('~id'): 'full~socks-wool' is every catalog item but wool socks
 async function setCloset(p, kind, extra) { await p.evaluate(([kind, extra]) => { const H = window.__q99, mk = id => H.closetItemFromCatalog(H.CLOSET_CATALOG.find(c => c.id === id)), [b, ...m] = kind.split(/(?=[+~])/);
   let L = b === 'full' ? H.CLOSET_CATALOG.map(c => c.id) : b === 'noleg' ? H.CLOSET_CATALOG.map(c => c.id).filter(id => !['legs', 'tights-light', 'tights-heavy', 'knees'].includes(id)) : H.CLOSET_STARTER.slice();
@@ -1096,9 +1103,14 @@ const closetName = k => k === 'noleg' ? 'full but no leg wear or knee warmers' :
 // round 5; Hard freezing and Recovery cold since v8 check round 1: wool socks over bare shins under overshoes); and on those two, where the full
 // closet gives overshoes, each leg wear under them with and without wool socks (v8 check round 1: V7_GAPS point 1 was judged on tights-heavy with
 // wool socks alone): legs from the starter closet plus overshoes, tights-heavy, tights-light and legs from the full closet less what the ride would
-// pick first, each with and without wool socks
+// pick first, each with and without wool socks. v8 check round 2 (FOUND): on the freezing ride, where the full closet gives boots, each leg wear
+// above boots with no wool socks (the full closet less wool socks, and less tights-heavy, and less tights-light too; the starter closet plus
+// boots); on the wet ride and the cool one, knee warmers with wool socks and toe covers or bare shoes (the full closet less leg warmers, and
+// less toe covers too); the cool ride is judged with these two closets alone (it was added for them)
 const LEGOVER = ['starter+overshoes', 'full~socks-wool', 'full~tights-heavy', 'full~tights-heavy~socks-wool', 'full~tights-heavy~tights-light', 'full~tights-heavy~tights-light~socks-wool'];
-const closetsOf = n => ['starter', 'full'].concat(['cold', 'freezing', 'hard freezing', 'recovery cold'].includes(n) ? ['noleg'] : [], ['hard freezing', 'recovery cold'].includes(n) ? LEGOVER : []);
+const LEGBOOT = ['full~socks-wool', 'full~tights-heavy~socks-wool', 'full~tights-heavy~tights-light~socks-wool', 'starter+boots'], KNEESOCK = ['full~legs', 'full~legs~toes'];
+const closetsOf = n => n === 'cool' ? KNEESOCK : ['starter', 'full'].concat(['cold', 'freezing', 'hard freezing', 'recovery cold'].includes(n) ? ['noleg'] : [], ['hard freezing', 'recovery cold'].includes(n) ? LEGOVER : [],
+  n === 'freezing' ? LEGBOOT : [], n === 'wet' ? KNEESOCK : []);
 const FIXED_SEEN = new Map(), FIXED8_SEEN = new Map(), RIDELISTS = new Map(); // RIDELISTS: every list a ride gave (any closet, either rider) -> where
 // the v6 gaps v7 fixed (V6_GAPS and SKIN_GAPS B until v7): each is judged as any item now, and each must be judged somewhere (a ride's
 // list, or the direct lists below where no ride reaches it); the smallest measurement of each is printed
@@ -1141,12 +1153,34 @@ const EDGES = [
   { ids: ['socks-wool'], when: L => L.includes('shoes') && !L.some(x => x === 'overshoes' || x === 'boots' || x === 'knees') && L.some(x => LEG.includes(x)), what: 'wool socks over leg wear or tights above shoe covers (v8 128 / 64, v7 96 / 32: by design until v8)' },
 ];
 const EDGE_SEEN = new Map();
+// cases found on v7 and recorded "not held" because no list the strip got had them (Bundle v7: boots with no wool socks under them, and the leg
+// wear above them; review round 5: wool socks under knee warmers with toe covers or bare shoes). The app's strip gets each (v8 check round 2: a
+// rider's own closet without wool socks on a freezing ride, without leg warmers on a wet or cool one), so each is judged as any item, must be
+// judged on a ride's list (every item and part, as FIXED_BY_V8) and is printed with its least
+const FOUND = [
+  { ids: ['boots'], when: L => !L.includes('socks-wool'), what: 'boots with no wool socks (Bundle v7: found, not held)' },
+  { ids: LEG, when: L => L.includes('boots') && !L.includes('socks-wool'), what: 'leg warmers or tights above boots with no wool socks (Bundle v7: found, not held)' },
+  { ids: ['socks-wool'], when: L => L.includes('knees') && !L.some(x => COVERS.includes(x)), parts: [['with toe covers', L => L.includes('toes')], ['with bare shoes', L => !L.includes('toes')]], what: 'wool socks under knee warmers with toe covers or bare shoes (review round 5: found, not held)' },
+];
+const FOUND_SEEN = new Map();
+// the items that show within half again of SHOW on Chromium at 2x (v8 check round 2: on WebKit, and at 3x, the thinnest fell on the other side
+// of the line; the widest gap measured, leg warmers over overshoes on tan skin, 156 px here and 116 in WebKit at 2x, a quarter less): list and
+// rider -> the items and their measurements here, measured again as other screens draw them at the end of the strip section
+const NEAR = new Map(), NEAR_BAND = 1.5;
 // the direct lists (the v6 gaps v7 fixed that no ride reaches, and the socks' edge); the outer layers and the rider's fields the wide sweep
 // varies on every jersey (review round 7); each leg wear under overshoes with and without wool socks, and the socks over bare shins under
-// overshoes and over leg wear above shoe covers (v8 check round 1), each in every jersey and every skin
+// overshoes and over leg wear above shoe covers (v8 check round 1); FOUND's cases (v8 check round 2), each in every jersey and every skin
 const DIRECT = [['windbreaker', 'jacket-rain'], ['jacket-thermal', 'jacket-rain'], ['jacket-winter', 'jacket-rain'], ['jersey-heavy', 'vest', 'jacket-rain'], ['jersey-heavy', 'windbreaker'], ['socks-wool'], ['tights-heavy', 'socks-wool'], ['socks-wool', 'shoes'], ['socks-wool', 'boots'],
-  ...LEG.flatMap(l => [[l, 'overshoes'], [l, 'socks-wool', 'overshoes']]), ['socks-wool', 'overshoes'], ['legs', 'socks-wool', 'shoes']];
+  ...LEG.flatMap(l => [[l, 'overshoes'], [l, 'socks-wool', 'overshoes']]), ['socks-wool', 'overshoes'], ['legs', 'socks-wool', 'shoes'],
+  /* v8 check round 2 (FOUND): boots with no wool socks, alone and under each leg wear; wool socks under knee warmers with toe covers and bare shoes */
+  ['boots'], ...LEG.map(l => [l, 'boots']), ['knees', 'socks-wool', 'toes'], ['knees', 'socks-wool']];
 const OUTER = ['vest', 'windbreaker', 'jacket-thermal', 'jacket-winter', 'jacket-rain', 'jersey-heavy'], VARY = ['kit2', 'sleeve', 'shorts', 'pattern'];
+// an entry's record (FIXED_BY_V8, FOUND), and each of its parts (the same record): judged how often, shows every time, on a ride's list, the
+// least and the least own
+function track(M, F, id, L, r, v, shows, ride, tag) { F.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, r)) return; const k = n + ':' + id, w = M.get(k) || { f, id, n: 0, shows: true, ride: false, parts: {} };
+  for (const q of [w, ...(f.parts || []).filter(([, pf]) => pf(L)).map(([pn]) => w.parts[pn] || (w.parts[pn] = { n: 0, shows: true, ride: false }))]) {
+    q.n++; q.shows = q.shows && shows; q.ride = q.ride || ride; if (!q.v || v.d48 < q.v.d48) Object.assign(q, { v, tag }); if (v.own != null && (!q.o || v.own < q.o.v.own)) q.o = { v, tag }; }
+  M.set(k, w); }); }
 // every rider shown (the default and the built one) is judged, nothing held (bundle v8; until v8 V7_GAPS and AWAIT held cases as measured on
 // v7, FIXED_BY_V8). agg (the wide sweep): count and collect rather than one check per item
 function judge(tag, S, px, agg, only) {
@@ -1155,12 +1189,10 @@ function judge(tag, S, px, agg, only) {
     chk(d && o, 'strip: ' + tag + ': ' + id + ' shows on the rider (' + (v ? v.d48 + ' device px changed' + (v.own != null ? ', ' + v.own + ' in its own colour' : '') : 'not measured') + ')', { v, L });
     FIXED_BY_V7.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = FIXED_SEEN.get(k);
       if (!w || v.d48 < w.v.d48) FIXED_SEEN.set(k, { f, id, v, tag, shows: d && o, n: (w ? w.n : 0) + 1 }); else w.n++; });
-    /* the cases v7 held: the least pixels changed and the least in its own colour, each with where; shows only if every judgement did */
-    FIXED_BY_V8.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = FIXED8_SEEN.get(k) || { f, id, n: 0, shows: true, ride: false, parts: {} };
-      /* the entry, and each of its parts (the same record): judged how often, shows every time, on a ride's list, the least and the least own */
-      for (const q of [w, ...(f.parts || []).filter(([, pf]) => pf(L)).map(([pn]) => w.parts[pn] || (w.parts[pn] = { n: 0, shows: true, ride: false }))]) {
-        q.n++; q.shows = q.shows && d && o; q.ride = q.ride || ride; if (!q.v || v.d48 < q.v.d48) Object.assign(q, { v, tag }); if (v.own != null && (!q.o || v.own < q.o.v.own)) q.o = { v, tag }; }
-      FIXED8_SEEN.set(k, w); });
+    /* the cases v7 held, and those found unjudged (FOUND): the least pixels changed and the least in its own colour, each with where; shows only if every judgement did */
+    track(FIXED8_SEEN, FIXED_BY_V8, id, L, S.r, v, d && o, ride, tag); track(FOUND_SEEN, FOUND, id, L, S.r, v, d && o, ride, tag);
+    /* close to the line: measured again on other screens (Chromium at 3x, WebKit at 2x and 3x) */
+    if (d && o && (v.d48 < SHOW.d48 * NEAR_BAND || (v.own != null && v.own < SHOW.own * NEAR_BAND))) { const k = L.join(' ') + '|' + J(S.r), w = NEAR.get(k) || { ids: L, r: S.r, items: new Map(), tag }; w.items.set(id, v); NEAR.set(k, w); }
     EDGES.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = EDGE_SEEN.get(k), rd = ride || !!(w && w.ride);
       if (!w || v.d48 < w.v.d48) EDGE_SEEN.set(k, { f, id, v, tag, shows: d && o, n: (w ? w.n : 0) + 1, ride: rd }); else { w.n++; w.ride = rd; } }); }
 }
@@ -1297,15 +1329,40 @@ section('strip', async () => {
           ok(agg.n > 0 && !agg.bad.length, 'strip: ' + where + ', ' + who + ': ' + f.ids.join(', ') + ' shows on every rider of its v7 width (FROM-APP-CHAT-' + f.point + ': ' + R.length + ' riders, ' + agg.n + ' judgements)', agg.bad.slice(0, 6)); }
         if (seen.size < R.length) miss.push(who + ': ' + (R.length - seen.size) + ' of ' + R.length + ' riders on no ride\'s list'); await x.close(); }
       ok(!miss.length, 'strip: FROM-APP-CHAT-' + f.point + ' ' + f.ids.join(', ') + ': every rider of its v7 width (' + Wd.length + ' on each of the default rider and RIDER99) is judged on a ride\'s list', miss); } }
+  // other screens (v8 check round 2: the acceptance check painted v8 on Safari and an iPhone): SHOW is 30 CSS px changed and 10 in the item's own
+  // colour (120 / 40 device px at 2x), so at 3x it is 270 / 90. Every item that showed here within half again of SHOW (Chromium at 2x, every
+  // judgement: rides, skins, jerseys, direct lists, the sweeps) is measured again in Chromium at 3x (most Android phones) and in WebKit at 2x
+  // (Safari on a Mac or iPad) and 3x (an iPhone), the same rider and list; one check per screen, list and item, its riders and the least; and
+  // the band is wide enough: no item reads a third less on another screen than here (by area), or one outside the band could fall under SHOW
+  { const own = Object.assign({}, OWN, OWN_HEAVY), G = [...NEAR.values()], wkb = await webkit.launch(), byList = new Map(); let gap = null;
+    for (const g of G) for (const [id, v] of g.items) { const k = g.ids.join(' ') + '|' + id; if (!byList.has(k)) byList.set(k, { ids: g.ids, id, tag: g.tag, R: [], V: [] }); byList.get(k).R.push(g.r); byList.get(k).V.push(v); }
+    console.log('  note: other screens: ' + G.length + ' riders and lists, ' + byList.size + ' lists and items within half again of SHOW on Chromium at 2x');
+    ok(byList.size > 0, 'strip: other screens: the items close to the line on Chromium at 2x are found (' + byList.size + ' lists and items)', null);
+    for (const [eng, sc] of [['Chromium', 3], ['WebKit', 2], ['WebKit', 3]]) { const A = (sc / 2) ** 2, sh = { d48: Math.round(SHOW.d48 * A), own: Math.round(SHOW.own * A) };
+      const x = await openH({ noErrs: true, browser: eng === 'WebKit' ? wkb : browser }), p = x.p;
+      for (const [, e] of byList) { const P = []; for (let c = 0; c < e.R.length; c += 40) P.push(...await pxMany(p, e.R.slice(c, c + 40), e.ids, own, null, [e.id], sc));
+        const bad = [], lo = P.reduce((m, q, i) => !m || q[e.id].d48 < m.v.d48 ? { v: q[e.id], r: e.R[i] } : m, null);
+        P.forEach((q, i) => { const v = q[e.id], h = e.V[i]; if (!(v.d48 >= sh.d48 && (v.own == null || v.own >= sh.own))) bad.push(e.R[i].skin + ' skin, ' + e.R[i].kit + ' jersey: ' + v.d48 + (v.own != null ? ' / ' + v.own : ''));
+          /* the widest gap: this screen's reading by area against Chromium at 2x's, pixels changed and own colour */
+          for (const [a, b] of [[v.d48, h.d48], [v.own, h.own]]) if (a != null && b) { const f = a / A / b; if (!gap || f < gap.f) gap = { f, eng, sc, list: e.ids.join(' '), id: e.id, skin: e.R[i].skin, here: b, there: a }; } });
+        ok(!bad.length, 'strip: ' + eng + ' at ' + sc + 'x (limit ' + sh.d48 + ' / ' + sh.own + ' device px): the list ' + e.ids.join(' ') + ': ' + e.id + ' shows on every rider it was close to the line for (' + e.R.length + ' riders; the least ' + lo.v.d48 + (lo.v.own != null ? ' / ' + lo.v.own : '') + ', ' + lo.r.skin + ' skin; first ' + e.tag + ')', bad.slice(0, 6)); }
+      await x.close(); }
+    await wkb.close();
+    ok(!!gap && gap.f > 1 / NEAR_BAND, 'strip: other screens: the band is wide enough: the widest gap reads ' + (gap ? Math.round(gap.f * 100) + '% of Chromium at 2x by area (' + gap.eng + ' at ' + gap.sc + 'x, ' + gap.id + ' on ' + gap.skin + ' skin: ' + gap.here + ' -> ' + gap.there + ', the list ' + gap.list + ')' : 'not measured') + ', over the ' + Math.round(100 / NEAR_BAND) + '% the band allows', gap); }
   // the cases v7 held, judged in full on v8: each printed with its least (pixels changed; and in its own colour) beside v7's, and each part's;
   // every item of each entry, and each of its parts, judged on a ride's list (v8 check round 1: any one item did; point 1's legs and
   // tights-light were never on one, and its leg wear without wool socks never judged)
   const lst = q => 'judged ' + q.n + ' times, ' + (q.shows ? 'shows every time' : 'DOES NOT SHOW') + ', the least ' + q.v.d48 + ' px changed (' + q.tag + ')' + (q.o ? ', the least in its own colour ' + q.o.v.own + ' (' + q.o.v.d48 + ' changed; ' + q.o.tag + ')' : '');
   for (const [, w] of FIXED8_SEEN) { console.log('  note: held on v7, judged on v8 (FROM-APP-CHAT-' + w.f.point + ') ' + w.id + ': ' + w.f.what + ': v7 ' + w.f.v7 + '; v8 ' + lst(w));
     for (const [pn, q] of Object.entries(w.parts)) console.log('  note:   ' + w.id + ' ' + pn + ': v8 ' + lst(q)); }
-  const v8unmet = FIXED_BY_V8.flatMap((f, n) => f.ids.flatMap(id => { const w = FIXED8_SEEN.get(n + ':' + id);
-    return !w || !w.ride ? [f.point + ' ' + id + ': ' + f.what] : (f.parts || []).filter(([pn]) => !(w.parts[pn] || {}).ride).map(([pn]) => f.point + ' ' + id + ' ' + pn + ': ' + f.what); }));
+  const unmet = (M, F) => F.flatMap((f, n) => f.ids.flatMap(id => { const w = M.get(n + ':' + id), at = (f.point ? f.point + ' ' : '') + id;
+    return !w || !w.ride ? [at + ': ' + f.what] : (f.parts || []).filter(([pn]) => !(w.parts[pn] || {}).ride).map(([pn]) => at + ' ' + pn + ': ' + f.what); }));
+  const v8unmet = unmet(FIXED8_SEEN, FIXED_BY_V8);
   ok(!v8unmet.length, 'strip: each case v7 held (' + FIXED_BY_V8.length + ' entries) is judged in full on a ride\'s list, every item of each and each part (nothing held)', v8unmet);
+  for (const [, w] of FOUND_SEEN) { console.log('  note: found unjudged, judged now: ' + w.id + ': ' + w.f.what + ': ' + lst(w));
+    for (const [pn, q] of Object.entries(w.parts)) console.log('  note:   ' + w.id + ' ' + pn + ': ' + lst(q)); }
+  const fdUnmet = unmet(FOUND_SEEN, FOUND);
+  ok(!fdUnmet.length, 'strip: each case found unjudged (' + FOUND.length + ' entries: boots with no wool socks, the leg wear above them, wool socks under knee warmers) is judged on a ride\'s list, every item of each and each part (v8 check round 2)', fdUnmet);
   for (const [, w] of FIXED_SEEN) console.log('  note: v6 gap v7 fixed, FROM-APP-CHAT-5 ' + (w.f.point === 'B' ? 'dark-skin note point B' : 'point ' + w.f.point) + ' ' + w.id + ': judged ' + w.n + ' times, ' + (w.shows ? 'shows' : 'does not show') + ', the least ' + JSON.stringify(w.v) + ' (' + w.tag + ')');
   for (const [, w] of EDGE_SEEN) console.log('  note: by-design rule\'s edge, ' + w.f.what + ': judged ' + w.n + ' times, ' + (w.shows ? 'shows' : 'does not show') + ', the least ' + JSON.stringify(w.v) + ' (' + w.tag + ')');
   const noEdge = EDGES.flatMap((f, n) => f.ids.filter(id => !(EDGE_SEEN.get(n + ':' + id) || {}).ride).map(id => id + ': ' + f.what));

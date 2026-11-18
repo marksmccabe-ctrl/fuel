@@ -14,7 +14,7 @@ because the laptop sleeps (two long runs died with it) and has 16 GB. This file 
 | `q96-sync` | Item 96, built, reviewed (7 rounds, ended at eafa457), main (item 95) merged in (c05e5a5, v120), kit step OK (Nov 6) | Merged into main (6a87e42) |
 | `q97-fw-plumbing` | Item 97, built, reviewed (6 rounds, round 6 dry, ended at 3dce12f, v121), kit step OK after a skeptic (Nov 6), logged | Merged into main (2f8c5c9) |
 | `q98-wx-fred` | Item 98, built on fred world v5, reviewed (5 rounds), kit step OK after skeptics (Nov 7), logged | Merged into main (8c19078) |
-| `q99-rider` | Item 99, built on fred world v7 (09:29), acceptance checks and 7 review rounds; fred world v8 (14:45) inlined at 6a8bb4e (v123); v8 check round 1 done (test gaps closed in q99) | q99 red on v8 with 206 failures in the art (dark gloves on deep brown; leg wear under overshoes without wool socks on brown to deep): waits for the app chat's decision, then the kit step, log and merge |
+| `q99-rider` | Item 99, built on fred world v7 (09:29), acceptance checks and 7 review rounds; fred world v8 (14:45) inlined at 6a8bb4e (v123); v8 check rounds 1 and 2 done (test gaps closed in q99: FOUND, other screens) | q99 red on v8, every failure in the art (DECISIONS.md Item 99 "v8 check round 2": dark gloves on deep brown; leg wear under overshoes or above boots without wool socks; boots' own colour; wool socks under knee warmers; on Safari / an iPhone also the socks over tights above shoe covers): waits for the app chat's decision, then the kit step, log and merge |
 | `claude/lucid-thompson-dc7gqa` | The Nov 1 cloud handoff (HANDOFF.md, old kit copy) | Old: superseded by this file |
 
 Folder layout (recreate it on the Studio; the laptop used exactly this):
