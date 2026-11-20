@@ -14,7 +14,7 @@ because the laptop sleeps (two long runs died with it) and has 16 GB. This file 
 | `q96-sync` | Item 96, built, reviewed (7 rounds, ended at eafa457), main (item 95) merged in (c05e5a5, v120), kit step OK (Nov 6) | Merged into main (6a87e42) |
 | `q97-fw-plumbing` | Item 97, built, reviewed (6 rounds, round 6 dry, ended at 3dce12f, v121), kit step OK after a skeptic (Nov 6), logged | Merged into main (2f8c5c9) |
 | `q98-wx-fred` | Item 98, built on fred world v5, reviewed (5 rounds), kit step OK after skeptics (Nov 7), logged | Merged into main (8c19078) |
-| `q99-rider` | Item 99, built on fred world v7 (09:29), acceptance checks and 7 review rounds; fred world v8 (14:45) inlined at 6a8bb4e (v123); v8 check rounds 1 and 2 done (test gaps closed in q99: FOUND, other screens) | q99 red on v8, every failure in the art (DECISIONS.md Item 99 "v8 check round 2": dark gloves on deep brown; leg wear under overshoes or above boots without wool socks; boots' own colour; wool socks under knee warmers; on Safari / an iPhone also the socks over tights above shoe covers): waits for the app chat's decision, then the kit step, log and merge |
+| `q99-rider` | Item 99, built on fred world v7 (09:29), acceptance checks and 7 review rounds; fred world v8 (14:45) inlined at 6a8bb4e (v123); v8 check rounds 1 and 2 done; v8 accepted (Mark: item 99 ships on v8; FROM-APP-CHAT-7 asks the design chat for polish, a v9 a later item takes) | q99 green on v8 with ACCEPTED_V8 (DECISIONS.md Item 99 "Bundle v8 accepted": `OK (8607 checks)`, main second `OK (8608)`; all 150 mutants fail): next the kit step, then log and merge |
 | `claude/lucid-thompson-dc7gqa` | The Nov 1 cloud handoff (HANDOFF.md, old kit copy) | Old: superseded by this file |
 
 Folder layout (recreate it on the Studio; the laptop used exactly this):
@@ -103,14 +103,15 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
   (built Nov 8 09:29; FROM-APP-CHAT-4 and -5), with the app guards (riderOutfit ids filtered by `Object.hasOwn(FW.OUTFIT_LOOK, id)`,
   always an array, size a number). Acceptance checks, then 7 review rounds (DECISIONS.md "Item 99"); app at e778443 (v123), every
   q99 check and the kit's other steps pass on v7 (budgets read host busy on a busy Mac: rerun it idle in the kit step).
-- **Next: item 99 on v8.** Two notes for the design chat: `~/Dropbox/00_T/handoff/FROM-APP-CHAT-6.md` (points 1-5: the overshoe cuff, a
-  colour of their own for shoe covers and overshoes, dark gloves on deep brown, build checks, HANDOFF text) and `FROM-APP-CHAT-6B.md`
-  (points 6-8: the dark jackets on Black and Navy jerseys, a thermal jersey that draws nothing in Black with arm warmers and the
-  vest, patterns that draw nothing on some jerseys). Check with Mark that both went. When v8 arrives: verify it with an independent
-  run (build time, version, each of 1-8), inline it on `q99-rider` with `node scripts/fw-inline.mjs`, add its sha1s to q99's
-  BUILDS, set FWV to 8 and empty V7_GAPS, AWAIT and PAT_AWAIT (q99 then judges those cases in full), update OWN for the new cover,
-  jacket and glove colours, recheck, then the kit step with a skeptic (all 125 q99 mutants; budgets on an idle Mac), log and merge
-  (v123 live).
+- Nov 17-20 (Mac Studio, kit only, no app change): fred world v8 (14:45) inlined on `q99-rider` (6a8bb4e, v123); v8 check rounds 1 and
+  2 found six cases reading under SHOW on v8, all in the art. Mark decided item 99 ships on v8: `~/Dropbox/00_T/handoff/FROM-APP-CHAT-7.md`
+  asks the design chat for polish (boots over leg wear, leg wear above boots and overshoes on darker skin, wool socks under knee warmers
+  and above shoe covers at 3x, the thermal jersey's cuff, build checks), a v9 a later item takes. q99 records it as ACCEPTED_V8, each
+  case exactly as wide as measured on v8 with a floor on each screen (DECISIONS.md Item 99 "Bundle v8 accepted"); q99 green on v8, all 150
+  mutants fail.
+- **Next: item 99's kit step.** A skeptic; all 150 q99 mutants; q97, q98, motion, budgets on an idle Mac, smoke, inventory, contrast,
+  layout, npm test; then log and merge (v123 live). When v9 arrives (a later item): verify it, inline it, add its sha1s to BUILDS, and
+  drop each ACCEPTED_V8 entry q99 prints as "now shows".
   Later: 102 must not pass self-animating wrappers (fw-peek, fw-chase-*) as o.cls; 103 crops FW.scene ([200,560,440,226] on
   phones, wider on html.dk within the 30-loop limit) with a unique p per scene.
 - Recommended answers Mark accepted with the rewrite: the sky card is a white box with the app's sky faded in at the top and hides

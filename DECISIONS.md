@@ -1985,3 +1985,72 @@
     `OK (253)`, `OK (49)`, `OK (21)`; motion `OK (26 checks)`; budgets `OK (62 checks)` on the 16 rider screens (host reference 1.32 ms, no
     host busy line); smoke `OK (14 checks)`; inventory `OK (7 checks)`; contrast `OK (58 checks)`; layout 320 and 390 px `OK`
     (LAYOUT_ONLY=rider); npm test 1824 tests, 1777 pass, 0 fail.
+- Bundle v8 accepted (Mark's decision; q99 green on v8; no app change: q99-rider stays at 6a8bb4e, v123). After reading the v8 check rounds,
+  Mark decided item 99 ships on fred world v8. The app chat's note to the design chat after v8 (handoff/FROM-APP-CHAT-7.md) asks for polish:
+  1 boots over leg wear, 2 leg wear above boots and overshoes on darker skin, 3 wool socks under knee warmers, 4 wool socks above shoe covers
+  at 3x, 5 the thermal jersey's cuff overhang, 6 build checks; and "for the record" accepts dark gloves on deep brown reading by their cuff.
+  That is a v9 a later item takes; item 99 does not wait for it.
+  - q99 (kit): one named list, ACCEPTED_V8, each entry tied to its FROM-APP-CHAT-7 point: its lists (when) and its width (screen -> item ->
+    skins), exactly as measured on v8. The widths were measured with q99 itself: Q99_ACCEPT_DUMP=<file> runs the strip with every entry as
+    wide as its lists and writes every reading of its items on every screen q99 measures it on (probe99/accept/dump1.jsonl, 8161 readings,
+    analysed by probe99/accept/an.py; runs/dump1.log `OK (8323 checks)`, 419 s, so nothing outside the six cases reads under SHOW anywhere).
+    Every cell (screen, item, skin) read all under SHOW or all at SHOW, over every list, jersey, fade, sleeves, shorts, pattern and both
+    riders, so the widths are per screen, item and skin and none is wider than measured. Inside a width a reading under SHOW passes only at
+    or over the entry's floor on that screen (90% of its least v8 reading there, rounded up, pixels changed and own colour separately; own 0
+    where v8's least is 0); a reading at SHOW inside a width prints "now shows" as a note, never a failure; one check per entry that every
+    cell of its width is judged; each entry prints a note per screen with its reading and floor. An accepted Chromium 2x reading is measured
+    on the other screens too (with the items within half again of SHOW), and so is any reading of an entry's case whose item and skin are in
+    its width on another screen, so a later build that shows well at 2x still has those cells judged; the band check reads only items that
+    showed at Chromium 2x, as before. Anything outside the list that reads under SHOW still fails; SHOW (120 / 40 at Chromium 2x), PAT_SHOW
+    (24), OWN and the by-design under-layers are unchanged.
+  - ACCEPTED_V8, entry by entry (least v8 reading changed / own -> floor; readings under SHOW per screen; C Chromium, W WebKit):
+    1. Point 1, boots over leg warmers or tights with no wool socks (their own colour, #3A2F2A within 48 of the leg wear: they read by their
+       outline): every skin, every screen. C2x 192 / 18 -> 173 / 17; C3x 353 / 61 -> 318 / 55; W2x 194 / 18 -> 175 / 17; W3x 334 / 46 ->
+       301 / 42 (224 readings on each). Over bare shins (506 / 192) and with wool socks they are outside it.
+    2. Point 2, leg warmers or tights above boots with no wool socks: at 2x (both engines) leg warmers and light tights on tan to deep brown,
+       heavy tights on olive to deep brown (fair to ruddy, and heavy tights on tan, read 126-130 / 44-50); at 3x (both engines) leg warmers
+       and light tights on dark and deep brown, heavy tights on deep brown. C2x 70 / 26 -> 63 / 24; C3x 228 / 82 -> 206 / 74; W2x 67 / 23 ->
+       61 / 21; W3x 233 / 84 -> 210 / 76 (121, 91, 121, 91 readings).
+    3. Point 2, leg warmers or tights above overshoes with no wool socks: Chromium 2x leg warmers and light tights on brown to deep brown,
+       heavy tights on brown and deep brown (on dark they read 120 / 50); WebKit 2x leg warmers and light tights on tan to deep brown, heavy
+       tights on brown to deep brown; no width at 3x (they read there, 286 and more). C2x 110 / 42 -> 99 / 38; W2x 103 / 39 -> 93 / 36 (156
+       and 164 readings). With wool socks they read (192 / 144).
+    4. Point 3, wool socks under knee warmers with toe covers or bare shoes: every skin, every screen. C2x 92 / 50 -> 83 / 45; C3x 196 / 174
+       -> 177 / 157; W2x 90 / 48 -> 81 / 44; W3x 202 / 176 -> 182 / 159 (188 readings on each; bare shoes 114 / 52 at C2x).
+    5. Point 4, wool socks over leg warmers or tights above shoe covers: Chromium and WebKit at 3x, every skin (at 2x they read, 128 / 64
+       and 124 / 64). C3x 260 / 148 -> 234 / 134; W3x 264 / 148 -> 238 / 134 (461 readings on each).
+    6. "For the record", full-finger and fingerless dark gloves on deep brown skin, read by their #C9D1DA cuff: deep brown only (dark brown
+       reads 516 / 312 and 376 / 64), every screen. C2x 204 / 0 -> 184 / 0; C3x 400 / 0 -> 360 / 0; W2x 212 / 0 -> 191 / 0; W3x 396 / 0 ->
+       357 / 0 (492 readings on each; fingerless alone 320 / 8, 740 / 56, 316 / 8, 740 / 56).
+  - Confirmed by Mark, the v8 check rounds' own decisions: SHOW is an area (270 / 90 device px at 3x); items within half again of SHOW are
+    measured again on Chromium 3x and WebKit 2x and 3x, with the band check (no item under two thirds of its Chromium 2x area; the widest
+    74%, leg warmers over overshoes on tan skin, 156 -> 116 in WebKit at 2x); 1x is not judged; the wool-sock by-design rule is narrowed to
+    where v8 draws nothing.
+  - Mutants (q99/mut99.mjs, 150; the page green, so Q99_BASELINE=runs/q99-2.log and any FAIL line is the mutant's own; probe99/w/mutants.log
+    "bundle v8 accepted", per-mutant logs in probe99/mut-<name>/q99.log). Twelve new, for each entry one just outside its width (the same item
+    drawn as nothing on a list, skin or screen it does not cover) and one under its floor: v8a1-out (boots gone over leg wear WITH wool socks,
+    the freezing full list) `FAIL 31`; v8a1-floor (the boots without their outline over leg wear, no wool socks: 30 / 30 against 173 / 17)
+    `FAIL 245`, all floor lines; v8a2-out (leg wear above boots gone on ruddy skin) `FAIL 10`; v8a2-floor (the same on deep brown) `FAIL 105`,
+    all floor lines; v8a3-out (leg wear under overshoes gone on tan skin, Chromium only: tan is in the width on WebKit 2x, not Chromium) `FAIL
+    15`; v8a3-floor (the same on deep brown, every engine) `FAIL 162` (142 floor lines, 20 at 3x where entry 3 has no width); v8a4-out (wool
+    socks gone under leg warmers or tights with toe covers or bare shoes) `FAIL 98`; v8a4-floor (the socks under knee warmers in the knee
+    warmers' grey: 84 / 0 against 83 / 45) `FAIL 206`, all floor lines; v8a5-out (the socks over leg wear above shoe covers gone in Chromium:
+    2x is outside entry 5) `FAIL 69`; v8a5-floor (a grey rib across part of those socks' band: at 2x they still read, 128 / 48 and 124 / 46;
+    at 3x 262 / 122 and 266 / 126 against 234 / 134 and 238 / 134; probe99/accept/m5.mjs) `FAIL 4`, all four the 3x floor; v8a6-out (the dark
+    gloves gone on dark brown) `FAIL 8`; v8a6-floor (the gloves without their #C9D1DA cuff on deep brown: 0 px left of the full glove against
+    184) `FAIL 92`, all floor lines. A first try at v8a5-floor (those socks in another grey) failed only at 2x, outside the width, so it was
+    replaced by the rib; and the twelve's first run showed a width cell (WebKit 2x heavy tights on olive above boots) left unjudged when
+    Chromium 2x read the case past the band, a failure from a case that showed: q99 now measures any reading of an entry's case on every
+    screen where its item and skin are in the width (accElsewhere; on v8 the same readings, the band unchanged), and every mutant was run
+    again on that q99. The other 138 each fail with lines of their own (the fewest one line: nofilter, privacy, store-open, print, hint, the
+    c1-, r2-, r4- to r7- sheet and fit ones as before); the v8 ones: c1-nojacket `FAIL 908`, v8-winterblack 40, v8-winterv7 52, v8-heavyblack
+    30, v8-bandcoral (sheet) 2, v8c1-legover 370, v8c1-thermalnavy 18, v8c1-winternavy 24, v8c1-heavynavy 10, v8c1-sockcover 73, v8c1-sockover
+    250, v8c1-sockskin 98, v8c2-bootsnosock 526, v8c2-kneesock 206, v8c2-wksock 5. None passes: no q99 change was needed for them.
+  - Proof, one at a time on a quiet machine (no other headless Chromium or test node running), fred99/null.html rebuilt with mknull.sh from
+    6a8bb4e (byte-identical to before), probe99/accept/chain.sh, logs in probe99/accept/runs/: q99 `OK: item 99: Your rider, and the rider
+    on the Closet card (8607 checks)` (884 s, q99-2.log); with main's page second `OK: ... (8608 checks)` (905 s, q99-main-2.log); the twelve
+    v8a-* 5438 s, the other 138 29742 s. (q99-1 and q99-main, before accElsewhere, ended the same: 8607 and 8608 checks.) Not run this step
+    (no app change, no other test touched): q97, q98, motion, budgets, smoke, inventory, contrast, layout, npm test; v8 check round 2's runs
+    of them on this page stand.
+  - Next: the kit step (a skeptic; all 150 q99 mutants; q97, q98, motion, budgets on an idle Mac, smoke, inventory, contrast, layout, npm
+    test), then log and merge (v123 live).
