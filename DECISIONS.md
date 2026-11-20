@@ -2021,7 +2021,8 @@
        and 124 / 64). C3x 260 / 148 -> 234 / 134; W3x 264 / 148 -> 238 / 134 (461 readings on each).
     6. "For the record", full-finger and fingerless dark gloves on deep brown skin, read by their #C9D1DA cuff: deep brown only (dark brown
        reads 516 / 312 and 376 / 64), every screen. C2x 204 / 0 -> 184 / 0; C3x 400 / 0 -> 360 / 0; W2x 212 / 0 -> 191 / 0; W3x 396 / 0 ->
-       357 / 0 (492 readings on each; fingerless alone 320 / 8, 740 / 56, 316 / 8, 740 / 56).
+       357 / 0 (492 readings on each; fingerless alone 320 / 8, 740 / 56, 316 / 8, 740 / 56). These floors were entry-wide (the weakest
+       item's); since the skeptic below they are per item (fingerless 288 / 8, 666 / 51, 285 / 8, 666 / 51).
   - Confirmed by Mark, the v8 check rounds' own decisions: SHOW is an area (270 / 90 device px at 3x); items within half again of SHOW are
     measured again on Chromium 3x and WebKit 2x and 3x, with the band check (no item under two thirds of its Chromium 2x area; the widest
     74%, leg warmers over overshoes on tan skin, 156 -> 116 in WebKit at 2x); 1x is not judged; the wool-sock by-design rule is narrowed to
@@ -2038,7 +2039,8 @@
     2x is outside entry 5) `FAIL 69`; v8a5-floor (a grey rib across part of those socks' band: at 2x they still read, 128 / 48 and 124 / 46;
     at 3x 262 / 122 and 266 / 126 against 234 / 134 and 238 / 134; probe99/accept/m5.mjs) `FAIL 4`, all four the 3x floor; v8a6-out (the dark
     gloves gone on dark brown) `FAIL 8`; v8a6-floor (the gloves without their #C9D1DA cuff on deep brown: 0 px left of the full glove against
-    184) `FAIL 92`, all floor lines. A first try at v8a5-floor (those socks in another grey) failed only at 2x, outside the width, so it was
+    184) `FAIL 92`, all floor lines, every one the full-finger gloves': the fingerless half passed it (200 / 28 over the entry-wide 184 /
+    0; skeptic, below). A first try at v8a5-floor (those socks in another grey) failed only at 2x, outside the width, so it was
     replaced by the rib; and the twelve's first run showed a width cell (WebKit 2x heavy tights on olive above boots) left unjudged when
     Chromium 2x read the case past the band, a failure from a case that showed: q99 now measures any reading of an entry's case on every
     screen where its item and skin are in the width (accElsewhere; on v8 the same readings, the band unchanged), and every mutant was run
@@ -2052,5 +2054,27 @@
     v8a-* 5438 s, the other 138 29742 s. (q99-1 and q99-main, before accElsewhere, ended the same: 8607 and 8608 checks.) Not run this step
     (no app change, no other test touched): q97, q98, motion, budgets, smoke, inventory, contrast, layout, npm test; v8 check round 2's runs
     of them on this page stand.
-  - Next: the kit step (a skeptic; all 150 q99 mutants; q97, q98, motion, budgets on an idle Mac, smoke, inventory, contrast, layout, npm
+  - Skeptic on how ACCEPTED_V8 was recorded (two findings, both reproduced, both fixed in q99; nothing loosened). (1) Entry 6's floor was
+    one per screen for both items, 90% of the full-finger gloves' least (184 / 0 at Chromium 2x), so the fingerless gloves (320 / 8) could lose
+    their #C9D1DA cuff on deep brown skin and still pass: 200 / 28 at Chromium 2x and 192 / 28 at WebKit 2x over 184 / 0 and 191 / 0, and at
+    3x 436 / 92 and 440 / 96, at SHOW, so q99 printed "now shows" for a worse build. Reproduced: the old q99 (4f2c989) strip on that page
+    `OK (8323 checks)` (probe99/acc2/runs/old-fingercuff.log; the skeptic's full run probe99/accchk1-fingernocuff/q99-full.log `OK (8607)`).
+    Fix: every entry's least and floor are per item (least: screen -> item -> [changed, own], from dump1.jsonl over each item's width
+    cells): entry 6 fingerless 320 / 8, 740 / 56, 316 / 8, 740 / 56 -> 288 / 8, 666 / 51, 285 / 8, 666 / 51 (full-finger as before); entries
+    2 and 3 heavy tights a little higher (2: C2x 74 / 28 -> 67 / 26, C3x 228 / 84 -> 206 / 76, W2x 74 / 29 -> 67 / 27, W3x 233 / 88 -> 210 /
+    80; 3: C2x 114 / 44 -> 103 / 40, W2x 110 / 45 -> 99 / 41); leg warmers and light tights, and entries 1, 4 and 5 (one item), unchanged.
+    The notes print each item's least and floor, and the "now shows" note says to drop an entry only on a run that is otherwise green. New
+    mutant v8a6-fingercuff (the fingerless cuff off on deep brown, the skeptic's page byte for byte): `FAIL 26`, 24 at Chromium 2x's floor
+    (288 / 8) and 2 at WebKit 2x's (285 / 8); the old q99 passes it. v8a6-floor now `FAIL 118` (the fingerless half's 26 added). (2) The
+    check "each case v7 held ... (nothing held)" and the comments (header, the bundle v8 note above PAT_SHOW, judge(), the wide sweep's check)
+    said nothing is held, beside ACCEPTED_V8: they now say "nothing held outside ACCEPTED_V8" (Bundle v8 accepted, Mark's decision); text
+    only, so no mutant (no build can pass through it). Proof, one at a time on a quiet machine, fred99/null.html rebuilt with mknull.sh from
+    6a8bb4e (byte-identical), probe99/acc2/chain.sh, logs in probe99/acc2/runs/: q99 `OK: item 99: Your rider, and the rider on the Closet
+    card (8607 checks)` (882 s, q99.log; every item's least on each screen equal to dump1's); with main's page second `OK (8608 checks)` (883 s);
+    all 151 mutants against q99.log (probe99/w/mutants.log "acc2", runs/mutants-acc2.txt): every one `FAIL` with lines not in the baseline,
+    the fewest one line as before (nofilter, privacy, store-open, print, hint, c1-, r2-, r4- to r7- sheet and fit ones); the counts as in the
+    last pass but v8a6-floor 92 -> 118 and v8a3-out 15 -> 21 (the six more its 3x lines, Chromium tan leg wear drawn as nothing; the old q99
+    gives 21 too, probe99/acc2/runs/old-v8a3-out.log, so the 15 logged above was from an earlier q99 state); 409 s for the new one, 29390 s
+    for the other 150.
+  - Next: the kit step (a skeptic; all 151 q99 mutants; q97, q98, motion, budgets on an idle Mac, smoke, inventory, contrast, layout, npm
     test), then log and merge (v123 live).
