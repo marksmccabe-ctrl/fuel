@@ -184,6 +184,10 @@ const M = [
   ['v8a5-floor', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return ids.includes('shoes') && ids.includes('socks-wool') && !ids.some(x=>['overshoes','boots','knees'].includes(x)) && ids.some(x=>" + LEGJS + ".includes(x)) ? t.replace(/(<path d=\"M116 254V276\" fill=\"none\" stroke=\"#8E949A\"[^>]*\\/>)/, '$1<path d=\"M75 264H83M107 264H115\" stroke=\"#B9C2CF\" stroke-width=\"1.2\"/>') : t;")], // those socks with a grey rib across part of their band: at 2x they still read (Chromium 128 / 48, WebKit 124 / 46), at 3x their own colour falls under the floor (122 and 126 against 134; probe99/accept/m5.mjs)
   ['v8a6-out', 'strip', s => fwWrap(s, "if(r && r.skin==='dark') ids=ids.filter(x=>x!=='gloves' && x!=='gloves-finger'); return ro(r, ids, e);")], // the dark gloves gone on dark brown skin (entry 6 is deep brown only)
   ['v8a6-floor', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return r && r.skin==='deep' && ids.some(x=>x==='gloves' || x==='gloves-finger') ? t.split('d=\"M-5.5 -8.8V8.8\" stroke=\"#C9D1DA\"').join('d=\"M-5.5 -8.8V8.8\" stroke=\"none\"').split('d=\"M-5 -8.5V8.5\" stroke=\"#C9D1DA\"').join('d=\"M-5 -8.5V8.5\" stroke=\"none\"') : t;")], // the gloves without their #C9D1DA cuff on deep brown
+  // the fingerless gloves alone without their cuff on deep brown (the full-finger ones untouched): 200 / 28 at Chromium 2x, 192 / 28 at WebKit 2x,
+  // over an entry-wide floor of 184 / 0 and 191 / 0 (the full-finger gloves' least), and at SHOW at 3x; under the fingerless gloves' own floor
+  // (288 / 8 and 285 / 8: ACCEPTED_V8's floors are per item since this mutant; the skeptic's probe99/accchk1-fingernocuff)
+  ['v8a6-fingercuff', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return r && r.skin==='deep' && ids.includes('gloves-finger') ? t.split('d=\"M-5 -8.5V8.5\" stroke=\"#C9D1DA\"').join('d=\"M-5 -8.5V8.5\" stroke=\"none\"') : t;")],
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mutants.log');
 // Q99_BASELINE: a q99 log of the page itself on the same sections; a mutant is caught by a FAIL line that log does not have (the page red)
