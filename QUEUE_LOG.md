@@ -5011,3 +5011,99 @@ Source: the owner in chat.
   allows a later item's art only inside its function (wxFred); budgets as above. `tools/runkit.sh` with items 91–93 and 95–98's
   tests (Mac Studio): 17 steps OK.
 - **Answer sheet:** 1,763 pass, 0 fail. Full kit passes. Cache v122.
+
+## 99 · Your rider, and the rider on the Closet card (fred, Nov 5)
+- **Bundle:** built on the design chat's v6 (built 2026-11-07 22:08 EST), moved to v7 (2026-11-08 09:29) after review round 2 and
+  to v8 (2026-11-17 14:45) after round 7, each checked on its own (rebuilt from its sources byte for byte, time stamp aside) and
+  inlined with `scripts/fw-inline.mjs`, never by hand; q99 holds each block by its sha1, so a hand edit fails.
+- **Row and sheet:** Settings › You › Your rider (`#prowBtn-rider`) reads "Not set" until a rider is built, then its jersey
+  ("Coral jersey"). The sheet has the live rider on top (120 x 180 px), then Look, Gear and Kit folds, each summing up its
+  choices: "Light skin · short dark brown hair", "Black helmet · shield · purple lens", "Bluebird blue jersey · plain · black
+  shorts". More colours holds the jersey's fade and the sleeves. Colours are 44 px swatches, the rest 44 px word buttons. 99.1's
+  radio groups with aria-pressed can't both hold (a radiogroup holds only radios), so each field is a role=group named by its
+  label, holding buttons with aria-label and aria-pressed: one Tab stop, the arrow keys move and choose, as in Carry's kinds.
+  "Same as jersey" is the jersey's colour as a ring (a disc matched the field's own swatch on 5 of 11 jerseys).
+- **Names follow the drawing:** every name is the bundle's, but with Covered the colours are a covering's (Rust and Gold, not
+  Auburn and Blond) and colour the beard too ("Covering and beard colour", "gold head covering and beard"); with Shaved and no
+  beard or mustache the colour field hides (the bundle draws no hair under the helmet) and the summary says "shaved head", and
+  with one the field is "Beard colour" or "Mustache colour"; the Gear summary says "glasses" for a pair; lens and frame hide with
+  no glasses. Summaries wrap, never cut (an ellipsis tried in round 2 failed the layout audit): at 390 px the longest take two
+  lines (88 of the 1,008 Look and 16 of the 264 Kit summaries when round 2 counted; round 4's "head covering and beard" wraps
+  more Look summaries since); the default rider's take one.
+- **The live rider while choosing:** sticky under the sheet's title bar (80 x 120 px below 700 px of height); beside the groups on
+  a phone held sideways; scrolling with the choices on a short, narrow window (a computer browser zoomed to 300-400%) and on a
+  computer layout under 440 px high, where a stuck rider left no room for a field. Nothing focused or tapped is ever under it, and
+  a tapped button keeps its place when a summary above it rewraps (WebKit has no scroll anchoring).
+- **settings.rider:** stored whole once the rider taps any choice (the pressed default too), no DEFAULT_SETTINGS entry, one key in
+  item 96's sync. riderNorm checks each value against the bundle's options on load, restore and sync (anything else is that
+  field's default; unknown keys go). It is read as an own key only, and a restored file's "__proto__" is never copied (it made a
+  ghost rider). A backup with no rider, or a null one, keeps this device's. A tampered cloud value arrives checked (each bad field
+  its default, the real choices kept) and later pulls of it change nothing; the raw value stays in the cloud until this device
+  changes the rider. A cloud rider null or deleted under a newer stamp (the live build's restore can write one) gets this
+  device's rider back, stamped 1 ms past the deletion, so every device ends on one rider.
+- **Avatars:** signed in with a rider built, `FW.riderAvatar` replaces the initial in the header circle (32 px) and `#sbAv`
+  (30 px); signed out keeps the outline and the empty circle. Fixed on the way: the header's icon rule drew the rider at 20 px,
+  and every signed-in load drew it twice.
+- **The strip:** `#rRider`, above the Closet list (the full plan and Clothing only), is `FW.riderOutfit` of exactly the list's
+  ids, 100 x 150 px, centred, aria-hidden, no text; only ids that are own keys of `FW.OUTFIT_LOOK` reach the bundle (custom items
+  and '__proto__' left out). Under-layers draw nothing by design (light and mid jerseys, bibs, base layers, summer socks, arm
+  warmers and sun sleeves under sleeves; from v7 all under the rain jacket, a thermal jersey under a sleeved jacket, and wool
+  socks under knee warmers above any cover or under leg wear above overshoes or boots), so a hot ride with the starter closet
+  shows the bare rider. The strip, the avatars and the sheet's rider are fwMount spots held still (`{still: true}`), each kept
+  by a key of what it shows.
+- **Elsewhere:** print and forced colours leave the strip out and show the initial; in forced colours the swatches keep their
+  colours with a CanvasText edge and a Highlight ring. The troubleshooting copy (DBG_DROP_SET) and AI prompts leave the rider
+  out; the privacy note names "your rider’s look". A Settings search matching only the other sport's side was a blank page
+  (since q42's sides); it now says "No Running settings match “rider”." with a 44 px button "Your rider is under Cycling ›".
+- **Review:** seven rounds of acceptance checks on v6 and v7: 67 problems (15, 12, 6, 11, 10, 8, 5), all real. App fixes: Same as
+  jersey, the summaries and the other side's search (round 1); the covering's names (2); the header drawn twice (3);
+  the sticky rider, the covering's beard, "glasses" (4); Shaved, the phone held sideways, "__proto__", the null rider (5); the
+  short windows and the cloud's deleted rider (6); none in 7. Most of the rest were q99 gaps, each closed by a check and a mutant
+  shown to fail: nothing checked the rider as painted (a strip clipped to the head passed), the Clothing-only results were never
+  opened, no check synced an edit to a built rider, and the strip was judged in two jerseys, the arrow keys in one field.
+- **The strip's bar:** an item shows when leaving it out of `FW.plain` at strip size on a 2x canvas changes at least 120 device px
+  by more than 48 in a channel, 40 of them in its own colour (SHOW). q99 judges every list the app gives on eight kinds of ride
+  with full, starter and thinned closets, for the default rider on all 8 skins and a built one, in all 11 jerseys, plus 198
+  variants of each of those two riders on each list where an outer layer is listed; items within half again of SHOW also as
+  Chromium at 3x and WebKit at 2x and 3x draw them (270 / 90 at 3x). Misses went to the design chat (held in named lists); the
+  app never works around the art.
+- **v8 check rounds:** 8 problems: three q99 gaps (point 1's leg wear judged only with wool socks, the jackets' widths on too few
+  riders, a wool-sock rule excusing socks v8 draws), then cases it had never reached: boots over leg wear with no wool socks
+  (192 px, 18 in their colour), the leg wear above them, wool socks under knee warmers (92-114 px), and Safari and 3x screens
+  reading lower than Chromium at 2x (leg warmers above overshoes on tan skin 156 -> 116 in WebKit). Also in the art: dark gloves
+  on deep brown skin, and the thermal jersey's cuff on the vest (41 px). q99 ended red on v8: 801 failures, all in the art.
+- **Accepted on v8 (Mark's decision):** item 99 ships on v8; `FROM-APP-CHAT-7.md` asks for polish in a v9 that a later item takes.
+  q99's ACCEPTED_V8 holds six cases, each tied to its point, exactly as wide as measured on v8 (screen, item, skin), with a floor
+  per screen and item at 90% of its least v8 reading (changed / own px, Chromium 2x): (1) boots over leg warmers or tights with no
+  wool socks, read by their outline (192 / 18), every skin; (2) leg wear above boots with no wool socks, tan to deep brown
+  (70 / 26); (3) the same above overshoes, brown to deep brown (110 / 42; from tan in WebKit); (4) wool socks under knee warmers
+  with toe covers or bare shoes (92 / 50), every skin; (5) wool socks over leg wear above shoe covers, at 3x only (Chromium
+  260 / 148 against 270 / 90); (6) "for the record", dark gloves on deep brown skin, read by their light cuff (204 / 0; fingerless
+  320 / 8). Anything else under SHOW still fails; an entry goes only when an otherwise green run prints it "now shows", never
+  under SHOW, on every screen of its width. Two skeptic rounds on the record found four gaps, all fixed, nothing loosened: floors
+  are per item (the fingerless gloves could lose their cuff and pass); a measuring run, all floors off, always ends FAIL.
+- **Kit step:** the whole kit on the v8 page. Item 99's 16 screens were each checked on a screenshot; none added. The first run
+  failed one step, motion, on main's page too (item 98's "now and then" case): main's dayFitRows sets white-space on each run row,
+  reads it and clears it in one statement, which no frame shows but the audit counted as motion under Reduce Motion. Fixed in the
+  audit, not the app: an inline style is judged by what each batch of records leaves, with a self-test the old audit fails. Then
+  `kit: OK: 18 steps passed, 0 item tests skipped (8937 s)`; no exemption, no app change. The skeptic's round 1 found nothing.
+- **Design chat:** in `~/Dropbox/00_T/handoff/`, `FROM-APP-CHAT-4.md` (in v6), `FROM-APP-CHAT-5.md` (10 points, 1–7 before this
+  item; v7 took 2, 3, 5–8 and 10, and 1, 4 and 9 in part), `FROM-APP-CHAT-6.md` and `-6B.md` (8 points, 6–8 from this item's
+  review rounds; all in v8) and `FROM-APP-CHAT-7.md` (6 points of polish; the dark gloves accepted). v7 cleared most of the
+  strip's v6 gaps (shoe covers over leg wear, rain jacket, jackets, wool socks, knee warmers, skullcap, headband); leg wear under
+  overshoes (0 px on v7) and the shoe covers' own colour went to -6 points 1–2. v8 gave the covers slate #4F6478 (0 -> 340 px in
+  it), the winter and thermal jackets colours that read on Black and Navy jerseys (240 -> 1,909 px), the thermal jersey a white
+  cuff (0 -> 348) and each pattern an ink edge (the band 0 -> 430). v9 (built 2026-11-20 17:38 EST) says all six of -7 are in
+  and passes the checks that need no browser; item 100 takes it first. Entry 6 is unchanged in v9 and stays accepted.
+- **Left:** ACCEPTED_V8's entries 1–5 until q99 on v9 shows them (entry 6 stays: v9 leaves the gloves as they are); the thermal
+  jersey's white cuff on the vest (v8's art). A 320 x 200 window (1280 x 800 at 400%) leaves 66 px of view for a 71 px field. A
+  cloud deletion erases which edit was newer: the first device to pull after it wins.
+- **Not changed (main too):** dayFitRows still sets and clears white-space on every fit (the audit no longer counts it); the
+  Settings search's Clear button sits inside the field's right end (layout's KNOWN_ON_MAIN entry for the new search screen).
+- **Not checked on a device:** VoiceOver (Chromium's accessibility tree has group "Jersey" holding button "Coral" [pressed]);
+  Safari on an iPhone or a Mac (Playwright's Chromium, and WebKit for the strip's readings); two real devices on Firestore.
+- **Kit:** new `kit2/q99/q99.test.mjs` (8,608 checks; 8,609 with main's page second; about 15 min) and `q99/mut99.mjs` (152
+  mutated pages, each fails); 16 screens in `lib/screens.mjs` (`needs: '#prowBtn-rider'` or `'#rRider'`, skipped on main; a screen
+  may carry its own forecast); q97 allows item 99's spots; q98's main section skips once main has wxFred; motion's batch rule and
+  its self-test. `tools/runkit.sh` with items 91–93 and 95–99's tests (Mac Studio): 18 steps OK.
+- **Answer sheet:** 1,777 pass, 0 fail (new `tests/engine/rider.test.mjs`, 14 tests). Full kit passes. Cache v123.

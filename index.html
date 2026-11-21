@@ -13,8 +13,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style id="fwCss">
-/* fred world v5 start */
-/* fred world v5 (2026-11-06 19:46 EST): built by build-bundle.py. Reads three app motion tokens (--t-slow, --ease-out, --ease-spring); every colour is its own --fw-* art token. */
+/* fred world v8 start */
+/* fred world v8 (2026-11-17 14:45 EST): built by build-bundle.py. Reads three app motion tokens (--t-slow, --ease-out, --ease-spring); every colour is its own --fw-* art token. */
 
 /* ===== cast.css ===== */
 /* fred world: shared tokens + character rig (style guide §3.1, §3.5–3.6) */
@@ -55,7 +55,7 @@
 @keyframes fw-ch-fizz{0%,100%{transform:none;opacity:1}80%{transform:translateY(-26px);opacity:0}81%{transform:none;opacity:0}}
 /* phase offsets so a group never moves in step; every loop is 1, 2 or 4 s like the video */
 .fw-p1 .fw-ch{animation-delay:-.3s} .fw-p1 .fw-ch-eyes{animation-delay:-1.1s}
-.fw-p2 .fw-ch{animation-delay:-.9s} .fw-p2 .fw-ch-eyes{animation-duration:8000ms;animation-delay:-2.3s}
+.fw-p2 .fw-ch{animation-delay:-.9s} .fw-p2 .fw-ch-eyes{animation-delay:-2.3s}
 .fw-p3 .fw-ch{animation-delay:-1.4s} .fw-p3 .fw-ch-eyes{animation-delay:-3s}
 @keyframes fw-ch-bob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-3px) scale(.985,1.015)}}
 @keyframes fw-ch-blink{0%,95%,100%{transform:scaleY(1)}96.75%{transform:scaleY(.1)}}
@@ -225,7 +225,7 @@
 .fw-rm .fw-deco *{animation:none!important}
 @media (prefers-reduced-motion:reduce){.fw-deco *{animation:none!important}}
 
-/* fred world v5 end */
+/* fred world v8 end */
 </style>
 <style>
 :root{
@@ -4129,6 +4129,7 @@ html.run-theme .fl-note{background:#4A3C1E;border-color:#6B5524;color:#F5D58F}
 #view-profile .sg-acct{--gc:var(--c-black);--gi:var(--text);--gl:rgba(13,13,13,.14)}
 #view-profile .pgroup.sf-out,#view-profile .prow.sf-out,#view-profile .prow[hidden]{display:none}
 .set-none[hidden]{display:none}
+.set-none-sw{display:inline-flex;align-items:center;min-height:44px;margin:0;padding:0;border:0;background:none;color:var(--blue);font:600 var(--t-row)/1.3 var(--font);cursor:pointer} /* item 99: the other side's match */
 /* q4-2: each group is a fold: the header (a 44px+ button inside the h2) shows the group name, a one-line grey summary and the caret; its 2px
    line in the group colour sits under it. Closed the first time (per device), then remembered (bluebird.fold.v1, keys set.fuel/gear/you/acct). */
 #view-profile .peyebrow{margin:0;padding:0;border-bottom:2px solid var(--gc);font:inherit}
@@ -6365,6 +6366,40 @@ html:not(.fw-anim) .fwm:not(#_) *,html:not(.fw-anim) .fwm:not(#_) *::before,html
 @layer fwm{html:not(.fw-anim) .fwm *,html:not(.fw-anim) .fwm *::before,html:not(.fw-anim) .fwm *::after,html .fwm:not(.fwm-go) *,html .fwm:not(.fwm-go) *::before,html .fwm:not(.fwm-go) *::after,body [class*="fw-"]:not(.fwm):not(.fwm *),body .fw-ch-fizz:not(.fwm *) circle{animation:none!important}}
 @media print{.fwm>*{display:none!important}}
 @media (forced-colors:active){.fwm>*{display:none!important}}
+/* item 99: Your rider. The sheet: the live rider on top (still), then Look / Gear / Kit folds, each with its summary under its title; 44 px
+   buttons: colour swatches (the colour, a darker edge, a ring when pressed) and word buttons; each field's label shows the name chosen.
+   The Closet card's strip: the rider, 100 x 150 px, centred over the list (no text). The avatars: the rider's circle over the initial.
+   Print: no strip, the initials. Forced colours: no strip, the initials; the swatches keep their colours (a colour picker's case for
+   forced-color-adjust) with an edge, the pressed one ringed in Highlight */
+.rd-fig{position:sticky;top:var(--set-top-h,0px);z-index:1;display:flex;justify-content:center;margin:0 -16px;padding:6px 16px 12px;background:inherit} .rd-fig svg{display:block;width:120px;height:180px} /* kept in view under the sheet's title while the groups scroll under it, so a tap shows its change (setTopFit gives --set-top-h); still, no size change as it sticks */
+#setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 198px)} /* a button the keyboard focuses or a tap scrolls to is never under the rider */
+@media (max-height:700px){ .rd-fig svg{width:80px;height:120px} #setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 138px)} } /* a short screen keeps room for the choices */
+@media (max-height:500px) and (min-width:480px){ html:not(.dk) #prowB-rider:not([hidden]){display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:16px;align-items:start} html:not(.dk) .rd-fig{margin:0;padding:6px 0 12px} html:not(.dk) #setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 8px)} } /* a phone held sideways (390 px high: a band over the groups left one field's label and no row): the rider in a column of its own beside them, still stuck under the title, so the sheet's whole height is the choices' */
+@media (max-height:399px) and (max-width:479px){ .rd-fig{position:static} #setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 8px)} }
+@media (max-height:439px){ html.dk .rd-fig{position:static} html.dk #setSheet .set-sheet:has(#prowB-rider:not([hidden])){scroll-padding-top:calc(var(--set-top-h,0px) + 8px)} } /* a short window too narrow for that column (a computer browser zoomed in: 1280 x 1024 at 400% is 320 x 256) and a short computer layout: a stuck rider left no room for a field (it fits from 380 px high at 200% text, 420 on the computer layout), so it scrolls away with the choices and nothing is ever under it */
+.rd-g.v-fold{margin:0 0 10px} .rd-gh{margin:0;font:inherit;letter-spacing:inherit;text-transform:none}
+.rd-g .v-fold-h{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px;row-gap:2px}
+.rd-g .v-fold-t{grid-column:1;grid-row:1} .rd-g .v-fold-s{grid-column:1;grid-row:2;text-align:left;overflow-wrap:anywhere} /* never cut (320 px, 200% text): a typical rider's summary is one line at 390 px, the longest choices wrap to a second */ .rd-g .v-fold-h>.v-caret{grid-column:2;grid-row:1/3}
+.rd-f{margin:0 0 16px} .rd-f[hidden]{display:none}
+.rd-fh{display:flex;flex-wrap:wrap;gap:0 8px;margin:0 0 8px;font:600 var(--t-row)/1.3 var(--font);color:var(--text)} .rd-n{font-weight:400;color:var(--text-2)}
+.rd-sw{display:flex;flex-wrap:wrap;gap:10px}
+.rd-c{flex:none;width:44px;height:44px;min-height:44px;margin:0;padding:0;border:1.5px solid rgba(0,0,0,.45);border-radius:50%;background:var(--sw,var(--track));cursor:pointer}
+.rd-c[aria-pressed="true"]{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--text)}
+.rd-c.rd-same{background:radial-gradient(circle,var(--panel) 0 8px,rgba(0,0,0,.45) 8px 9.5px,transparent 10px) var(--sw,var(--track))} /* "Same as jersey": the jersey's colour as a ring, never one more plain disc of a colour the field also offers (a black jersey's Black) */
+.rd-t{flex:none;min-width:44px;min-height:44px;margin:0;padding:0 14px;border:var(--ol) solid var(--chip-line);border-radius:999px;background:var(--panel);color:var(--text);font:500 var(--fs-pill)/1.2 var(--font);cursor:pointer}
+.rd-t[aria-pressed="true"]{background:var(--black);border-color:var(--black);color:var(--white);font-weight:600}
+.rd-c:focus-visible,.rd-t:focus-visible,.rd-more:focus-visible{outline:2px solid var(--blue);outline-offset:4px}
+.rd-more{display:flex;align-items:center;gap:8px;min-height:44px;margin:0 0 8px;padding:0;border:0;background:none;color:var(--blue);font:600 var(--t-row)/1.3 var(--font);cursor:pointer}
+.rd-more[aria-expanded="true"]>.v-caret{margin-bottom:-4px;transform:rotate(-135deg)} .rd-moreb[hidden]{display:none}
+.cz-rider{position:relative;display:flex;justify-content:center;padding:4px 16px 6px} .cz-rider:empty{display:none} .cz-rider svg{display:block;width:100px;height:150px}
+.cz-rider::after{content:"";position:absolute;left:16px;right:16px;bottom:0;border-top:1px solid var(--g-line)} /* the list's own hairline under it */
+.av-r{display:none} .av-on>.av-i{display:none} .av-on>.av-r{display:block;line-height:0} .av-r>svg{display:block}
+header .hacct .hav>.av-r>svg{width:32px;height:32px} /* the circle's own size (the header's icon rule draws its svgs at 20 px) */
+@media print{#rRider{display:none!important} .av-on>.av-i{display:inline} .av-on>.av-r{display:none}}
+@media (forced-colors:active){#rRider{display:none!important} .av-on>.av-i{display:inline} .av-on>.av-r{display:none}
+  .rd-c{forced-color-adjust:none;border-color:CanvasText} .rd-c[aria-pressed="true"]{box-shadow:0 0 0 2px Canvas,0 0 0 4px Highlight}
+  .rd-c.rd-same{background-image:radial-gradient(circle,Canvas 0 8px,CanvasText 8px 9.5px,transparent 10px)}
+  .rd-t[aria-pressed="true"]{forced-color-adjust:none;background:Highlight;border-color:Highlight;color:HighlightText}}
 /* r1014 (item 85): a fresh Crunch's hour bars grow up from the bottom (520 ms), the first 240 ms after the box appears, then 70 ms apart */
 #rWhy.wy-from .wy-stk{transform:scaleY(0)!important}
 #rWhy.wy-run .wy-stk{transition:transform calc(var(--t-slow) + var(--t-fast)) var(--ease-out)!important;transition-delay:calc(var(--t-base) + var(--b,0) * var(--t-fast) / 2)!important}
@@ -6609,7 +6644,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     </div>
     <section class="v-fold v-green r-fold wear-only gs gs-green" id="rWearCard" data-fold="res-closet" data-open="1">
       <h2 class="gs-h r-gh"><button type="button" class="v-fold-h" aria-expanded="true"><span class="v-fold-t">Closet</span><span class="gs-sep" aria-hidden="true"> · </span><span class="v-fold-s" id="rWearR"></span><i class="v-caret" aria-hidden="true"></i></button></h2>
-      <div class="v-fold-b"><div class="gs-b"><div id="rWear"></div></div></div>
+      <div class="v-fold-b"><div class="gs-b"><div class="cz-rider" id="rRider"></div><div id="rWear"></div></div></div><!-- item 99: the rider in the list's items (riderStrip), no text -->
     </section>
     <section class="v-fold v-grey r-fold gs gs-plain" id="rDetails" data-fold="res-details">
       <button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">Details</span><span class="v-fold-s">the math</span><i class="v-caret" aria-hidden="true"></i></button>
@@ -6668,6 +6703,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="sweat"><button type="button" class="prow-h" id="prowBtn-sweat" data-sheet="sweat" aria-haspopup="dialog" data-kw="fluid drink oz ml hot"><span class="prow-l">Sweat rate</span><span class="prow-v" id="prowV-sweat"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="sodium"><button type="button" class="prow-h" id="prowBtn-sodium" data-sheet="sodium" aria-haspopup="dialog" data-kw="salt electrolytes salty mg/l"><span class="prow-l">Sweat sodium</span><span class="prow-v" id="prowV-sodium"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
       <div class="prow" data-prow="fluidlim"><button type="button" class="prow-h" id="prowBtn-fluidlim" data-sheet="fluidlim" aria-haspopup="dialog" data-kw="fluid limits floor ceiling lowest highest minimum maximum least most drink oz ml per hour"><span class="prow-l">Fluid limits</span><span class="prow-v" id="prowV-fluidlim"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
+      <div class="prow" data-prow="rider"><button type="button" class="prow-h" id="prowBtn-rider" data-sheet="rider" aria-haspopup="dialog" data-kw="your rider avatar look skin hair helmet glasses jersey kit shorts colours colors closet"><span class="prow-l">Your rider</span><span class="prow-v" id="prowV-rider"></span><span class="prow-chev" aria-hidden="true"></span></button></div><!-- item 99 -->
     </div>
   </section>
   <section class="pgroup sg-prod gs gs-blue" aria-labelledby="pgT-prod">
@@ -6862,6 +6898,10 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <p class="hint in-tight">Anything in between is Moderate.</p>
     <span class="src"><span class="kind rule">Our rule</span><button type="button" class="more" data-sci="sci-gaps">The 85 / 65°F defaults are our call</button></span>
 
+      </div>
+      <div class="ssec" data-sec="rider" id="prowB-rider" hidden><!-- item 99: the live rider (still), then Look / Gear / Kit (riderSheet builds them from the bundle's rider options) -->
+        <div class="rd-fig" id="rdFig"></div>
+        <div class="rd-gs" id="rdGroups"></div>
       </div>
       <div class="ssec" data-sec="planfor" id="prowB-planfor" hidden>
         <span class="sr" id="modeLbl">Plan for</span>
@@ -7535,7 +7575,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <div class="priv-body" id="privacyBody">
       <p class="priv-lead">Nothing leaves this device until you sign in with Google. After that:</p>
       <h3>What’s stored</h3>
-      <p>Your Google name, email and photo; settings, closet, bikes and product library; your last plan; your Journal (with any header photo) and Races; birthday and gender, if given.</p>
+      <p>Your Google name, email and photo; settings, closet, bikes and product library; your rider’s look; your last plan; your Journal (with any header photo) and Races; birthday and gender, if given.</p>
       <h3>Where</h3>
       <p>Google Firebase (Cloud Firestore and Cloud Storage), in the United States. Each signed-in device keeps a copy too.</p>
       <h3>Who can see it</h3>
@@ -8042,8 +8082,8 @@ Then tell me: "Open fred, tap Volume, tap Import training history, and choose th
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script id="fwJs">
-/* fred world v5 start */
-/* fred world v5 (2026-11-06 19:46 EST): characters, the world scene and holiday looks for fred (fuel.bluebirdmultisport.com).
+/* fred world v8 start */
+/* fred world v8 (2026-11-17 14:45 EST): characters, the world scene and holiday looks for fred (fuel.bluebirdmultisport.com).
    Built by build-bundle.py from cast.js, world.js, holidays.js. Do not edit by hand: edit the sources and rebuild.
    One global: window.FW. Every function returns an SVG string; the art is decorative (aria-hidden).
    Classes, keyframes and custom properties all start with fw-. SVG ids are deterministic (a counter, or o.idp). */
@@ -8185,10 +8225,15 @@ function person(o={}){
   /* the checkered sleeve: a friend's options say url(#CHK); point it at this drawing's own pattern */
   o=Object.fromEntries(Object.entries(o).map(([k,v])=>[k,v==='url(#CHK)'?`url(#${id}chk)`:v]));
   const [skin,skinS]=o.skin||SKIN.light, top=o.top||'#fff', sleeve=o.sleeve||top;
-  const limb=(d,c,w=19)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+8}"/><path d="${d}" fill="none" stroke="${f(c)}" stroke-width="${w}"/>`;
+  const limb=(d,c,w=19,cap='')=>{const lc=cap?` stroke-linecap="${cap}"`:''; return `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+8}"${lc}/><path d="${d}" fill="none" stroke="${f(c)}" stroke-width="${w}"${lc}/>`;};
   const B='M62 166C62 156 70 150 80 150H120C130 150 138 156 138 166L142 238C142 247 135 252 126 252H74C65 252 58 247 58 238Z';
-  const hand=(x,y)=>o.fingerless&&!o.gloves?`<circle cx="${x}" cy="${y}" r="11" fill="${f(skin)}" stroke="${INK}" stroke-width="5"/><path d="M${x-11} ${y-1}A11 11 0 0 0 ${x+11} ${y-1}Z" fill="${f(o.fingerless)}" stroke="${INK}" stroke-width="4"/>`
-    :`<circle cx="${x}" cy="${y}" r="${o.mitts?13.5:11}" fill="${f(o.gloves||skin)}" stroke="${INK}" stroke-width="5"/>`;
+  /* fingerless gloves: the glove covers the wrist side of the hand (toward the arm, deg = the arm's direction into the hand),
+     with a light cuff; the finger end stays skin, so the hand reads against dark shorts */
+  const hand=(x,y,deg=90)=>o.fingerless&&!o.gloves?`<circle cx="${x}" cy="${y}" r="11" fill="${f(skin)}" stroke="${INK}" stroke-width="5"/><g transform="translate(${x} ${y}) rotate(${deg})"><path d="M1 -10.9A11 11 0 0 0 1 10.9Z" fill="${f(o.fingerless)}" stroke="${INK}" stroke-width="4"/>${sil?'':`<path d="M-5 -8.5V8.5" stroke="#C9D1DA" stroke-width="4"/>`}</g>`
+    :o.gloves?`<circle cx="${x}" cy="${y}" r="${o.mitts?13.5:11}" fill="${f(o.gloves)}" stroke="${INK}" stroke-width="5"/>${sil?'':`<path transform="translate(${x} ${y}) rotate(${deg})" d="${o.mitts?'M-7.5 -10.5V10.5':'M-5.5 -8.8V8.8'}" stroke="#C9D1DA" stroke-width="4"/>`}`
+    :`<circle cx="${x}" cy="${y}" r="11" fill="${f(skin)}" stroke="${INK}" stroke-width="5"/>`;
+  /* the thermal jersey's cuff: a light band on the sleeve just before the hand (o.cuff), so it shows even when the sleeve matches arm warmers */
+  const cuff=(x,y,deg)=>o.cuff?`<g transform="translate(${x} ${y}) rotate(${deg})"><path d="M-17 -10.5V10.5" stroke="${INK}" stroke-width="10"/><path d="M-17 -10.5V10.5" stroke="${f(o.cuff)}" stroke-width="5"/></g>`:'';
   const fing=(d,w=6)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+7}"/><path d="${d}" fill="none" stroke="${f(skin)}" stroke-width="${w}"/>`;
   const knuck=(x,y)=>sil?'':`<path d="M${x} ${y}h7M${x} ${y+5}h7" stroke="${INK}" stroke-width="2.5" opacity=".7"/>`;
   /* right-arm poses; the left arm is the same pose mirrored */
@@ -8215,7 +8260,8 @@ function person(o={}){
     if(name==='clip') item=`<g stroke="${INK}" stroke-width="4"><rect x="86" y="170" width="44" height="56" rx="4" fill="${f('#C99A6B')}"/><rect x="92" y="178" width="32" height="42" fill="${f('#fff')}" stroke-width="2.5"/>${sil?'':`<path d="M97 188h22M97 196h22M97 204h14" stroke-width="2.5" opacity=".55"/><path d="M97 212l4 4 8-8" stroke="var(--fw-green)" stroke-width="3" fill="none"/>`}<rect x="100" y="164" width="16" height="10" rx="3" fill="${f('#B9C2CF')}"/></g>`;
     if(name==='wave'&&o.itemR==='bottle'&&side==='R') item=`<g stroke="${INK}" stroke-width="5"><rect x="167" y="80" width="22" height="40" rx="6" fill="${f(o.bottle||'var(--fw-green)')}" transform="rotate(12 178 120)"/>
       <rect x="171" y="70" width="14" height="12" rx="3" fill="${f('var(--fw-teal)')}" transform="rotate(12 178 120)"/></g>`;
-    const inner=part==='hand'?`${name!=='wheel'?item:''}${hand(...p.h)}${p.x||''}`:`${name==='wheel'?item:''}${limb(p.d,full||skin)}${full?'':limb(p.s,sleeve,21)}`;
+    const [ex,ey]=p.d.trim().split(/[^\d.-]+/).filter(Boolean).map(Number).slice(-2), deg=Math.round(Math.atan2(p.h[1]-ey, p.h[0]-ex)*180/Math.PI);
+    const inner=part==='hand'?`${name!=='wheel'?item:''}${o.armSleeve?cuff(...p.h, deg):''}${hand(...p.h, deg)}${p.x||''}`:`${name==='wheel'?item:''}${limb(p.d,full||skin)}${full?'':limb(p.s,sleeve,21)}`;
     const g=`<g class="${name==='wave'?'fw-ch-arm-f ':''}fw-ch-arm-${side==='L'?'l':'r'}" style="transform-origin:134px 166px">${inner}</g>`;
     return side==='L'?`<g transform="translate(200 0) scale(-1 1)">${g}</g>`:g;
   };
@@ -8263,9 +8309,9 @@ function person(o={}){
   const pat={
     dots:`${[...Array(30)].map((_,i)=>`<circle cx="${60+(i%6)*16+(Math.floor(i/6)%2)*8}" cy="${158+Math.floor(i/6)*12}" r="${4-(i%3)}" fill="${i%4?'#fff':'#F4A7B9'}"/>`).join('')}`,
     chevron:`<path d="M56 176L100 200L144 176M56 194L100 218L144 194" fill="none" stroke="#F4A6A0" stroke-width="9"/><path d="M56 185L100 209L144 185" fill="none" stroke="#fff" stroke-width="5"/>`,
-    splatter:`${[[74,170,7],[92,186,5],[120,168,6],[128,196,8],[80,204,6],[108,210,5],[66,190,4],[112,184,3]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${o.splat||'#2F5FB5'}"/><circle cx="${x+r+3}" cy="${y-2}" r="${r*.35}" fill="${o.splat||'#2F5FB5'}"/>`).join('')}`,
-    band:`<rect x="50" y="194" width="100" height="14" fill="${o.bandC||'#F26B5B'}"/>`,
-    side:`<rect x="128" y="150" width="8" height="104" fill="${o.sideC||'#F0708A'}"/>`,
+    splatter:`${[[74,170,7],[92,186,5],[120,168,6],[128,196,8],[80,204,6],[108,210,5],[66,190,4],[112,184,3]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${o.splat||'#2F5FB5'}"${o.patEdge?` stroke="${INK}" stroke-width="2"`:''}/><circle cx="${x+r+3}" cy="${y-2}" r="${r*.35}" fill="${o.splat||'#2F5FB5'}"/>`).join('')}`,
+    band:`<rect x="50" y="194" width="100" height="14" fill="${o.bandC||'#F26B5B'}"/>${o.patEdge?`<path d="M50 194H150M50 208H150" stroke="${INK}" stroke-width="2.5"/>`:''}`,
+    side:o.patEdge?`<rect x="118" y="150" width="12" height="104" fill="${o.sideC||'#F0708A'}"/><path d="M118 150V254" stroke="${INK}" stroke-width="2.5"/>`:`<rect x="128" y="150" width="8" height="104" fill="${o.sideC||'#F0708A'}"/>`,
     tank:''
   }[o.pattern]||'';
   const camo=o.shortsPattern==='camo'?[[70,226,7],[96,232,5],[118,224,8],[132,240,5],[84,244,6]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.6}" fill="#3A1F33"/>`).join(''):'';
@@ -8282,11 +8328,16 @@ function person(o={}){
     ${hair.style==='curly'?`<g fill="${f(hair.c)}" stroke="${INK}" stroke-width="5">${[[100,52],[68,60],[132,60],[50,84],[150,84],[44,110],[156,110],[52,134],[148,134]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="20"/>`).join('')}</g>`:''}
     ${hair.style==='long'?`<path d="M52 92C38 126 40 172 56 200H144C160 172 162 126 148 92Z" fill="${f(hair.c)}" stroke="${INK}" stroke-width="5"/>`:''}
     ${o.ride?'':`<g class="fw-ch-legs" stroke="${INK}" stroke-width="5">
-      ${limb('M84 248V272',o.legC||skin,legW)}${limb('M116 248V272',o.legC||skin,legW)}
-      ${o.knee?limb('M84 250V264',o.knee,legW+1)+limb('M116 250V264',o.knee,legW+1):''}
-      ${limb(o.longSocks?'M84 254V276':'M84 268V276',sock,legW)}${limb(o.longSocks?'M116 254V276':'M116 268V276',sock,legW)}
+      ${limb('M84 248V272',skin,legW)}${limb('M116 248V272',skin,legW)}
+      ${o.legC&&!o.longSocks?'':limb(o.longSocks?'M84 254V276':'M84 268V276',sock,legW)+limb(o.longSocks?'M116 254V276':'M116 268V276',sock,legW)}
+      ${/* leg wear: with long socks it stops flat at mid-shin (y 262) and the sock shows from there to the shoe */''}
+      ${o.legC?(o.longSocks?limb('M84 248V262',o.legC,legW,'butt')+limb('M116 248V262',o.legC,legW,'butt'):limb('M84 248V277',o.legC,legW)+limb('M116 248V277',o.legC,legW))+(sil?'':`<path d="${o.longSocks?'M90 256V260M122 256V260':'M90 256V272M122 256V272'}" stroke="#fff" stroke-width="2.5" opacity=".35"/>`):''}
+      ${/* knee warmers: a flat-ended band drawn after the socks and leg wear, so it shows over both */''}
+      ${o.knee?limb('M84 250V266',o.knee,legW+1,'butt')+limb('M116 250V266',o.knee,legW+1,'butt')+`<path d="M74 266H94M106 266H126" stroke="${INK}" stroke-width="2.5"/>`+(sil?'':`<path d="M76 262.5H92M108 262.5H124" stroke="#fff" stroke-width="2" opacity=".85"/>`):''}
+      ${/* shoe covers ('shoes') and overshoes: a cuff above the shoe in their own shape, over any sock or leg wear, with a light hem */''}
+      ${o.cover?`<path d="M72 ${o.cover}H96V278H72ZM104 ${o.cover}H128V278H104Z" fill="${f(COVER)}" stroke-width="3"/>${sil||o.cover>262?'':`<path d="M75 ${o.cover+3.5}H93M107 ${o.cover+3.5}H125" stroke="#C9D1DA" stroke-width="2"/>`}`:''}
       <path d="M70 284C70 274 78 272 86 272H96V286H72Z" fill="${f(o.shoes||'#fff')}"/><path d="M130 284C130 274 122 272 114 272H104V286H128Z" fill="${f(o.shoes||'#fff')}"/>
-      ${o.toes?`<path d="M70 284C70 274 78 272 86 272H88V286H72Z" fill="${f(o.toes)}"/><path d="M130 284C130 274 122 272 114 272H112V286H128Z" fill="${f(o.toes)}"/>`:''}
+      ${o.toes?`<path d="M70 284C70 274 78 272 86 272H92V286H72Z" fill="${f(o.toes)}"/><path d="M130 284C130 274 122 272 114 272H108V286H128Z" fill="${f(o.toes)}"/>`:''}
       ${o.boots?`<path d="M72 286V262H96V286Z" fill="${f(o.boots)}"/><path d="M128 286V262H104V286Z" fill="${f(o.boots)}"/>`:''}
     </g>`}
     <g class="fw-ch-body" stroke="${INK}" stroke-width="5">
@@ -8318,8 +8369,8 @@ function person(o={}){
         <circle cx="78" cy="102.5" r="2.4" fill="#fff"/><circle cx="118" cy="102.5" r="2.4" fill="#fff"/></g>`:''}`}
       ${o.balaclava?'':underHelmet}
       ${o.balaclava?`<g clip-path="url(#${id}f)" stroke="none"><path d="M40 118H160V160H40Z" fill="${f(o.balaclava)}"/><path d="M40 40H60V160H40ZM140 40H160V160H140Z" fill="${f(o.balaclava)}"/></g>`:''}
-      ${o.under==='skullcap'?`<path d="M46 104C46 92 154 92 154 104L154 112Q100 98 46 112Z" fill="${f('#2A2A30')}"/>`:''}
-      ${o.under==='headband'?`<path d="M46 98H60V118H46ZM140 98H154V118H140Z" fill="${f(o.underC||'var(--fw-teal)')}"/>`:''}
+      ${o.under==='skullcap'?`<path d="${gl?'M46 104C46 92 154 92 154 104L154 112Q100 98 46 112Z':'M46 104C46 98 57 96.7 70 96.4L70 107.2Q57 109 46 112ZM154 104C154 98 143 96.7 130 96.4L130 107.2Q143 109 154 112Z'}" fill="${f('#8FA7C4')}"/><path d="M44 98C42 114 46 128 54 136L64 128C58 118 57 108 58 98ZM156 98C158 114 154 128 146 136L136 128C142 118 143 108 142 98Z" fill="${f('#8FA7C4')}"/>`:''}
+      ${o.under==='headband'?`<path d="M44 98C42 114 46 128 54 136L64 128C58 118 57 108 58 98ZM156 98C158 114 154 128 146 136L136 128C142 118 143 108 142 98Z" fill="${f(o.underC||'var(--fw-teal)')}"/>${sil?'':`<path d="M47 108Q50 122 57 130M153 108Q150 122 143 130" fill="none" stroke="#fff" stroke-width="2.5" opacity=".7"/>`}`:''}
       ${hatSvg}${glSvg}${o.under==='cap'?`<path d="M60 88Q100 70 140 88L138 96Q100 80 62 96Z" fill="${f(o.underC||'#F26B5B')}" stroke-width="4"/>${sil?'':`<path d="M70 86Q100 74 130 86" fill="none" stroke="#fff" stroke-width="2.5" opacity=".8"/>`}`:''}${o.brows?`<path d="M66 84L88 90M134 84L112 90" stroke-width="5" fill="none"/>`:''}
       ${o.hhat==='santa'?`<path d="M60 56C64 10 120 -14 152 4C166 12 170 30 166 46L146 52Q100 36 60 56Z" fill="${f('#F26B5B')}"/><path d="M54 58Q100 34 146 58L148 72Q100 48 52 72Z" fill="${f('#fff')}"/><circle cx="168" cy="50" r="11" fill="${f('#fff')}"/>`:''}
       ${o.hhat==='witch'?`<path d="M28 48Q100 26 172 48L168 58Q100 40 32 58Z" fill="${f('#2A2F5A')}"/><path d="M66 42L108 -52L136 40Z" fill="${f('#2A2F5A')}"/><path d="M68 30Q100 22 132 30L130 40Q100 32 70 40Z" fill="${f('#F28C28')}"/>`:''}
@@ -8507,26 +8558,28 @@ function riderValid(r){
   }
   return out;
 }
+/* shoe covers and overshoes: slate, apart from the leg wear (#1E1E24, #14141A), the ink, toe covers and boots */
+const COVER='#4F6478';
 function riderBase(r){
   r=riderValid(r);
   return {skin:SKIN[r.skin]||SKIN.light, hair:{c:r.hair, style:r.hairStyle}, hat:{type:'road', c:r.helmet},
     glasses:r.glasses==='none'?null:{type:r.glasses, lens:r.lens, frame:r.frame},
     beard:r.face==='beard'?r.hair:null, stache:r.face==='stache'?r.hair:null,
-    top:r.kit, top2:r.kit2||r.kit, sleeve:r.sleeve||r.kit, pattern:r.pattern||'', shorts:r.shorts, shoes:'#1E1E24'};
+    top:r.kit, top2:r.kit2||r.kit, sleeve:r.sleeve||r.kit, pattern:r.pattern||'', patEdge:true, shorts:r.shorts, shoes:'#1E1E24'};
 }
 /* closet id -> how it shows on the rider */
 const OUTFIT_LOOK={
   'jersey-light':o=>{}, 'jersey-med':o=>{}, 'bibs':o=>{}, /* the rider's default look: short-sleeve jersey and bib shorts */
-  'jersey-heavy':o=>{o.armSleeve=o.top;},
+  'jersey-heavy':o=>{if(!o.armSleeve){ o.armSleeve=o.top; o.cuff='#FFFFFF'; }},
   'base-ls':o=>{}, 'base-ss':o=>{}, 'base-sleeveless':o=>{}, 'base-thermal':o=>{},
   'vest':o=>{o.outer='#BFE6E6';},
   'windbreaker':o=>{o.outer='#DCE1E8'; o.armSleeve='#DCE1E8';},
-  'jacket-thermal':o=>{o.outer='#2F3B6E'; o.armSleeve='#2F3B6E';},
-  'jacket-winter':o=>{o.outer='#1E2A4A'; o.armSleeve='#1E2A4A';},
-  'jacket-rain':o=>{o.outer='#F2D64B'; o.armSleeve='#F2D64B';},
+  'jacket-thermal':o=>{o.outer='#5B4E9E'; o.armSleeve='#5B4E9E';},
+  'jacket-winter':o=>{o.outer='#2F6B4F'; o.armSleeve='#2F6B4F';},
+  'jacket-rain':o=>{o.outer='#F2D64B'; o.armSleeve='#F2D64B'; o.cuff=null;},
   'arms':o=>{if(!o.armSleeve) o.armSleeve='#1E1E24';},
   'sun-sleeves':o=>{if(!o.armSleeve) o.armSleeve='#FFFFFF';},
-  'knees':o=>{o.knee='#1E1E24';},
+  'knees':o=>{o.knee='#B9C2CF';},
   'legs':o=>{o.legC='#1E1E24';},
   'tights-light':o=>{o.legC='#1E1E24';},
   'tights-heavy':o=>{o.legC='#14141A';},
@@ -8535,13 +8588,14 @@ const OUTFIT_LOOK={
   'cap':o=>{o.under='cap';}, 'head':o=>{o.under='headband';}, 'skullcap':o=>{o.under='skullcap';},
   'balaclava':o=>{o.balaclava='#1E1E24';}, 'gaiter':o=>{o.gaiter='#2ABCBB';},
   'socks-summer':o=>{o.socks='#fff';}, 'socks-wool':o=>{o.socks='#8E949A'; o.longSocks=true;},
-  'toes':o=>{o.toes='#1E1E24';}, 'shoes':o=>{o.shoes='#1E1E24'; o.socks=o.socks||'#1E1E24';},
-  'overshoes':o=>{o.shoes='#1E1E24'; o.socks='#1E1E24'; o.longSocks=true;}, 'boots':o=>{o.boots='#3A2F2A';}
+  'toes':o=>{o.toes='#8E949A';}, 'shoes':o=>{o.shoes=COVER; o.cover=Math.min(o.cover||266,266);},
+  'overshoes':o=>{o.shoes=COVER; o.cover=262;}, 'boots':o=>{o.boots='#3A2F2A';}
 };
 function riderOutfit(rider, ids=[], extra={}){
   const o=riderBase(rider);
-  /* order matters: a shell sets the sleeves before arm warmers can */
-  const order=['jacket-rain','jacket-winter','jacket-thermal','windbreaker','vest','jersey-heavy','arms','sun-sleeves'];
+  /* order matters: a shell sets the sleeves before a thermal jersey or arm warmers can; the rain jacket goes on last, over everything;
+     socks before anything on the feet */
+  const order=['jacket-winter','jacket-thermal','windbreaker','vest','jersey-heavy','arms','sun-sleeves','jacket-rain','socks-summer','socks-wool','toes','shoes','overshoes','boots'];
   [...ids].sort((a,b)=>(order.indexOf(a)+1||99)-(order.indexOf(b)+1||99)).forEach(id=>OUTFIT_LOOK[id]&&OUTFIT_LOOK[id](o));
   return person({...o, ...extra});
 }
@@ -8687,6 +8741,8 @@ const SEASONS={
 /* scene(p, season, {crop:[x, y, w, h]}): a crop (in the 1600x900 scene units) becomes the viewBox, and every figure, sparkle,
    icon, stalk and layer that falls wholly outside it is left out of the SVG, so a small window costs only what it shows. */
 function scene(p, season='', opt={}){
+  /* ids: p (cleaned) plus the shared counter, so two scenes on one page never share a sky, fog or pattern, even with the same p */
+  p=String(p).replace(/[^A-Za-z0-9_-]/g,'_')+'-s'+(++UID)+'-';
   const S=SEASONS[season];
   const C=opt.crop, inC=(x0,y0,x1,y1)=>!C||(x1>C[0]&&x0<C[0]+C[2]&&y1>C[1]&&y0<C[1]+C[3]), keep=(ok,str)=>ok?str:'';
   const sparkles = Array.from({length:16}, (_, i) => {
@@ -8853,9 +8909,9 @@ function komPhase(date = new Date()){
   return md <= KOM_SEASON.chaseEnd ? 'chase' : 'takeover';
 }
 
-window.FW = { version: '5', built: '2026-11-06 19:46 EST', bird, ashley, person, friend, FRIENDS, SKIN, birdWear, holidayWear, NOCAP, riderOutfit, riderAvatar, riderBase, RIDER_DEFAULT, RIDER_OPTIONS, RIDER_NAMES, OUTFIT_LOOK, scene, SEASONS, WX_WEAR, WX_KINDS, HOLIDAYS: GROUPS, DECO, SKY, kitty, bike, KOM_SEASON, komPhase, plain, box };
+window.FW = { version: '8', built: '2026-11-17 14:45 EST', bird, ashley, person, friend, FRIENDS, SKIN, birdWear, holidayWear, NOCAP, riderOutfit, riderAvatar, riderBase, RIDER_DEFAULT, RIDER_OPTIONS, RIDER_NAMES, OUTFIT_LOOK, scene, SEASONS, WX_WEAR, WX_KINDS, HOLIDAYS: GROUPS, DECO, SKY, kitty, bike, KOM_SEASON, komPhase, plain, box };
 })();
-/* fred world v5 end */
+/* fred world v8 end */
 </script>
 <script>
 (function(){
@@ -9644,6 +9700,7 @@ function volOffDue(vol, today){
 function vN(x, d){ if(x==null || !Number.isFinite(x)) return '—'; const a=Math.abs(x); const dec=d!=null ? d : a<10 && Math.round(a*10)%10 ? 1 : 0; return x.toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
 const SET_HAD = (()=>{ const o=load(KEYS.settings, null); return o && typeof o==='object' ? Object.keys(o) : null; })(); /* item 96: the keys this launch found stored, before any boot save (sfInit) */
 let settings = Object.assign({}, DEFAULT_SETTINGS, load(KEYS.settings, {}));
+riderSetNorm(settings); /* item 99: the rider's look, checked value by value against the bundle's options */
 settings.volume = volNorm(settings.volume); // Volume tab choices (goal, counted sports, season, off-season); defaults fill in, nothing dropped
 dfcBoot(); /* item 92: deficits an older build's save dropped here come back */
 const CAP_MAX={hot:6, mod:8, cold:12}, CONC_CEIL=12; // q56: Settings › Concentration caps (Cold up to 12%, Moderate 8%, Hot 6%)
@@ -10015,6 +10072,78 @@ function fwMount(el, draw, key, o={}){ if(!el) return; const old=FWM.get(el), fn
 onAppOpen(()=>FWM.forEach((r,el)=>{ if(!el.isConnected) return fwmDrop(el, r); fwmRest(el, r); fwmArm(el, r); })); /* a new app open: each kept drawing moves once more when it is next seen; one out of the page is let go, put in or not (the render that mounted it is long done) */
 try{ const q=matchMedia('(prefers-reduced-motion: reduce)'); if(q.addEventListener) q.addEventListener('change', fwGate); else q.addListener(fwGate); }catch(x){}
 fwGate();
+/* ---------- item 99: Your rider. settings.rider holds the bundle's rider fields (FW.RIDER_DEFAULT: skin, hair, helmet, glasses, kit ...).
+   No DEFAULT_SETTINGS entry (as settings.worldMotion): stored only once the rider builds one in Settings › You › Your rider (a tap on any
+   choice stores the whole rider), and synced as one key (item 96). riderNorm checks it value by value against FW.RIDER_OPTIONS, as the
+   bundle's own riderValid does: a value not offered (not a string, unknown, a prototype name) is that field's default, a key the bundle
+   has no field for is dropped, and anything that is not a rider at all is the default rider. It runs on load, on restore and when
+   synced settings arrive (riderSetNorm), so every copy the app keeps is clean. Never in the troubleshooting copy (DBG_DROP_SET) or an AI
+   prompt (none reads it). Drawn still (fwMount o.still: rule a, the avatar never moves), each spot keyed on what it shows: the sheet's
+   live rider, the header circle (.hav, 32 px) and the computer layout's #sbAv (30 px) once built and signed in (the initial until
+   then, the outline or the empty circle signed out), and the Closet card's strip (riderStrip). The bundle's riderOutfit throws on an
+   id that is no own key of FW.OUTFIT_LOOK ('__proto__') and on no array, and riderAvatar writes its size into the svg tag: the strip
+   passes only string ids FW.OUTFIT_LOOK has as its own (riderIds: a closet item of your own, a uid, is left out), always an array, and
+   the avatars a number. Plain functions here (no const): riderSetNorm runs at boot, before this part of the script. ---------- */
+function riderNorm(r){ const F=window.FW; if(r==null) return undefined; if(!F || !F.RIDER_DEFAULT || !F.RIDER_OPTIONS) return r; /* (no bundle: nothing to check against, nothing drawn) */
+  const D=F.RIDER_DEFAULT, O=F.RIDER_OPTIONS, own=(o, k)=>Object.prototype.hasOwnProperty.call(o, k), out={};
+  Object.keys(D).forEach(k=>{ const v=typeof r==='object' ? r[k] : undefined, o=own(O, k) ? O[k] : null; out[k]=typeof v==='string' && o && (Array.isArray(o) ? o.includes(v) : own(o, v)) ? v : D[k]; });
+  return out; }
+function riderSetNorm(S){ if(S && typeof S==='object' && Object.prototype.hasOwnProperty.call(S, 'rider')){ const v=riderNorm(S.rider); if(v===undefined) delete S.rider; else S.rider=v; } return S; }
+function riderOwn(S){ return S && typeof S==='object' && Object.prototype.hasOwnProperty.call(S, 'rider') ? S.rider : undefined; } /* the rider as an own key only (as riderSetNorm checks it): a settings object whose prototype came from a file's "__proto__" never lends one */
+function riderBuilt(){ const r=riderOwn(settings); return !!r && typeof r==='object'; }
+function riderNow(){ return riderNorm(riderOwn(settings) || {}); } /* the rider drawn: the one built, else the bundle's default */
+function riderIds(L){ const O=window.FW && window.FW.OUTFIT_LOOK; return (Array.isArray(L) ? L : []).filter(id=>typeof id==='string' && !!O && Object.prototype.hasOwnProperty.call(O, id)); }
+/* 99.4: the Closet card's strip: the rider in exactly the items the list names (outfit().wear), still, no text (the list stays the
+   source of truth). Kept by its key: a re-render with the same rider and items draws nothing again */
+function riderStrip(ids){ const el=$('rRider'), F=window.FW; if(!el || !F) return; const r=riderNow(), L=riderIds(ids); el._ids=L;
+  fwMount(el, ()=>F.riderOutfit(r, L.slice()), 'strip:'+JSON.stringify(r)+'|'+L.join(','), {still:true}); }
+/* 99.3: an avatar circle (box: the header's .hav or #sbAv) with ini, the initial ('' signed out: the circle as before); a built rider
+   replaces it while signed in. The initial stays in the box under the art (print and forced colours show it: no art there) */
+function riderAv(box, ini, size){ if(!box) return; let i=box.querySelector(':scope>.av-i'), a=box.querySelector(':scope>.av-r'); const F=window.FW, on=!!ini && riderBuilt() && !!F;
+  if(!i || !a){ box.textContent=''; i=document.createElement('span'); i.className='av-i'; a=document.createElement('span'); a.className='av-r'; box.append(i, a); }
+  if(i.textContent!==ini) i.textContent=ini; box.classList.toggle('av-on', on);
+  if(on){ const r=riderNow(); fwMount(a, ()=>F.riderAvatar(r, +size), 'av:'+size+':'+JSON.stringify(r), {still:true}); } else if(FWM.has(a)) fwMount(a, ''); }
+function riderHdr(){ const hb=$('syncHdr'), h=hb && hb.querySelector(':scope>.hav'); if(h) riderAv(h, hb.dataset.ini||'', 32); }
+/* 99.1: the sheet. The live rider on top, then Look / Gear / Kit (v-fold groups, each folded to a one-line summary), every choice from
+   FW.RIDER_OPTIONS and named from FW.RIDER_NAMES (or the option's own name): 44 px buttons with that name (aria-label) and aria-pressed,
+   one pressed per labelled group, which acts as a radio group (one Tab stop, the arrow keys move and choose, as Carry's kinds do).
+   The colour swatches keep their colours in forced colours, with an edge; each field's label shows the chosen name. The jersey's fade
+   and sleeves are under More colours. Lens and frame hide with no glasses (the drawing has none), the hair colour with Shaved and no
+   beard or mustache (nothing drawn under the helmet): a field shows only when its choices draw different riders. */
+const RD_GROUPS=[['look', 'Look', ['skin','hairStyle','hair','face']], ['gear', 'Gear', ['helmet','glasses','lens','frame']], ['kit', 'Kit', ['kit','pattern','shorts'], ['kit2','sleeve']]];
+const RD_LABEL={skin:'Skin', hairStyle:'Hair', hair:'Hair colour', face:'Face', helmet:'Helmet', glasses:'Glasses', lens:'Lens', frame:'Frame', kit:'Jersey', pattern:'Pattern', shorts:'Shorts', kit2:'Jersey fade', sleeve:'Sleeves'};
+function rdOpts(k){ const o=FW.RIDER_OPTIONS[k]; return Array.isArray(o) ? o.slice() : Object.keys(o); }
+function rdName(k, v){ const o=FW.RIDER_OPTIONS[k], n=Array.isArray(o) ? (FW.RIDER_NAMES[k]||{})[v] : Object.prototype.hasOwnProperty.call(o, v) ? o[v] : null; return n==null ? String(v) : String(n); }
+const RD_COVER={'#C8743C':'Rust', '#E9C46A':'Gold'}; /* with Covered the hair colours are a covering's: no "blond head covering" (the other four read as plain colours already) */
+function rdNm(k, v, r){ return k==='hair' && r && r.hairStyle==='covered' && Object.prototype.hasOwnProperty.call(RD_COVER, v) ? RD_COVER[v] : rdName(k, v); }
+function rdSwatch(k){ return k==='skin' || Array.isArray(FW.RIDER_OPTIONS[k]); }
+function rdColour(k, v, r){ return k==='skin' ? ((FW.SKIN||{})[v]||[])[0]||'' : v || r.kit; } /* '' (Same as jersey): the jersey's colour */
+function rdSum(g, r){ const n=k=>rdNm(k, r[k], r), lc=s=>s.charAt(0).toLowerCase()+s.slice(1);
+  const hs=r.hairStyle, bare=hs==='shaved', hc=lc(n('hair')), fc=r.face!=='none' ? (bare ? hc+' ' : '')+lc(n('face')) : '', cov=hs==='covered', hair=cov ? hc+' head covering'+(fc ? ' and '+fc : '') : bare ? 'shaved head' : hs==='pony' || hs==='braids' ? hc+' '+lc(n('hairStyle')) : lc(n('hairStyle'))+' '+hc+' hair'; /* "dark brown ponytail", "dark brown head covering" (the bundle draws 'covered' as a covering in that colour, and a beard or mustache in it too: "gold head covering and beard"), "short dark brown hair"; shaved hair is drawn as nothing under the helmet, so its colour is only the beard's or mustache's: "shaved head · grey beard" */
+  return g==='look' ? `${n('skin')} skin · ${hair}${fc && !cov ? ' · '+fc : ''}`
+    : g==='gear' ? `${n('helmet')} helmet · ${r.glasses==='none' ? 'no glasses' : (r.glasses==='pair' ? 'glasses' : lc(n('glasses')))+' · '+lc(n('lens'))+' lens'}` /* "pair" alone names nothing, folded or read out */
+    : `${n('kit')} jersey · ${lc(n('pattern'))} · ${lc(n('shorts'))} shorts`; }
+function riderRowV(){ return riderBuilt() && window.FW ? rdName('kit', riderNow().kit)+' jersey' : 'Not set'; }
+function riderSheet(){ const box=$('rdGroups'), F=window.FW; if(!box || !F) return;
+  if(!box.firstChild){ const field=k=>{ const c=rdSwatch(k); return `<div class="rd-f" data-rd-f="${k}"><p class="rd-fh"><span id="rdL-${k}">${RD_LABEL[k]}</span><span class="rd-n" id="rdN-${k}"></span></p><div class="rd-sw" role="group" aria-labelledby="rdL-${k}">${rdOpts(k).map(v=>`<button type="button" class="${c ? 'rd-c'+(v==='' ? ' rd-same' : '') : 'rd-t'}" data-rd="${k}" data-v="${esc(v)}" aria-label="${esc(rdName(k, v))}" aria-pressed="false" tabindex="-1">${c ? '' : esc(rdName(k, v))}</button>`).join('')}</div></div>`; };
+    box.innerHTML=RD_GROUPS.map(([g, t, L, more])=>`<section class="v-fold rd-g" data-fold="rider-${g}"><h3 class="rd-gh"><button type="button" class="v-fold-h" aria-expanded="false"><span class="v-fold-t">${t}</span><span class="v-fold-s" id="rdS-${g}"></span><i class="v-caret" aria-hidden="true"></i></button></h3><div class="v-fold-b" hidden>${L.map(field).join('')}${more ? `<button type="button" class="rd-more" id="rdMore" aria-expanded="false" aria-controls="rdMoreB">More colours<i class="v-caret" aria-hidden="true"></i></button><div class="rd-moreb" id="rdMoreB" hidden>${more.map(field).join('')}</div>` : ''}</div></section>`).join('');
+    vFoldInit(box); }
+  riderSheetSync(); }
+function riderSheetSync(){ const F=window.FW, box=$('rdGroups'); if(!F || !box || !box.firstChild) return; const r=riderNow();
+  box.querySelectorAll('[data-rd]').forEach(b=>{ const k=b.dataset.rd, v=b.dataset.v, on=r[k]===v; if(b.getAttribute('aria-pressed')!==String(on)) b.setAttribute('aria-pressed', String(on)); b.tabIndex=on ? 0 : -1; if(b.classList.contains('rd-c')) b.style.setProperty('--sw', rdColour(k, v, r)); if(k==='hair'){ const t=rdNm(k, v, r); if(b.getAttribute('aria-label')!==t) b.setAttribute('aria-label', t); } });
+  Object.keys(RD_LABEL).forEach(k=>{ const n=$('rdN-'+k), t=rdNm(k, r[k], r); if(n && n.textContent!==t) n.textContent=t; });
+  { const l=$('rdL-hair'), t=r.hairStyle==='shaved' && r.face!=='none' ? rdName('face', r.face)+' colour' : r.hairStyle!=='covered' ? RD_LABEL.hair : r.face==='none' ? 'Covering colour' : 'Covering and '+rdName('face', r.face).toLowerCase()+' colour'; if(l && l.textContent!==t) l.textContent=t; } /* the group's name too (aria-labelledby); with Covered the bundle draws the beard or mustache in the covering's colour, so the field says it sets both; with Shaved it colours only the beard or mustache ("Beard colour") */
+  RD_GROUPS.forEach(([g])=>{ const s=$('rdS-'+g), t=rdSum(g, r); if(s && s.textContent!==t) s.textContent=t; });
+  ['lens','frame'].forEach(k=>{ const f=box.querySelector(`[data-rd-f="${k}"]`); if(f) f.hidden=r.glasses==='none'; });
+  { const f=box.querySelector('[data-rd-f="hair"]'); if(f) f.hidden=r.hairStyle==='shaved' && r.face==='none'; } /* shaved with no beard or mustache: the six colours draw the same rider (nothing under the helmet), so the field hides as lens and frame do with no glasses; the stored colour is kept */
+  fwMount($('rdFig'), ()=>F.riderOutfit(r), 'fig:'+JSON.stringify(r), {still:true}); }
+function riderPut(k, v){ settings=Object.assign({}, settings, {rider:riderNorm(Object.assign({}, riderNow(), {[k]:v}))}); save(KEYS.settings, settings); riderApply(); }
+/* the rider changed (here, a sync, a restore): the sheet, the strip, both avatars and the row follow */
+function riderApply(){ riderSheetSync(); const s=$('rRider'); if(s && s._ids) riderStrip(s._ids); riderHdr(); try{ sbAcctRender(); }catch(e){} const v=$('prowV-rider'); if(v && v.textContent!==riderRowV()) v.textContent=riderRowV(); }
+$('rdGroups').addEventListener('click', e=>{ const b=e.target.closest('[data-rd]'); if(b){ const sc=b.closest('.set-sheet'), y=b.getBoundingClientRect().top; riderPut(b.dataset.rd, b.dataset.v); const d=b.getBoundingClientRect().top-y; if(sc && d) sc.scrollTop+=d; return; } /* the button tapped stays where it was: a group's summary above it that wraps to fewer or more lines (a phone held sideways, 200% text) would slide it under the title bar */
+  const m=e.target.closest('#rdMore'); if(m){ const o=m.getAttribute('aria-expanded')!=='true'; m.setAttribute('aria-expanded', String(o)); $('rdMoreB').hidden=!o; } });
+$('rdGroups').addEventListener('keydown', e=>{ const b=e.target.closest('[data-rd]'), d={ArrowRight:1, ArrowDown:1, ArrowLeft:-1, ArrowUp:-1}[e.key]; if(!b || !d || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  const L=[...b.parentNode.querySelectorAll('[data-rd]')], n=L[(L.indexOf(b)+d+L.length)%L.length]; e.preventDefault(); n.focus(); n.click(); });
 /* r1014 (item 85): the press on a touch screen. iOS shows :active only on a page that listens for touches. When a touch turns into a scroll
    (a scroll event, from the page or any scroller inside it, while the finger is down; or the finger 10 px from where it landed) html.mo-drag
    goes on until it lifts: the press drops at once, with no motion, so a scroll never moves a row and a slightly rolled tap keeps its press.
@@ -10262,12 +10391,13 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    the whole result (bottles, legs, gels, the ride-day plan, the hours), and the last page errors, as text the owner pastes to Claude.
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids; item 92: the
-   weigh-ins, the deficits (settings.volume) and the Profile weight (settings.weightLb, which the newest weigh-in sets). */
-const APP_BUILD='fred-shell-v122'; // = sw.js CACHE (the kit checks)
+   weigh-ins, the deficits (settings.volume) and the Profile weight (settings.weightLb, which the newest weigh-in sets); item 99: the rider's look
+   (settings.rider, and the Closet card's strip that draws it). */
+const APP_BUILD='fred-shell-v123'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
-const DBG_DROP_SET=['birthday','meds','medsOther','stack','barcodes','recentPlaces','raceName','chapterId','chapterCompare','gender','volume','news','profileSeen','winsTag','raceSummaryView','bikeTombs','journalHeader','weightLb','weightAt'];
+const DBG_DROP_SET=['birthday','meds','medsOther','stack','barcodes','recentPlaces','raceName','chapterId','chapterCompare','gender','volume','news','profileSeen','winsTag','raceSummaryView','bikeTombs','journalHeader','weightLb','weightAt','rider'];
 const DBG_DROP_KEY=/^(meds|medsOther|stack|stackCaf|stk|birthday|barcodes?|email|uid|userId|token|accessToken|refreshToken|password|secret)$/i;
 // a plain, cycle-free copy: numbers to 3 decimals, long lists and strings cut (and said), functions and page elements left out
 function dbgClean(x, depth=0, path=new WeakSet()){
@@ -10293,7 +10423,7 @@ function dbgScrub(text){ let t=text; dbgHealthWords().forEach(wd=>{ t=t.split(wd
 // the screen as text: a copy of Results laid out off screen (so innerText keeps its lines), every fold and Details row open, without the
 // Medications note and the stack's pre-ride caffeine line
 function dbgScreenText(){ const R=$('results'); if(!R) return ''; const c=R.cloneNode(true);
-  c.querySelectorAll('#rDbg, #planBar, #shareWrap, script, style').forEach(e=>e.remove());
+  c.querySelectorAll('#rDbg, #planBar, #shareWrap, #rRider, script, style').forEach(e=>e.remove()); /* item 99: not the rider's strip */
   c.querySelectorAll('#totGrid b[data-mo-live]').forEach(b=>{ const s=b.nextElementSibling; if(s && s.classList.contains('loc-sr')){ b.textContent=s.textContent; s.remove(); } b.removeAttribute('style'); }); // Ride totals held at 0 or counting: their real numbers, in their own cells (the table keeps its rows)
   c.querySelectorAll('#rNotes > *').forEach(e=>{ if(/Medication/i.test(e.textContent)) e.remove(); });
   [...c.querySelectorAll('*')].filter(e=>/your stack/i.test(e.textContent) && ![...e.children].some(k=>/your stack/i.test(k.textContent))).forEach(e=>e.remove());
@@ -10490,7 +10620,7 @@ vFoldInit();
    set.gear / set.you / set.acct); each header carries a one-line summary (pgSummaries). "Recently changed" is gone: its per-device list
    (bluebird.settingsRecent.v1, never synced, no user data) is removed at boot. A search shows every group with a match open (without
    remembering it) and hides the others; clearing it puts back the remembered open/closed state. Deep links open the row's group first. */
-const SET_NOSAVE=new Set(['account','strava','training','backup','planfor']); // r1013: Plan for is three buttons (no "Saves as you type.")
+const SET_NOSAVE=new Set(['account','strava','training','backup','planfor','rider']); // r1013: Plan for is three buttons (no "Saves as you type.")
 const SET_ALIAS={about:'birthday', topoffs:'salt'}; // b9 row names still used by older links (q26: meds is its own row now, Settings › Account › Health)
 const SSH={keys:[], row:'', bike:'', opener:null, volFrom:'', bikeIds:[]};
 try{ localStorage.removeItem('bluebird.profileRows.v1'); localStorage.removeItem('bluebird.settingsRecent.v1'); }catch(e){}
@@ -10531,6 +10661,7 @@ function setSheetOpen(key, o={}){
   $('setSheetTitle').textContent = o.title || (row==='account' && ACC.from==='settings' && ACC.sub ? (ACC.sub==='stack' ? 'My stack' : 'Units & week') : '') || (SSH.bike ? (bikes().find(b=>b.id===SSH.bike)||{}).name : row==='fluidlim' ? 'Fluid limits' : setRowLabel(row)) || 'Settings'; // q51: a direct page keeps its name (the dialog's label)
   $('setSaveHint').hidden = keys.every(k=>SET_NOSAVE.has(k)) || row==='addbike' || row==='fluidlim'; // q50: Fluid limits saves on Done
   if(row==='sweat'){ swSel=null; sweatRender(); } // q39/q42: the grid (cycling or running) and its title
+  if(row==='rider') riderSheet(); /* item 99 */
   if(!m.classList.contains('open')) SSH.opener = o.opener || document.activeElement;
   m.classList.add('open'); setTopFit(); if(!dkOn()){ $('setList').inert=true; const h=document.querySelector('header'); if(h) h.inert=true; } // q22: on a computer the sheet is the right pane, next to the list
   document.querySelectorAll('#view-profile .prow-h[aria-current]').forEach(b=>b.removeAttribute('aria-current'));
@@ -10584,7 +10715,7 @@ function profileReveal(key, focusId){
 }
 // live search: label, value (and a few words for what a sheet holds, e.g. Medications under Caffeine); empty groups hide
 function setFilter(){
-  const raw=($('setSearch').value||'').trim(), q=raw.toLowerCase(); $('setSearchClear').hidden=!raw; let any=0;
+  const raw=($('setSearch').value||'').trim(), q=raw.toLowerCase(); $('setSearchClear').hidden=!raw; let any=0, oth=0, othL='';
   document.querySelectorAll('#setList .pgroup').forEach(g=>{ let n=0;
     g.querySelectorAll('.prow').forEach(r=>{ const b=r.querySelector('.prow-h'), l=r.querySelector('.prow-l'), val=r.querySelector('.prow-v');
       // q13: the Account row also answers for the settings on Settings › Account (Birthday, Units, Week starts on …)
@@ -10593,8 +10724,12 @@ function setFilter(){
       const sub=SQ[r.dataset.prow] ? [...document.querySelectorAll(SQ[r.dataset.prow])].map(x=>[x.querySelector('.prow-l').textContent, (x.querySelector('.prow-v')||{}).textContent||'', x.querySelector('.prow-h').dataset.kw||''].join(' ')).join(' \u2003 ') : '';
       const hay=[(l||b).textContent, val ? val.textContent : '', b.dataset.kw||'', sub].join(' \u2003 ').toLowerCase(), hit=!q || hay.includes(q);
       r.classList.toggle('sf-out', !hit); if(hit && !r.hidden) n++; });
-    g.classList.toggle('sf-out', !!q && !n); any+=n; });
-  $('setNoMatch').hidden=!q || !!any; if(q && !any) $('setNoMatch').textContent=`No settings match “${raw}”.`;
+    g.classList.toggle('sf-out', !!q && !n); if(!g.classList.contains('sp-hide')){ any+=n; return; } /* item 99: a match on the side not shown (Cycling | Running) shows nothing here */
+    oth+=n; if(n && !othL) othL=[...g.querySelectorAll('.prow')].filter(r=>!r.hidden && !r.classList.contains('sf-out')).map(r=>(r.querySelector('.prow-l')||r).textContent)[0]||''; });
+  const nm=$('setNoMatch'); nm.hidden=!q || !!any;
+  if(q && !any){ const run=setSportView()==='run', o=run ? 'Cycling' : 'Running', t=`No ${run ? 'Running' : 'Cycling'} settings match “${raw}”.`, bt=!oth ? '' : oth===1 && othL ? `${othL} is under ${o} ›` : `${oth} under ${o} ›`;
+    if(nm.dataset.k!==t+bt){ nm.dataset.k=t+bt; nm.textContent=t; /* the other side's match, one tap away (kept while unchanged: a re-filter between the press and the lift would take the button away) */
+      if(bt){ const b=document.createElement('button'); b.type='button'; b.className='set-none-sw'; b.dataset.setSport=run ? 'ride' : 'run'; b.textContent=bt; nm.append(' ', b); } } }
   // q4-2: a search opens every group with a match (not remembered); no search = the remembered open/closed state. Then the stripes.
   setFilter.q=q;
   pgStripe();
@@ -10626,6 +10761,7 @@ function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){}
   set('prowV-carbs', `${intCarbs('recovery')} · ${intCarbs('z2')} · ${intCarbs('hard')} g`);
   { const S=sweatNorm(settings.sweat); set('prowV-sweat', sweatAllAuto(S) ? S.level[0].toUpperCase()+S.level.slice(1) : 'By weather & effort'); sweatRender(); } // q39
   set('prowV-sodium', n(readSodiumConc())+' mg/L'); fluidLimRender(); // q38
+  set('prowV-rider', riderRowV()); /* item 99 */
   const c=cafSettings(), pw=lib.powders.find(p=>p.id===$('powderSel').value), gel=lib.gels.find(x=>x.id===$('gelSel').value);
   set('prowV-mix', pw ? fullName(pw)+star(pw) : 'None');
   set('prowV-gels', gel ? fullName(gel)+star(gel)+` · first at ${firstGelMin()} min` : 'None'); // r1013: First gel at lives in the Gels sheet
@@ -10810,7 +10946,8 @@ function flWidth(inp){ inp.style.width=(Math.max(1, (inp.value||'').length)+1.4)
 function flHighlight(){ const hl=FL.moved||FL.focus; ['min','max'].forEach(k=>$('flBox-'+k).classList.toggle('on', hl===k)); }
 // the sheet's top: Cancel · title · Done on one row while the title fits there, else the title under them (checked whenever the top resizes)
 function setTopFit(){ const t=document.querySelector('#setSheet .set-top'), h=$('setSheetTitle'); if(!t || !h) return;
-  t.classList.remove('stack'); if(t.closest('.set-edit') && h.scrollWidth>h.clientWidth+1) t.classList.add('stack'); }
+  t.classList.remove('stack'); if(t.closest('.set-edit') && h.scrollWidth>h.clientWidth+1) t.classList.add('stack');
+  const sh=t.closest('.set-sheet'), th=t.offsetHeight+'px'; if(sh && sh.style.getPropertyValue('--set-top-h')!==th) sh.style.setProperty('--set-top-h', th); } /* item 99: the rider's sheet keeps its rider stuck right under this bar */
 if(window.ResizeObserver){ const t=document.querySelector('#setSheet .set-top'); if(t) new ResizeObserver(roDefer(()=>setTopFit())).observe(t); }
 function flStepBy(k, dir){ const x=FL[k==='min' ? 'lo' : 'hi']; if(!x.on) return; const st=flStep();
   x.v = st>1 ? (dir>0 ? (Math.floor(x.v/st+1e-9)+1)*st : (Math.ceil(x.v/st-1e-9)-1)*st) : x.v+dir; FL.focus=k; flFix(k); flRender(); }
@@ -13430,6 +13567,7 @@ const WEAR_AREA={Torso:'Top', Outer:'Top', Arms:'Arms', Legs:'Legs', Hands:'Hand
 function renderWear(i){
   { const minF = i.wxMinF!=null ? i.wxMinF : i.tempF, maxF = i.wxMaxF!=null ? i.wxMaxF : null; const o = outfit(minF, maxF, i.wxRain, i.intensity);
     const names={recovery:'Recovery',z2:'Steady',hard:'Hard'}; const rain = i.wxRain!=null && i.wxRain>=40, keys=[];
+    riderStrip(o.wear.map(c=>c && c.id)); /* item 99: the rider in exactly the items below */
     // r1009 (item 73): one row per body zone: the zone, a three-step meter (Light / Medium / Thermal) to the zone's warmest item, the level
     // word, the item(s), a wind pill when a shell is on ("vest" on the torso, "wind" elsewhere), a tick. The tick key is the items' keys (one
     // item: the pre-r1009 key, so a tick saved before still matches). Header: the effort and the feels-like, the colder end blue, the warmer orange.
@@ -14115,7 +14253,8 @@ function setSportApply(){ const v=setSportView(), run=v==='run';
   ['runCEasy','runCSteady','runCHard'].forEach((id,k)=>{ const e=$(id); if(e && document.activeElement!==e) e.value=C.carbs[['recovery','z2','hard'][k]]; });
   document.querySelectorAll('#runCarryKinds [data-rc]').forEach(b=>{ const on=b.dataset.rc===C.carry.kind; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); });
   if(document.activeElement!==$('runCarryN')) $('runCarryN').value=C.carry.n; if(document.activeElement!==$('runCarryMl')) $('runCarryMl').value=C.carry.ml; }
-$('setSport').addEventListener('click', e=>{ const b=e.target.closest('[data-set-sport]'); if(!b) return; try{ localStorage.setItem(SETSP_KEY, b.dataset.setSport); }catch(_){} setSportApply(); b.focus(); });
+$('setSport').addEventListener('click', e=>{ const b=e.target.closest('[data-set-sport]'); if(!b) return; try{ localStorage.setItem(SETSP_KEY, b.dataset.setSport); }catch(_){} setSportApply(); if(setFilter.q) setFilter(); b.focus(); });
+$('setNoMatch').addEventListener('click', e=>{ const b=e.target.closest('[data-set-sport]'); if(!b) return; try{ localStorage.setItem(SETSP_KEY, b.dataset.setSport); }catch(_){} setSportApply(); setFilter(); const r=document.querySelector('#setList .pgroup:not(.sp-hide):not(.sf-out) .prow:not(.sf-out):not([hidden]) .prow-h'); if(r) r.focus(); }); /* item 99: a match on the other side */
 function runSetSave(o){ const r=Object.assign({}, settings.run||{}); Object.assign(r, o); settings=Object.assign({}, settings, {run:r}); save(KEYS.settings, settings); setSportApply(); runApply(); }
 ['runCEasy','runCSteady','runCHard'].forEach((id,k)=>$(id).addEventListener('input', ()=>{ const v=+$(id).value; if(!(v>0)) return; const c=Object.assign({}, runCfg().carbs, {[['recovery','z2','hard'][k]]:Math.round(v)}); runSetSave({carbs:c}); }));
 $('runCarryKinds').addEventListener('click', e=>{ const b=e.target.closest('[data-rc]'); if(!b) return; const k=b.dataset.rc; runSetSave({carry:{kind:k, n:RUN_CARRY[k].n, ml:RUN_CARRY[k].ml}}); });
@@ -15782,15 +15921,16 @@ $('backupFile').addEventListener('change',ev=>{
 // restore a backup (d: the parsed file). Profile, closet, bikes and products are replaced; journal entries and races merge, newest edit wins.
 function restoreAll(d){
   const ms=v=>typeof v==='number' ? v : (Date.parse(v)||0), oldTombs=Object.assign({}, settings.bikeTombs);
-  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pwa=settings.weightAt, pmb=settings.myBottles, pba=settings.bottleAsk; // an older backup without a mode / birthday / gender keeps this device's
+  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pwa=settings.weightAt, pmb=settings.myBottles, pba=settings.bottleAsk, prd=riderOwn(settings); // an older backup without a mode / birthday / gender keeps this device's
   normalizeJournal(d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
   journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); dropBrands(lib); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings) settings=Object.assign({},DEFAULT_SETTINGS,d.settings);
+  if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); dropBrands(lib); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings){ const ds={}; Object.keys(d.settings).forEach(k=>{ if(k!=='__proto__') ds[k]=d.settings[k]; }); settings=Object.assign({},DEFAULT_SETTINGS,ds); } /* item 99: a file's own "__proto__" key (JSON.parse makes one) is never copied: Object.assign would make it the settings' prototype, and every key it holds (a rider) would read as set without being stored */
   if(!PLAN_MODES.includes(settings.planMode) || !(d.settings && PLAN_MODES.includes(d.settings.planMode))) settings.planMode = PLAN_MODES.includes(pm) ? pm : 'both';
   if(!(d.settings && 'weightLb' in d.settings)){ if(pw) settings.weightLb=pw; else delete settings.weightLb; if(pwa) settings.weightAt=pwa; else delete settings.weightAt; }
   if(d.settings && !('myBottles' in d.settings) && pmb) settings.myBottles=pmb; if(d.settings && !('bottleAsk' in d.settings) && pba) settings.bottleAsk=pba; ownNorm(settings); // q8
   if(!(d.settings && 'raceName' in d.settings)){ if(pn) settings.raceName=pn; else delete settings.raceName; } else if(typeof settings.raceName!=='string') settings.raceName='';
   if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
+  if(riderOwn(d.settings)==null){ if(prd) settings.rider=prd; else delete settings.rider; } riderSetNorm(settings); /* item 99: a backup without a rider (no key, or null: riderNorm's "no rider") keeps this device's (as birthday and gender); a tampered one draws the default */
   if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday=''; if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender='';
   if(d.settings){ // a bike you bring back is yours again: one that was deleted (here or in its own file) gets a new id, so no tombstone removes it
     const dead=Object.assign({}, oldTombs, d.settings.bikeTombs), ren={}; if(Object.keys(dead).length) settings.bikeTombs=dead;
@@ -15806,7 +15946,7 @@ function restoreAll(d){
   if(d.lastPlan && typeof d.lastPlan==='object') save(KEYS.plan, d.lastPlan);
   if(d.training && Array.isArray(d.training.workouts) && STRAVA_ON) tiRestore(d.training); // imported training: merged by id (signed in only)
   { const n=wghNewest(); if(typed && n && +settings.weightAt<(+n.updatedAt||0)) settings.weightAt=Date.now(); } /* (the typed weight still stands after that stamp, here and on the other devices it syncs to) */ save(KEYS.journal,journal); save(KEYS.lib,lib); save(KEYS.settings,settings); dfcMirror(); { const top=wghTop(); wghToProfile('', (bw && top===wt && top===bw.id+'|'+bw.lb) || typed); } /* item 92: the newest weigh-in is the Profile weight (a backup with no weigh-ins too), unless it is the backup's own newest, unchanged here (its Profile weight stands), or a weight was typed after it */ renderLibrary(); renderJournal(); renderSettings(); renderIntSettings(); renderBikes(); renderToday(); renderIntensity(); renderAbout(); renderRaces(); applyMode(); updateSummaries(); volRender();
-  toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : '')); jhpRender(); jhpRestorePhoto(d); fwGate(); /* item 97: the backup's Animate the world */
+  toast('Restored'+(rr ? ` · races: ${rr.added} added, ${rr.updated} updated` : '')); jhpRender(); jhpRestorePhoto(d); fwGate(); /* item 97: the backup's Animate the world */ riderApply(); /* item 99: the backup's rider */
 }
 // apply a Journal backup (d: the parsed file): same as a full restore (journal and races merged, products and settings replaced)
 function jRestore(d, back){ restoreAll(d); if(back) goTo('journal'); }
@@ -18770,10 +18910,12 @@ function sfMerge(c, cAt, cm, l, lAt, lm){
 function sfDocMerge(cloudDoc, out){
   const c=cloudDoc && cloudDoc.settings && typeof cloudDoc.settings==='object' ? cloudDoc.settings : null, hasLocal=!!settings, lm=+SY.meta.settings||0;
   if(!c){ if(hasLocal){ const F=sfF(); out.up.push('settings'); out.sUp=sfKeys(settings); out.sAt={}; out.sUp.forEach(k=>{ if(!sfQuiet(k)) out.sAt[k]=F[k]!=null ? F[k] : lm; }); } return; }
-  const cm=syncMs(c.updatedAt), cs=syncStrip(c), cAt=cloudDoc.settingsAt;
+  const cm=syncMs(c.updatedAt), cs=riderSetNorm(syncStrip(c)), cAt=cloudDoc.settingsAt; /* item 99: the cloud's rider as this device keeps it (checked), so a value it can't draw is no change to apply on every pull */
+  const rGone=riderOwn(cs)===undefined && riderBuilt(); /* the app never removes a rider (a restore without one keeps this device's), so a cloud copy with none (null, a deleted field: foreign, e.g. an older build's restore) is no value: below, this device's goes back up */
   out.sCm=cm; /* the cloud doc this merge saw: a write that only puts its stamps back carries its updatedAt + 1 (sfOps) */
   if(!hasLocal){ const r=sfMerge(cs, cAt, cm, {}, {}); out.apply.settings={data:cs, at:cm}; out.sAt=r.at; return; }
   const r=sfMerge(cs, cAt, cm, settings, sfF(), lm);
+  if(rGone && r.m.rider===undefined){ r.m.rider=riderOwn(settings); r.at.rider=(+r.at.rider||0)+1; if(!r.up.includes('rider')) r.up.push('rider'); } /* the cloud's none won the stamps: this device's rider goes back up, stamped 1 ms past it so every build takes it (an older one would send the deletion again on each pull against an older stamp); a device that pulls it later takes it, so the devices meet again */
   const g=jhpDocMerge(jhpDocMerge(bikeTombMerge(bikeTombMerge(dfcGuard(r.m, settings), cs.bikeTombs), settings.bikeTombs), cs.journalHeader), settings.journalHeader); /* the guards on top: a copy without the deficits keeps this device's (item 92), deleted bikes stay deleted, the newer header photo stays (item 91) */
   sfKeys(g, r.m).forEach(k=>{ if(!sfSame(g[k], r.m[k]) && !sfSame(g[k], cs[k]) && !r.up.includes(k)) r.up.push(k); });
   const at=Math.max(lm, cm), D=sfD(), won={};
@@ -18942,7 +19084,7 @@ function syncApply(plan){
   return ch;
 }
 function syncSetSettings(d){ const jh=window.__jhp ? jhpGet() : null; settings=Object.assign({}, DEFAULT_SETTINGS, bikeTombMerge(d, null)); [['hotPct','hot'],['modPct','mod'],['coldPct','cold']].forEach(([k,c])=>settings[k]=clampPct(settings[k], CAP_MAX[c])); // q56: each band its own top
-  migrateWaterRoles(settings); (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; if(!Array.isArray(settings.ridePresets)) settings.ridePresets=[]; settings.volume=volNorm(settings.volume); ownNorm(settings); save(KEYS.settings, settings); if(jh){ const j=jhpGet(); jhpRender(); jhpKick(j.photoAt===jh.photoAt && j.goneAt===jh.goneAt); } fwGate(); /* item 97: another device's Animate the world */ } /* r1017 (item 91): the photo the header now names, fetched or sent (at once when it changed; otherwise a Storage retry keeps its wait) */
+  migrateWaterRoles(settings); (settings.bikes||[]).forEach(b=>{ b.roles=bikeRoles(b); }); if(!Array.isArray(settings.setupPresets)) settings.setupPresets=[]; if(!Array.isArray(settings.ridePresets)) settings.ridePresets=[]; settings.volume=volNorm(settings.volume); ownNorm(settings); riderSetNorm(settings); /* item 99 */ save(KEYS.settings, settings); if(jh){ const j=jhpGet(); jhpRender(); jhpKick(j.photoAt===jh.photoAt && j.goneAt===jh.goneAt); } fwGate(); /* item 97: another device's Animate the world */ } /* r1017 (item 91): the photo the header now names, fetched or sent (at once when it changed; otherwise a Storage retry keeps its wait) */
 function syncSetLib(d){ lib=d; dropBrands(lib); if(!Array.isArray(lib.gels)) lib.gels=JSON.parse(JSON.stringify(DEFAULT_LIB.gels)); if(!Array.isArray(lib.powders)) lib.powders=JSON.parse(JSON.stringify(DEFAULT_LIB.powders));
   if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); fillForms(); fillRatios(); save(KEYS.lib, lib); }
 // redraw what changed; the plan inputs only come back while nobody has touched them on this page. Item 96 (review round 4): a redraw never
@@ -18974,7 +19116,7 @@ function syncRender(ch){
   const held=(id, fn)=>{ const s=$(id); if(!uc && s && a && s.contains(a)){ (SY.held||(SY.held={}))[id]=fn; prowSoon(); } else { if(SY.held) delete SY.held[id]; fn(); } };
   try{
     if(ch.library){ buildBottleOptions(); renderBottles(); renderLibrary(); fillProductSelects(); }
-    if(ch.settings){ renderSettings(); renderIntSettings(); held('prowB-bikes', renderBikes); held('prowB-closet', renderClothing); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); }
+    if(ch.settings){ renderSettings(); renderIntSettings(); held('prowB-bikes', renderBikes); held('prowB-closet', renderClothing); renderMeds(); renderCaf(); renderIntensity(); renderAbout(); applyMode(); riderApply(); /* item 99 */ }
     if(ch.lastPlan && !SY.planTouched) restoreInputs();
     if(ch.settings || ch.lastPlan){ sweatMigrate(); sweatSyncInput(); runApply(); setSportApply(); } // q39, q42
     if(ch.settings || ch.library || ch.lastPlan){ renderToday(); updateSummaries(); }
@@ -19093,7 +19235,7 @@ function renderSyncStatus(){ setTimeout(()=>{ try{ sbAcctRender(); }catch(e){} }
   hb.hidden=!s.on; $('syncHdrIn').hidden = s.on; renderGreeting(s.on); if(!s.on){ hdrSubRender(); return; }
   const label = s.st==='offline' ? 'Offline — will sync' : s.st==='pending' ? 'Syncing…' : 'Synced ✓ '+syncAgo(s.at);
   const u=SY.user||{}, ini=((u.displayName||u.email||'?').trim()[0]||'?').toUpperCase();
-  if(hb.dataset.st!==s.st || hb.dataset.ini!==ini){ hb.dataset.st=s.st; hb.dataset.ini=ini; hb.innerHTML=`<span class="hav">${esc(ini)}</span>`; }
+  if(!hb.querySelector(':scope>.hav')) hb.innerHTML='<span class="hav"></span>'; hb.dataset.ini=ini; hb.dataset.st=s.st; riderHdr(); /* item 99: the initial, or the rider once built; .hav made once (riderAv sets the initial, '?' before sign-in then the real one, and keeps the rider by its key) */
   hdrSubRender(); hb.dataset.label=label+'. Open Settings'; hb.title=label; hdrAttnRender();
   const st=$('syncSt'); st.className='sync-st '+(s.st==='synced'?'ok':s.st==='offline'?'off':'');
   st.innerHTML=SYNC_ICON[s.st]+`<span>${esc(label)}</span>`;
@@ -21575,7 +21717,7 @@ const DK_TABS=['plan','journal','volume','races','news'];
 function dkOn(){ return DK.matches; }
 function sbAcctRender(){ const el=$('sbAcct'); if(!el) return; let on=false, u=null; try{ on=syncState().on; u=SY.user; }catch(e){}
   const name=on && u ? (u.displayName||u.email||'Signed in') : 'Not signed in';
-  $('sbName').textContent=name; $('sbAv').textContent=on && u ? (name.trim()[0]||'?').toUpperCase() : '';
+  $('sbName').textContent=name; riderAv($('sbAv'), on && u ? (name.trim()[0]||'?').toUpperCase() : '', 30); /* item 99: the initial, or the rider once built */
   el.setAttribute('aria-label', `${name} · Settings`); el.classList.toggle('active', hdrView()==='profile'); }
 // the page's actions, right of the title (built for the active page; empty on pages without any)
 function dkActsRender(){ const box=$('hdrActs'); if(!box) return; const v=hdrView(); let h='';

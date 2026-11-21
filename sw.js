@@ -5,7 +5,7 @@
 // the /__/ auth helper are never intercepted.
 // Strava: the fred-api Worker (another host) is never intercepted, and neither is /strava/callback/.
 // News: data/news.json is stale-while-revalidate (the last copy shows offline).
-const CACHE = 'fred-shell-v122';
+const CACHE = 'fred-shell-v123';
 // the two marker fonts (Races graffiti, Ready Freddy title) are precached so they work offline from the first visit
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png',
   './assets/fonts/permanent-marker-latin-400-normal.woff2', './assets/fonts/caveat-brush-latin-400-normal.woff2'];
