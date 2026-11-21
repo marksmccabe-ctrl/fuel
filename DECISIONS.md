@@ -2141,3 +2141,8 @@
     inventory nothing removed; motion 153 screens, 56 checks; budgets 145 screens (46 with fred world art), the reference 1.07-1.72 ms,
     62 checks; q91 324, q92 285, q93 209, q95 43, q96 101, q97 126, q98 321, q99 8609 (882 s, under the 1500 s step). Next: log and merge
     (v123 live).
+- Merged 2026-11-21 (main 8c66750, v123; pushed, deploys). The kit step's skeptic (round 1) found no problems. The log entry
+  ("Queue item 99 done: log entry", 61bf62d) is in QUEUE_LOG.md; before it went in, five checkers tested its claims against this
+  file, the code and the logs, and nine wrong or stale lines were corrected. npm test on the merge: 1777 pass, 0 fail. fred/null.html
+  rebuilt from main: sha a3ea1d76, the same as fred99's. Item 100 takes fred world v9 first (probe99/v9-1738-copy/CHECKS.md);
+  ACCEPTED_V8's entries 1-5 go only by HANDOFF's drop rule, and entry 6 (the dark gloves, unchanged in v9) stays.
