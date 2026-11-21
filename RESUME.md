@@ -208,6 +208,18 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   on main), layout 123 (365 opened) at 320/375/430 and 129 (383) at 390, inventory nothing removed, motion 137, budgets 129 (31 with
   fred world art, 26 checks), q91 324, q92 285, q93 209, q95 43, q96 101, q97 127, q98 322 (865 s whole, under the 1500 s step). No
   app change and no inventory exemption in the kit step. On main's page the 20 print `skipped (needs css:.rwx-fred)`.
+- Item 99 brings 16 screens (needs '#prowBtn-rider': settings-rider, -built, -look, -gear, -kit, settings-running-search-rider,
+  desktop-settings-rider, plan-avatar-rider, desktop-avatar-rider; needs '#rRider': plan-closet-rider-hot, -mild, -cold, -freezing,
+  -wet, -full, desktop-closet-rider), added in its build and review round 2, each checked again on a screenshot on the v8 page in the
+  kit step; a screen can carry its own forecast (`wx: {lo, hi, rain}`) and the 'closet-full' seed. New test q99/q99.test.mjs (about
+  15 min whole since ACCEPTED_V8; q99/mut99.mjs, 152 mutants). The kit step's one failure was motion's, main's too: dayFitRows (r1008)
+  sets and clears an inline white-space in one statement on every fitAll, which the observer counted as scripted motion (the
+  intermittent dayFitRows case item 98 met); the motion audit now judges an inline style by what each batch of records leaves, with a
+  self-test probe (__moPa) that a set-and-clear in one task is not caught (DECISIONS "Item 99", kit step). Proof on q99-rider (6a8bb4e,
+  v123), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 8c19078, v122), Mac Studio: `kit: OK: 18 steps passed, 0 item tests
+  skipped (8937 s)`; answer 1777 pass, contrast 145 screens, layout 136 (404 opened) at 320/375/430 and 145 (431) at 390, inventory
+  nothing removed, motion 153 (56 checks), budgets 145 (46 with fred world art), q91 324, q92 285, q93 209, q95 43, q96 101, q97 126,
+  q98 321, q99 8609. No app change and no exemption in the kit step. On main's page the 16 print `skipped (needs ...)`.
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with

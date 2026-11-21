@@ -14,7 +14,7 @@ because the laptop sleeps (two long runs died with it) and has 16 GB. This file 
 | `q96-sync` | Item 96, built, reviewed (7 rounds, ended at eafa457), main (item 95) merged in (c05e5a5, v120), kit step OK (Nov 6) | Merged into main (6a87e42) |
 | `q97-fw-plumbing` | Item 97, built, reviewed (6 rounds, round 6 dry, ended at 3dce12f, v121), kit step OK after a skeptic (Nov 6), logged | Merged into main (2f8c5c9) |
 | `q98-wx-fred` | Item 98, built on fred world v5, reviewed (5 rounds), kit step OK after skeptics (Nov 7), logged | Merged into main (8c19078) |
-| `q99-rider` | Item 99, built on fred world v7 (09:29), acceptance checks and 7 review rounds; fred world v8 (14:45) inlined at 6a8bb4e (v123); v8 check rounds 1 and 2 done; v8 accepted (Mark: item 99 ships on v8; FROM-APP-CHAT-7 asks the design chat for polish, a v9 a later item takes) | q99 green on v8 with ACCEPTED_V8 (DECISIONS.md Item 99 "Bundle v8 accepted": `OK (8608 checks)`, main second `OK (8609)`; all 152 mutants fail): next the kit step, then log and merge |
+| `q99-rider` | Item 99, built on fred world v7 (09:29), acceptance checks and 7 review rounds; fred world v8 (14:45) inlined at 6a8bb4e (v123); v8 check rounds 1 and 2 done; v8 accepted (Mark: item 99 ships on v8; FROM-APP-CHAT-7 asks the design chat for polish, a v9 a later item takes) | q99 green on v8 with ACCEPTED_V8 (DECISIONS.md Item 99 "Bundle v8 accepted": `OK (8608 checks)`, main second `OK (8609)`; all 152 mutants fail); kit step done Nov 21 (runkit `kit: OK: 18 steps passed, 0 item tests skipped (8937 s)`, no app change, one motion audit fix, no exemption): next log and merge |
 | `claude/lucid-thompson-dc7gqa` | The Nov 1 cloud handoff (HANDOFF.md, old kit copy) | Old: superseded by this file |
 
 Folder layout (recreate it on the Studio; the laptop used exactly this):
@@ -109,8 +109,10 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
   and above shoe covers at 3x, the thermal jersey's cuff, build checks), a v9 a later item takes. q99 records it as ACCEPTED_V8, each
   case exactly as wide as measured on v8 with a floor on each screen (DECISIONS.md Item 99 "Bundle v8 accepted"); q99 green on v8, all 152
   mutants fail.
-- **Next: item 99's kit step.** A skeptic; all 152 q99 mutants; q97, q98, motion, budgets on an idle Mac, smoke, inventory, contrast,
-  layout, npm test; then log and merge (v123 live). When v9 arrives (a later item): verify it, inline it, add its sha1s to BUILDS, and
+- Nov 21 (Mac Studio, kit only): item 99's kit step: the whole kit on q99-rider 6a8bb4e (v123), KIT_ITEMS unset: `kit: OK: 18 steps
+  passed, 0 item tests skipped (8937 s)`. The 16 rider screens checked on screenshots on v8, none added; the one failure (motion, main's too:
+  dayFitRows' set-and-clear of white-space read as scripted motion) fixed in the audit (DECISIONS.md Item 99, kit step); no exemption.
+- **Next: a skeptic on item 99's kit step, if one is run, then log item 99 and merge it (v123 live).** When v9 arrives (a later item): verify it, inline it, add its sha1s to BUILDS, and
   drop an ACCEPTED_V8 entry only when, on a run that is otherwise green (and not a Q99_ACCEPT_DUMP run, which always ends FAIL), q99
   prints it as "now shows" and "never under SHOW" on every screen of its width.
   Later: 102 must not pass self-animating wrappers (fw-peek, fw-chase-*) as o.cls; 103 crops FW.scene ([200,560,440,226] on

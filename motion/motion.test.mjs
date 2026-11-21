@@ -38,7 +38,8 @@
 //   The motion-on pass walks every screen the same way as (1) (go(), scroll, close, tab) with Reduce Motion off, for (2) and (3).
 //   Self-tests: probes that must be caught on the first screen of each pass (a looping animation, a 0-opacity text, a scaleY(0) text, a
 //   leftover motion class, a counting number, a parallax under Reduce Motion, a scripted height tween, element.animate(), a width
-//   transition, motion before the first tap), so the audit cannot pass by measuring nothing; and the motion pass must see the motions
+//   transition, motion before the first tap), so the audit cannot pass by measuring nothing, and one that must not be (a style set and
+//   cleared again in one task, a measurement no frame shows: the Reduce Motion and first-load passes); and the motion pass must see the motions
 //   items 85-90 promise somewhere (EXPECT: the Crunch sweep, a sheet rising, the segment pill, the results stagger, the hour bars, a sky
 //   loop, the Volume entrance, a tile growing, the Journal entrance, a list sliding in).
 // Each failure prints its pass and rule, the element (nearest id, parent, itself), the animation, transition or property, and the
@@ -319,17 +320,24 @@ function INSTR(cfg) {
   };
   // scripted motion (no CSS animation to see): an element\u2019s inline style property, or a short number\u2019s digits, rewritten in 4 or
   // more different frames within 500 ms (a requestAnimationFrame loop, a count-up, a JS tween). One-off sets (a FLIP start and its
-  // release) never reach 4.
+  // release) never reach 4. An inline style is judged by what each batch of the observer's records leaves on the element (its style before
+  // the batch's first record against its style at the batch's end): the records of one batch come from one task, which no frame splits,
+  // so a property a script sets and clears again before its task ends (a measurement: main's dayFitRows sets white-space:nowrap on each
+  // row's first line to see whether it would wrap, then clears it, on every fitAll) is never painted and is no change. Every value a
+  // frame can show is still noted (the self-tests: __moP9's height tween is caught, __moPa's set-and-clear in one task is not).
   M.mut = new Map();
   const note = (e, k, v) => { if (M.mut.size > 5000) return; let x = M.mut.get(e); if (!x) M.mut.set(e, x = { pre: !M.live, step: M.step, p: new Map(), last: new Map(), load: new Map() });
     if (v !== undefined) { if (x.last.get(k) === v) return; x.last.set(k, v); } /* (the same text written again is no change) */
     if (!x.load.has(k) || x.load.get(k) < 0) x.load.set(k, okIdx(cfg.onLoad, e, 'script', k)); /* (judged as it moves: a box\u2019s entrance class is gone by the time we look) */
     let T = x.p.get(k); if (!T) x.p.set(k, T = []); const t = now(); if (T[T.length - 1] !== t) T.push(t); if (T.length > 16) T.shift(); };
   const pst = s => { const m = new Map(); for (const d of (s || '').split(';')) { const i = d.indexOf(':'); if (i > 0) m.set(d.slice(0, i).trim().toLowerCase(), d.slice(i + 1).trim()); } return m; };
-  new MutationObserver(L => { for (const r of L) {
-    if (r.type === 'attributes') { const a = pst(r.oldValue), b = pst(r.target.getAttribute('style')); for (const k of new Set([...a.keys(), ...b.keys()])) if (a.get(k) !== b.get(k)) note(r.target, k); continue; }
-    const e = r.type === 'characterData' ? r.target.parentElement : r.target; if (!e || e.childElementCount) continue; const s = e.textContent; if (s.length <= 24 && /\d/.test(s)) note(e, 'text', s);
-  } }).observe(document, { attributes: true, attributeFilter: ['style'], attributeOldValue: true, childList: true, characterData: true, subtree: true });
+  new MutationObserver(L => { const st0 = new Map(); /* (each element's style before this batch: its first style record's oldValue) */
+    for (const r of L) {
+      if (r.type === 'attributes') { if (!st0.has(r.target)) st0.set(r.target, r.oldValue); continue; }
+      const e = r.type === 'characterData' ? r.target.parentElement : r.target; if (!e || e.childElementCount) continue; const s = e.textContent; if (s.length <= 24 && /\d/.test(s)) note(e, 'text', s);
+    }
+    for (const [t, o] of st0) { const a = pst(o), b = pst(t.getAttribute('style')); for (const k of new Set([...a.keys(), ...b.keys()])) if (a.get(k) !== b.get(k)) note(t, k); }
+  }).observe(document, { attributes: true, attributeFilter: ['style'], attributeOldValue: true, childList: true, characterData: true, subtree: true });
   M.scripted = () => { const out = [];
     for (const [e, x] of M.mut) for (const [k, T] of x.p) for (let i = 0; i + 3 < T.length; i++) if (T[i + 3] - T[i] <= 500) { out.push({ sel: M.desc(e), prop: k, n: T.length, pre: x.pre, step: x.step, load: x.load.get(k), lok: okIdx(cfg.layoutOk, e, null, k) }); break; }
     M.mut.clear(); return out; };
@@ -521,6 +529,8 @@ async function selfTest(p, pass, screen) {
     w.offsetWidth; w.style.width = '200px';
     mk('__moP7', '', 'probe animate').animate([{ opacity: 1 }, { opacity: .5 }], { duration: 5000 });
     const h = mk('__moP9', 'height:4px;background:#000', ''); let k = 0; window.__moH = setInterval(() => { h.style.height = (4 + ++k) + 'px'; }, 20);
+    /* a measurement, not motion: a style set and cleared again in one task (as main's dayFitRows does), never painted, so never caught */
+    const ms = mk('__moPa', '', 'probe measure'); window.__moMn = 0; window.__moM = setInterval(() => { ms.style.whiteSpace = 'nowrap'; window.__moMw = ms.scrollWidth; ms.style.whiteSpace = ''; window.__moMn++; }, 20);
     const sp = document.createElement('div'); sp.id = '__moSp'; sp.style.height = '3000px'; document.body.append(sp); /* (room to scroll on any screen) */
     const q = mk('__moP8', '', 'probe parallax'); window.__moL = () => { q.style.transform = 'translateX(' + Math.round(scrollY * .05) + 'px)'; }; addEventListener('scroll', window.__moL);
   });
@@ -532,7 +542,9 @@ async function selfTest(p, pass, screen) {
     ? [['running', '__moP1'], ['moved', '__moP1'], ['hidden', '__moP2'], ['collapsed', '__moP3'], ['armed', '__moP4'], ['js', '__moP5'], ['layout', '__moP6'], ['moved', '__moP6'], ['animate', '__moP7'], ['running', '__moP7'], ['scroll', '__moP8'], ['moved', '__moP9']]
     : pass === 'load' ? [['on-load', '__moP1'], ['layout', '__moP6'], ['animate', '__moP7'], ['on-load', '__moP9'], ['layout', '__moP9']] : [['layout', '__moP6'], ['animate', '__moP7'], ['layout', '__moP9']];
   for (const [rule, id] of want) C.ok(has(rule, id), pass + ' self-test: a probe ' + id + ' is caught as ' + rule, F.map(f => f.rule + ' ' + f.sel));
-  await p.evaluate(() => { clearInterval(window.__moT); clearInterval(window.__moH); removeEventListener('scroll', window.__moL); ['__moS', '__moSp', '__moW', '__moP1', '__moP2', '__moP3', '__moP4', '__moP5', '__moP6', '__moP7', '__moP8', '__moP9'].forEach(id => { const e = document.getElementById(id); if (e) e.remove(); }); document.getAnimations().forEach(a => { if (!a.animationName && !a.transitionProperty) a.cancel(); }); });
+  if (pass !== 'motion') { const n = await p.evaluate(() => window.__moMn); /* (the motion pass judges scripted styles only for layout properties: nothing to see there) */
+    C.ok(n >= 4 && !F.some(f => f.sel.includes('__moPa')), pass + ' self-test: a probe __moPa that sets a style and clears it in the same task (' + n + ' times; a measurement, never painted) is not caught', F.filter(f => f.sel.includes('__moPa')).map(f => f.rule + ' ' + f.name + ' ' + f.detail)); }
+  await p.evaluate(() => { clearInterval(window.__moT); clearInterval(window.__moH); clearInterval(window.__moM); removeEventListener('scroll', window.__moL); ['__moS', '__moSp', '__moW', '__moP1', '__moP2', '__moP3', '__moP4', '__moP5', '__moP6', '__moP7', '__moP8', '__moP9', '__moPa'].forEach(id => { const e = document.getElementById(id); if (e) e.remove(); }); document.getAnimations().forEach(a => { if (!a.animationName && !a.transitionProperty) a.cancel(); }); });
   await p.waitForTimeout(100);
   FIND.splice(before);
   { const E = await evs(p), ok = x => !/__mo/.test(x.sel); E.ev = E.ev.filter(ok); E.calls = E.calls.filter(ok); E.js = E.js.filter(ok); judgeEvents(pass, screen, 'go', E); } /* (the screen\u2019s own, the probes\u2019 left out) */

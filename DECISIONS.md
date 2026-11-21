@@ -2098,3 +2098,46 @@
     as acc2; 438 s for v8a-dump, 29682 s for the other 151.
   - Next: the kit step (a skeptic; all 152 q99 mutants; q97, q98, motion, budgets on an idle Mac, smoke, inventory, contrast, layout, npm
     test), then log and merge (v123 live).
+- Kit step (the whole kit, tools/runkit.sh, on fred99 = q99-rider 6a8bb4e, v123, rebuilt with mknull.sh, byte-identical to before;
+  KIT_ITEMS unset, so q91-q99 all ran; KIT_MAIN default, fred/null.html = main 8c19078, v122; Mac Studio, Nov 21; scratch in kit99/):
+  - Screens: none added. Item 99's 16 were already in lib/screens.mjs with their needs ('#prowBtn-rider': settings-rider, -built,
+    -look, -gear, -kit, settings-running-search-rider, desktop-settings-rider, plan-avatar-rider, desktop-avatar-rider; '#rRider':
+    plan-closet-rider-hot, -mild, -cold, -freezing, -wet, -full, desktop-closet-rider), and run() skips each on a page without it
+    (on main's page all 16 print `skipped (needs ...)`). Each checked on a screenshot on the v8 page (kit99/shots.mjs, kit99/shots/):
+    the sheet with the default rider and three folded summaries ("Light skin · short dark brown hair", "Black helmet · shield · purple
+    lens", "Bluebird blue jersey · plain · black shorts"); built (RIDER99: "Deep brown skin · curly black hair · beard", "Coral helmet ·
+    glasses · green lens", "Coral jersey · dots · navy shorts"); Look, Gear and Kit open (Kit with More colours: Jersey fade Berry),
+    the rider stuck under the title bar; Settings on Running with "rider" typed ("No Running settings match “rider”." and "Your rider
+    is under Cycling ›"); the sheet as the pane beside the list at 1280 x 800 (Kit open); the rider in the header circle (signed in,
+    390 px) and in #sbAv (1280 x 800, "Kit Rider"); the Closet strip over its list on the hot (bare rider, summer jersey, bib shorts),
+    mild (arm and knee warmers, toe covers), cold (RIDER99: headband, thermal jersey and vest, gloves, leg warmers, shoe covers),
+    freezing, wet (RIDER99: cycling cap, full-finger gloves, toe covers) and full-closet freezing rides (balaclava, winter jacket,
+    lobster gloves, thermal tights) and on the computer layout (1440 x 900, wet, RIDER99, "Rain likely" under the list). Not added: a
+    phone held sideways (review round 5's side column) and the short, narrow windows (round 6): q99's fit section (figView) checks
+    them, and the sheet's colours there are the ones these screens audit.
+  - First run: `kit: FAIL 1 of 18 steps (0 item tests skipped, 8871 s)`, every step OK but motion `FAIL 1`: "reduce moved:
+    div#runResults span.dr-b > b · script: style white-space · changed in 4 frames under Reduce Motion (load) · on run-wx-fred-snow".
+    Not item 99's: main's page fails it the same way (the run screens' reduce pass, 2 runs of 2: run-wx-fred-sun x16, and rain and snow
+    x4 once; kit99/mo-main1.log, mo-main2.log), as fred99 does (3 of 3, kit99/mo-run1-3.log). Item 98's rounds met it as "an
+    intermittent dayFitRows case in main's code" and passed it by running again (above). Cause: main's dayFitRows (r1008) sets
+    white-space:nowrap on each run row's first line, reads its scrollWidth and clears it in the same statement, on every fitAll (a frame
+    queued by any DOM mutation or body resize); the audit's observer compared each record's oldValue with the attribute as it stood at
+    the callback, so every set-and-clear counted as a change, and a load where fitAll ran in 4 frames within 500 ms read as scripted
+    motion. No frame ever shows the nowrap: a task's records reach the observer before the next frame.
+    Decision (b), the audit was wrong; fixed in motion/motion.test.mjs (no app change, no KNOWN_ON_MAIN entry): the observer judges an
+    inline style by what each batch of records leaves (the style before the batch's first record against the style at its end), so
+    a property set and cleared in one task is no change; every value a frame can show is still noted (a tween writes once per frame,
+    in a task of its own). New self-test probe __moPa (white-space set, scrollWidth read and cleared in one task every 20 ms), in the
+    Reduce Motion and first-load passes: it must run 4 times or more and not be caught. The old observer (kit99/mo/motion-mut.test.mjs,
+    this file with the old block) fails it ("moved ... changed in 6 frames") and the run screens again (`FAIL 2`, kit99/mo/mut-run.log);
+    the new one passes the run screens on fred99 (reduce and load, `OK (21 checks)`) and on main's page (reduce, `OK (21 checks)`), and
+    the whole step on fred99 `OK ... 153 screens ... (56 checks)` (54 + the two new self-test checks; __moP9's height tween still caught).
+  - Exemptions: none added (no inventory/allow.json, KNOWN_ON_MAIN, ELLIPSIS_OK, SIDEWAYS_OK or KEYFRAMES entry); ACCEPTED_V8 stands as
+    Mark decided ("Bundle v8 accepted"). q99 and the app unchanged, so q99's 152 mutants were not run again. Budgets ended OK in both
+    runs (some screens read again after "host busy" readings, then judged).
+  - Proof, after the motion fix (the same page and checkout, end to end, one run at a time, nothing else running but the desktop):
+    `kit: OK: 18 steps passed, 0 item tests skipped (8937 s)`; answer 1824 tests, 1777 pass, 0 fail (47 todo); smoke 14 checks; contrast
+    145 screens (4 known on main), 316 checks; layout 136 screens (404 opened) at 320/375/430 and 145 (431) at 390, no new failures;
+    inventory nothing removed; motion 153 screens, 56 checks; budgets 145 screens (46 with fred world art), the reference 1.07-1.72 ms,
+    62 checks; q91 324, q92 285, q93 209, q95 43, q96 101, q97 126, q98 321, q99 8609 (882 s, under the 1500 s step). Next: log and merge
+    (v123 live).
