@@ -132,7 +132,8 @@
 //            colour separately: per item, since the fingerless gloves could lose their cuff over the full-finger gloves' floor), and
 //            is measured on the other screens too; at SHOW it prints "now shows" (a note); every cell of each width must be judged; each
 //            prints a note with its reading. Anything else under SHOW fails as before; SHOW, PAT_SHOW, OWN and the by-design rules are
-//            unchanged. Q99_ACCEPT_DUMP=<file> measures the widths again (each entry as wide as its lists; every reading, one JSON line)
+//            unchanged. Q99_ACCEPT_DUMP=<file> measures the widths again (each entry as wide as its lists; every reading, one JSON line):
+//            a measuring run with no widths or floors, so it always ends FAIL (its first strip check)
 //   painted  (review round 3) the strip, the sheet's live rider and both avatars as the page paints them: the spot's svg screenshot at dpr 2
 //            against FW.plain of the same drawing at that size on the colour behind it (at most 0.5% of the pixels more than 48 apart, the
 //            strip at most 24 device px: a fifth of what an item needs to show, review round 5;
@@ -1221,7 +1222,10 @@ const ACCEPTED_V8 = [
       'WebKit 2x': { gloves: [212, 0], 'gloves-finger': [316, 8] }, 'WebKit 3x': { gloves: [396, 0], 'gloves-finger': [740, 56] } } },
 ];
 // Q99_ACCEPT_DUMP=<file>: measure the widths again (every entry taken as wide as its lists, on every skin and screen; no floors): each reading
-// of an entry's items on its lists, on every screen, one JSON line each (the entries' widths and least readings come from such a run on v8)
+// of an entry's items on its lists, on every screen, one JSON line each (the entries' widths and least readings come from such a run on v8).
+// A measuring run, never a verdict: with it set the strip section fails its first check, so the run ends FAIL, and its accepted readings
+// print "measured" rather than "at or over its floor" (skeptic, Bundle v8 accepted: a dump run on a page whose leg wear above boots drew
+// nothing on deep brown skin ended OK, and the mutant runner hands its own environment on; mut99's v8a-dump)
 const DUMP = process.env.Q99_ACCEPT_DUMP || null; if (DUMP) fs.writeFileSync(DUMP, '');
 const accOf = (id, L, r, scr) => ACCEPTED_V8.find(e => e.ids.includes(id) && e.when(L, r) && (!!DUMP || ((e.width[scr] || {})[id] || []).includes(r.skin))) || null;
 // an entry's case whose item and skin are inside its width on another screen: measured there whatever Chromium at 2x read (so a case that
@@ -1258,7 +1262,7 @@ function judge(tag, S, px, agg, only) {
   for (const id of L) { if (byDesign(id, L) || (only && !only.includes(id))) continue; const v = px[id], d = !!v && v.d48 >= SHOW.d48, o = !!v && (v.own == null || v.own >= SHOW.own);
     /* ACCEPTED_V8: a reading inside an entry's v8 width (Chromium at 2x) passes under SHOW at or over its floor; at SHOW it prints "now shows" */
     const acc = v ? accOf(id, L, S.r, SCR[0]) : null, under = !(d && o); if (acc) accRec(acc, SCR[0], id, L, S.r, v, under, tag);
-    if (acc && under) { const fl = floorOf(acc, SCR[0], id); chk(floorOk(acc, SCR[0], id, v), 'strip: ' + tag + ': ' + id + ' reads under SHOW (' + v.d48 + ' device px changed, ' + v.own + ' in its own colour), accepted on v8 (ACCEPTED_V8 ' + acc.n + ', FROM-APP-CHAT-7 ' + acc.point + ') at or over its floor on Chromium at 2x (' + id + '\'s, ' + fl[0] + ' / ' + fl[1] + ')', { v, L }); }
+    if (acc && under) { const fl = floorOf(acc, SCR[0], id); chk(floorOk(acc, SCR[0], id, v), 'strip: ' + tag + ': ' + id + ' reads under SHOW (' + v.d48 + ' device px changed, ' + v.own + ' in its own colour), accepted on v8 (ACCEPTED_V8 ' + acc.n + ', FROM-APP-CHAT-7 ' + acc.point + ') ' + (DUMP ? 'measured on Chromium at 2x (Q99_ACCEPT_DUMP: no width or floor applied; ' + id + '\'s floor ' : 'at or over its floor on Chromium at 2x (' + id + '\'s, ') + fl[0] + ' / ' + fl[1] + ')', { v, L }); }
     else chk(d && o, 'strip: ' + tag + ': ' + id + ' shows on the rider (' + (v ? v.d48 + ' device px changed' + (v.own != null ? ', ' + v.own + ' in its own colour' : '') : 'not measured') + ')', { v, L });
     FIXED_BY_V7.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = FIXED_SEEN.get(k);
       if (!w || v.d48 < w.v.d48) FIXED_SEEN.set(k, { f, id, v, tag, shows: d && o, n: (w ? w.n : 0) + 1 }); else w.n++; });
@@ -1272,6 +1276,8 @@ function judge(tag, S, px, agg, only) {
       if (!w || v.d48 < w.v.d48) EDGE_SEEN.set(k, { f, id, v, tag, shows: d && o, n: (w ? w.n : 0) + 1, ride: rd }); else { w.n++; w.ride = rd; } }); }
 }
 section('strip', async () => {
+  // Q99_ACCEPT_DUMP turns off ACCEPTED_V8's widths and floors (it measures them again): such a run is never a verdict, so it fails here first
+  ok(!DUMP, 'strip: ACCEPTED_V8\'s widths and floors apply (Q99_ACCEPT_DUMP ' + (DUMP ? 'is set: ' + DUMP + ': a measuring run with no widths or floors, not a verdict' : 'not set') + ')', DUMP);
   const [SKINS, KITS, , VOPT] = await (async () => { const x = await openH({ noErrs: true }), v = await x.p.evaluate(V => [Object.keys(FW.SKIN), FW.RIDER_OPTIONS.kit.map(k => [k, FW.RIDER_NAMES.kit[k]]), +FW.version,
     Object.fromEntries(V.map(k => { const o = FW.RIDER_OPTIONS[k]; return [k, Array.isArray(o) ? o.map(v => [v, FW.RIDER_NAMES[k][v]]) : Object.entries(o)]; }))], VARY); await x.close(); return v; })();
   const WIDE = new Map(); // the lists a ride gives that carry an outer layer: list -> its ride and closet
@@ -1425,7 +1431,7 @@ section('strip', async () => {
           /* the widest gap: this screen's reading by area against Chromium at 2x's, pixels changed and own colour (an item that showed there: the band's
              own check; a reading accepted there is held by its floor) */
           if (!h.acc) for (const [a, b] of [[v.d48, h.d48], [v.own, h.own]]) if (a != null && b) { const f = a / A / b; if (!gap || f < gap.f) gap = { f, eng, sc, list: e.ids.join(' '), id: e.id, skin: e.R[i].skin, here: b, there: a }; } });
-        ok(!bad.length, 'strip: ' + eng + ' at ' + sc + 'x (limit ' + sh.d48 + ' / ' + sh.own + ' device px): the list ' + e.ids.join(' ') + ': ' + e.id + ' shows on every rider it was close to the line for, or reads within ACCEPTED_V8\'s width here at or over its floor (' + e.R.length + ' riders, ' + na + ' accepted; the least ' + lo.v.d48 + (lo.v.own != null ? ' / ' + lo.v.own : '') + ', ' + lo.r.skin + ' skin; first ' + e.tag + ')', bad.slice(0, 6)); }
+        ok(!bad.length, 'strip: ' + eng + ' at ' + sc + 'x (limit ' + sh.d48 + ' / ' + sh.own + ' device px): the list ' + e.ids.join(' ') + ': ' + e.id + ' shows on every rider it was close to the line for, or reads within ACCEPTED_V8\'s width here ' + (DUMP ? 'as measured (Q99_ACCEPT_DUMP: no width or floor applied)' : 'at or over its floor') + ' (' + e.R.length + ' riders, ' + na + ' accepted; the least ' + lo.v.d48 + (lo.v.own != null ? ' / ' + lo.v.own : '') + ', ' + lo.r.skin + ' skin; first ' + e.tag + ')', bad.slice(0, 6)); }
       await x.close(); }
     await wkb.close();
     ok(!!gap && gap.f > 1 / NEAR_BAND, 'strip: other screens: the band is wide enough: the widest gap reads ' + (gap ? Math.round(gap.f * 100) + '% of Chromium at 2x by area (' + gap.eng + ' at ' + gap.sc + 'x, ' + gap.id + ' on ' + gap.skin + ' skin: ' + gap.here + ' -> ' + gap.there + ', the list ' + gap.list + ')' : 'not measured') + ', over the ' + Math.round(100 / NEAR_BAND) + '% the band allows', gap); }
@@ -1452,10 +1458,10 @@ section('strip', async () => {
   for (const e of ACCEPTED_V8) { const miss = [];
     for (const scr of SCR) { const w = ACC_SEEN.get(e.n + '|' + scr), W = e.width[scr] || {};
       for (const id of e.ids) { const q = w && w.it.get(id); if (!q && !W[id]) continue;
-        console.log('  note: accepted on v8, ACCEPTED_V8 ' + e.n + ' (FROM-APP-CHAT-7 ' + e.point + '), ' + e.what + ': ' + scr + ': ' + id + ' ' + (q ? 'reads under SHOW ' + q.n + ' times, the least ' + q.d.v.d48 + ' px changed (' + q.d.tag + '), the least in its own colour ' + (q.o ? q.o.v.own + ' (' + q.o.tag + ')' : 'none') : 'never under SHOW') + '; v8\'s least ' + ((e.least[scr] || {})[id] || ['-', '-']).join(' / ') + ', its floor ' + floorOf(e, scr, id).join(' / ')); }
+        console.log('  note: accepted on v8, ACCEPTED_V8 ' + e.n + ' (FROM-APP-CHAT-7 ' + e.point + '), ' + e.what + ': ' + scr + ': ' + id + ' ' + (q ? 'reads under SHOW ' + q.n + ' times, the least ' + q.d.v.d48 + ' px changed (' + q.d.tag + '), the least in its own colour ' + (q.o ? q.o.v.own + ' (' + q.o.tag + ')' : 'none') : 'never under SHOW') + '; v8\'s least ' + ((e.least[scr] || {})[id] || ['-', '-']).join(' / ') + ', its floor ' + floorOf(e, scr, id).join(' / ') + (DUMP ? ' (Q99_ACCEPT_DUMP: not applied)' : '')); }
       if (w && w.now.length) console.log('  note: ACCEPTED_V8 ' + e.n + ' now shows on ' + scr + ' (' + w.now.length + ' readings at SHOW inside its width; a later item can drop it, on a run that is otherwise green: a build that loses what an item reads by can reach SHOW on one screen and fall under its floor on another): ' + w.now.slice(0, 3).join('; '));
       for (const [id, sks] of Object.entries(W)) for (const sk of sks) if (!(w && w.cells.has(id + '|' + sk))) miss.push(scr + ': ' + id + ' on ' + sk + ' skin'); }
-    ok(!miss.length, 'strip: ACCEPTED_V8 ' + e.n + ' (FROM-APP-CHAT-7 ' + e.point + '): every screen, item and skin of its v8 width is judged (' + (Object.entries(e.width).map(([s, W]) => s + ' ' + Object.values(W).reduce((a, x) => a + x.length, 0)).join(', ') || 'none') + ')', miss); }
+    ok(!miss.length, 'strip: ACCEPTED_V8 ' + e.n + ' (FROM-APP-CHAT-7 ' + e.point + '): every screen, item and skin of its v8 width is judged (' + (Object.entries(e.width).map(([s, W]) => s + ' ' + Object.values(W).reduce((a, x) => a + x.length, 0)).join(', ') || 'none') + ')' + (DUMP ? ' (Q99_ACCEPT_DUMP: every reading counts, no width applied)' : ''), miss); }
   const unseen = FIXED_BY_V7.flatMap((f, n) => f.ids.filter(id => !FIXED_SEEN.has(n + ':' + id)).map(id => f.point + ' ' + id));
   ok(!unseen.length, 'strip: each v6 gap v7 fixed (' + FIXED_BY_V7.length + ' entries, every item of each) is judged on v7, on a ride or a direct list', unseen);
   // the detector itself: an item that draws nothing in every version (bib shorts: the rider's default look) is judged as not showing; the

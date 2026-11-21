@@ -2076,5 +2076,25 @@
     last pass but v8a6-floor 92 -> 118 and v8a3-out 15 -> 21 (the six more its 3x lines, Chromium tan leg wear drawn as nothing; the old q99
     gives 21 too, probe99/acc2/runs/old-v8a3-out.log, so the 15 logged above was from an earlier q99 state); 409 s for the new one, 29390 s
     for the other 150.
-  - Next: the kit step (a skeptic; all 151 q99 mutants; q97, q98, motion, budgets on an idle Mac, smoke, inventory, contrast, layout, npm
+  - Skeptic, round 2, on how ACCEPTED_V8 was recorded (two findings, both reproduced, both fixed; nothing loosened). (1) Q99_ACCEPT_DUMP,
+    the measuring switch, turned off every width and floor (accOf, floorOk, accElsewhere) and the run still ended OK: on mut99's v8a2-floor
+    page (leg wear above boots, no wool socks, drawn as nothing on deep brown) the old q99 with the switch set ended `OK (8323 checks)`
+    (probe99/dump3/runs/old-dump.log; the skeptic's probe99/accchk2-dumpmode), printing a 0 px reading "at or over its floor" (63 / 24).
+    Fix: with the switch set, the strip section's first check fails ("ACCEPTED_V8's widths and floors apply ... a measuring run with no
+    widths or floors, not a verdict"), so a dump run always ends FAIL; its accepted lines say "measured ... (Q99_ACCEPT_DUMP: no width or
+    floor applied)", not "at or over its floor", and its notes and width checks say the same; mut99's runner no longer hands Q99_ACCEPT_DUMP
+    on to a mutant (a mutant may carry its own environment, a 4th field). New mutant v8a-dump (v8a2-floor's page with the switch set):
+    `FAIL 1`, that check; the old q99 passes it. The new q99 with the switch set: `FAIL 1`, that check only, on fred99 (runs/dump-fred99.log;
+    its readings, sorted, equal accept/dump1.jsonl line for line, 8161) and on the v8a2-floor page (runs/new-dump.log: 785 lines
+    "measured", none "at or over its floor"). The dump1 run above (`OK (8323 checks)`) was such a measuring run, not a verdict; what it
+    showed still holds, as the switch never touched readings outside the entries' items and lists (the dump on fred99 fails that one check
+    only). (2) HANDOFF.md said 150 mutants and to drop any entry that prints "now shows": now 152, and an entry is dropped only when, on a
+    run that is otherwise green (never a dump run), q99 prints it as "now shows" and "never under SHOW" on every screen of its width. Proof,
+    one at a time on a quiet machine, fred99/null.html from 6a8bb4e as before, probe99/dump3/chain.sh then chain-rest.sh (the first start
+    was stopped at 15:13 EST Nov 20 when every process under the session was killed; the rest restarted detached at 17:31), logs in
+    probe99/dump3/runs/: q99 `OK: item 99: Your rider, and the rider on the Closet card (8608 checks)` (895 s, q99.log; one more than 8607,
+    the new check); with main's page second `OK (8609 checks)` (892 s); all 152 mutants against q99.log (probe99/w/mutants.log "dump3",
+    runs/mutants-dump3.txt): every one `FAIL` with lines not in the baseline (none OK, BUILD or TIMEOUT), the other 151 with the same counts
+    as acc2; 438 s for v8a-dump, 29682 s for the other 151.
+  - Next: the kit step (a skeptic; all 152 q99 mutants; q97, q98, motion, budgets on an idle Mac, smoke, inventory, contrast, layout, npm
     test), then log and merge (v123 live).

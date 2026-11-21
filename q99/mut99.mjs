@@ -188,17 +188,21 @@ const M = [
   // over an entry-wide floor of 184 / 0 and 191 / 0 (the full-finger gloves' least), and at SHOW at 3x; under the fingerless gloves' own floor
   // (288 / 8 and 285 / 8: ACCEPTED_V8's floors are per item since this mutant; the skeptic's probe99/accchk1-fingernocuff)
   ['v8a6-fingercuff', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return r && r.skin==='deep' && ids.includes('gloves-finger') ? t.split('d=\"M-5 -8.5V8.5\" stroke=\"#C9D1DA\"').join('d=\"M-5 -8.5V8.5\" stroke=\"none\"') : t;")],
+  // a dump run (Q99_ACCEPT_DUMP: ACCEPTED_V8 as wide as its lists, no floors) on v8a2-floor's page (leg wear above boots, no wool socks, drawn
+  // as nothing on deep brown skin): it ended OK (skeptic, probe99/accchk2-dumpmode); a measuring run must end FAIL. A 4th field is the
+  // mutant's own environment (from its folder); the runner hands no other Q99_ACCEPT_DUMP on
+  ['v8a-dump', 'strip', s => fwWrap(s, "if(r && r.skin==='deep' && ids.includes('boots') && !ids.includes('socks-wool')) ids=ids.filter(x=>!" + LEGJS + ".includes(x)); return ro(r, ids, e);"), dir => ({ Q99_ACCEPT_DUMP: path.join(dir, 'dump.jsonl') })],
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mutants.log');
 // Q99_BASELINE: a q99 log of the page itself on the same sections; a mutant is caught by a FAIL line that log does not have (the page red)
 const baseFails = process.env.Q99_BASELINE ? new Set(fs.readFileSync(process.env.Q99_BASELINE, 'utf8').split('\n').filter(l => /^\s+FAIL /.test(l)).map(l => l.trim())) : null;
-for (const [name, only, f] of M) {
+for (const [name, only, f, envOf] of M) {
   if (pick.length && !pick.includes(name)) continue;
   const dir = path.join(BASE, 'mut-' + name); fs.mkdirSync(dir, { recursive: true });
   let t; try { t = f(src); } catch (e) { fs.appendFileSync(out, name + ': BUILD ' + e.message + '\n'); continue; }
   fs.writeFileSync(path.join(dir, 'null.html'), t); fs.writeFileSync(path.join(dir, 'sw.js'), sw);
   if (process.env.DRY) { console.log(name, 'built'); continue; }
-  let log = ''; try { log = execFileSync('perl', ['../tools/timeout.pl', '900', process.execPath, 'q99.test.mjs', path.join(dir, 'null.html')], { cwd: KIT, env: Object.assign({}, process.env, { Q99_ONLY: only }), encoding: 'utf8', maxBuffer: 64e6 }); } catch (e) { log = (e.stdout || '') + (e.stderr || ''); }
+  let log = ''; try { log = execFileSync('perl', ['../tools/timeout.pl', '900', process.execPath, 'q99.test.mjs', path.join(dir, 'null.html')], { cwd: KIT, env: Object.assign(Object.fromEntries(Object.entries(process.env).filter(([k]) => k !== 'Q99_ACCEPT_DUMP')), { Q99_ONLY: only }, envOf ? envOf(dir) : {}), encoding: 'utf8', maxBuffer: 64e6 }); } catch (e) { log = (e.stdout || '') + (e.stderr || ''); }
   fs.writeFileSync(path.join(dir, 'q99.log'), log);
   const last = log.trim().split('\n').pop(), fails = log.split('\n').filter(l => /^\s+FAIL /.test(l)).map(l => l.trim().slice(0, 160));
   const fresh = baseFails ? log.split('\n').filter(l => /^\s+FAIL /.test(l) && !baseFails.has(l.trim())).map(l => l.trim().slice(0, 160)) : fails;
