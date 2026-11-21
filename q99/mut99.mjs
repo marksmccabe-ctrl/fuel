@@ -1,9 +1,11 @@
-// item 99's mutants (kept from the build: paths are the Mac Studio's fuel-work folders): each a copy of fred99/null.html with one change, in probe99/mut-<name>/ (null.html and sw.js); q99 runs the
-// sections that guard it (Q99_ONLY) and must end FAIL. node mutants.mjs [name,name]  -> probe99/w/mutants.log (one line per mutant)
+// item 99's mutants (kept from the build: paths are the Mac Studio's fuel-work folders): each a copy of the item page with one change, in <BASE>/mut-<name>/ (null.html and sw.js); q99 runs the
+// sections that guard it (Q99_ONLY) and must end FAIL. node mutants.mjs [name,name]  -> <BASE>/w/mutants.log (one line per mutant)
+// Item 100 (fred world v9): the page is fred100/null.html (q100-front, v9) and BASE probe100; MUT_SRC / MUT_BASE override them (item 99's
+// runs used fred99 and probe99)
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-const SRC = '/Users/markmccabe/code/fuel-work/fred99/null.html', BASE = '/Users/markmccabe/code/fuel-work/probe99', KIT = '/Users/markmccabe/code/fuel-work/kit2/q99';
+const SRC = process.env.MUT_SRC || '/Users/markmccabe/code/fuel-work/fred100/null.html', BASE = process.env.MUT_BASE || '/Users/markmccabe/code/fuel-work/probe100', KIT = '/Users/markmccabe/code/fuel-work/kit2/q99';
 const src = fs.readFileSync(SRC, 'utf8'), sw = fs.readFileSync(path.join(path.dirname(SRC), 'sw.js'), 'utf8');
 const css = (s, rules) => rep(s, '\n</head>', '\n<style id="mut">' + rules + '</style>\n</head>');
 const rep = (s, a, b) => { const n = s.split(a).length - 1; if (n !== 1) throw new Error('mutant: ' + JSON.stringify(a.slice(0, 80)) + ' found ' + n + ' times'); return s.replace(a, () => b); };
@@ -11,6 +13,8 @@ const rep = (s, a, b) => { const n = s.split(a).length - 1; if (n !== 1) throw n
 // the drawing (the v8 accepted mutants; the earlier v8 ones spell it out)
 const fwWrap = (s, body) => rep(s, "  return out; }\nfunction riderSetNorm(S){", "  return out; }\nif(window.FW){ const ro=FW.riderOutfit; FW.riderOutfit=(r, ids=[], e={})=>{ " + body + " }; }\nfunction riderSetNorm(S){");
 const LEGJS = "['legs','tights-light','tights-heavy']", COVJS = "['shoes','overshoes','boots']";
+// v8's white base sock above a foot cover (v9 leaves it out under boots and overshoes without wool socks: FROM-APP-CHAT-7 point 2)
+const BASESOCK = ' <path d="M84 268V276" fill="none" stroke="var(--fw-ink)" stroke-width="26"/><path d="M84 268V276" fill="none" stroke="#fff" stroke-width="18"/><path d="M116 268V276" fill="none" stroke="var(--fw-ink)" stroke-width="26"/><path d="M116 268V276" fill="none" stroke="#fff" stroke-width="18"/> ';
 const M = [
   ['nofilter', 'strip', s => rep(s, "const r=riderNow(), L=riderIds(ids); el._ids=L;", "const r=riderNow(), L=(Array.isArray(ids)?ids:[]).filter(id=>typeof id==='string'); el._ids=L;")],
   ['keep', 'strip', s => rep(s, "riderStrip(o.wear.map(c=>c && c.id));", "riderStrip(o.keep.map(c=>c && c.id));")],
@@ -173,7 +177,8 @@ const M = [
   // list, skin or screen the entry does not cover) and one under its floor (inside the width, under 90% of its least v8 reading); green
   // baseline, so any FAIL line is the mutant's own
   ['v8a1-out', 'strip', s => fwWrap(s, "if(ids.includes('boots') && ids.includes('socks-wool') && ids.some(x=>" + LEGJS + ".includes(x))) ids=ids.filter(x=>x!=='boots'); return ro(r, ids, e);")], // boots over leg wear WITH wool socks (the freezing full list): not entry 1's lists
-  ['v8a1-floor', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return ids.includes('boots') && !ids.includes('socks-wool') && ids.some(x=>" + LEGJS + ".includes(x)) ? t.split('d=\"M72 286V262H96V286Z\"').join('d=\"M72 286V262H96V286Z\" stroke=\"none\"').split('d=\"M128 286V262H104V286Z\"').join('d=\"M128 286V262H104V286Z\" stroke=\"none\"') : t;")], // the boots without their outline over leg wear, no wool socks
+  // v8a1-floor (the boots without their outline over leg wear) went with v9: v9's #B0343A boots read by their colour, 1152 / 1152 at Chromium 2x
+  // with no outline (fwcheck7/app probe/mutpx.mjs), so a build that drops the outline is no fault now; v9-boots38 and v9a1-thin below guard entry 1's case
   ['v8a2-out', 'strip', s => fwWrap(s, "if(r && r.skin==='ruddy' && ids.includes('boots') && !ids.includes('socks-wool')) ids=ids.filter(x=>!" + LEGJS + ".includes(x)); return ro(r, ids, e);")], // leg wear above boots, no wool socks, gone on ruddy skin (entry 2 starts at tan)
   ['v8a2-floor', 'strip', s => fwWrap(s, "if(r && r.skin==='deep' && ids.includes('boots') && !ids.includes('socks-wool')) ids=ids.filter(x=>!" + LEGJS + ".includes(x)); return ro(r, ids, e);")], // the same on deep brown skin, inside the width: 0 px
   ['v8a3-out', 'strip', s => fwWrap(s, "if(/Chrome/.test(navigator.userAgent) && r && r.skin==='tan' && ids.includes('overshoes') && !ids.includes('socks-wool')) ids=ids.filter(x=>!" + LEGJS + ".includes(x)); return ro(r, ids, e);")], // leg wear under overshoes, no wool socks, gone on tan skin in Chromium only (entry 3 covers tan on WebKit at 2x, not Chromium)
@@ -181,7 +186,8 @@ const M = [
   ['v8a4-out', 'strip', s => fwWrap(s, "if(ids.includes('socks-wool') && !ids.includes('knees') && !ids.some(x=>" + COVJS + ".includes(x)) && ids.some(x=>" + LEGJS + ".includes(x))) ids=ids.filter(x=>x!=='socks-wool'); return ro(r, ids, e);")], // wool socks under leg warmers or tights (not knee warmers) with toe covers or bare shoes
   ['v8a4-floor', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return ids.includes('knees') && ids.includes('socks-wool') && !ids.some(x=>" + COVJS + ".includes(x)) ? t.split('stroke=\"#8E949A\"').join('stroke=\"#B9C2CF\"') : t;")], // the socks under knee warmers drawn in the knee warmers' grey: their own colour lost
   ['v8a5-out', 'strip', s => fwWrap(s, "if(/Chrome/.test(navigator.userAgent) && ids.includes('shoes') && ids.includes('socks-wool') && !ids.some(x=>['overshoes','boots','knees'].includes(x)) && ids.some(x=>" + LEGJS + ".includes(x))) ids=ids.filter(x=>x!=='socks-wool'); return ro(r, ids, e);")], // wool socks over leg wear above shoe covers gone in Chromium (entry 5 covers 3x only, not 2x)
-  ['v8a5-floor', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return ids.includes('shoes') && ids.includes('socks-wool') && !ids.some(x=>['overshoes','boots','knees'].includes(x)) && ids.some(x=>" + LEGJS + ".includes(x)) ? t.replace(/(<path d=\"M116 254V276\" fill=\"none\" stroke=\"#8E949A\"[^>]*\\/>)/, '$1<path d=\"M75 264H83M107 264H115\" stroke=\"#B9C2CF\" stroke-width=\"1.2\"/>') : t;")], // those socks with a grey rib across part of their band: at 2x they still read (Chromium 128 / 48, WebKit 124 / 46), at 3x their own colour falls under the floor (122 and 126 against 134; probe99/accept/m5.mjs)
+  // v8a5-floor (a grey rib across those socks' band, tuned to v8's 3x floor) went with v9: v9's taller band still reads with it (196 / 112 at
+  // 2x, 438 / 266 at Chromium 3x), so it is no fault now; v9a5-legtop below puts back v8's leg-wear end instead
   ['v8a6-out', 'strip', s => fwWrap(s, "if(r && r.skin==='dark') ids=ids.filter(x=>x!=='gloves' && x!=='gloves-finger'); return ro(r, ids, e);")], // the dark gloves gone on dark brown skin (entry 6 is deep brown only)
   ['v8a6-floor', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return r && r.skin==='deep' && ids.some(x=>x==='gloves' || x==='gloves-finger') ? t.split('d=\"M-5.5 -8.8V8.8\" stroke=\"#C9D1DA\"').join('d=\"M-5.5 -8.8V8.8\" stroke=\"none\"').split('d=\"M-5 -8.5V8.5\" stroke=\"#C9D1DA\"').join('d=\"M-5 -8.5V8.5\" stroke=\"none\"') : t;")], // the gloves without their #C9D1DA cuff on deep brown
   // the fingerless gloves alone without their cuff on deep brown (the full-finger ones untouched): 200 / 28 at Chromium 2x, 192 / 28 at WebKit 2x,
@@ -191,6 +197,19 @@ const M = [
   // a dump run (Q99_ACCEPT_DUMP: ACCEPTED_V8 as wide as its lists, no floors) on v8a2-floor's page (leg wear above boots, no wool socks, drawn
   // as nothing on deep brown skin): it ended OK (skeptic, probe99/accchk2-dumpmode); a measuring run must end FAIL. A 4th field is the
   // mutant's own environment (from its folder); the runner hands no other Q99_ACCEPT_DUMP on
+  // item 100, fred world v9 (Item 100, Bundle v9): OWN.boots is v9's #B0343A, and ACCEPTED_V8's entries 1-5 are gone (on v9 each read at
+  // SHOW on every screen of its width). Each mutant puts back what v8 drew for one case (probe100/main/mpx.mjs: each reads v8's least
+  // exactly, at or over the entry's old floor, so the q99 that kept entries 1-5 passes it) and fails only because the entry is gone or the
+  // own colour moved: boots back in v8's #3A2F2A everywhere (own 0 in #B0343A: OWN); entry 1, the boots over leg wear with no wool socks in
+  // #3A2F2A with a thin #B0343A band (240 / 24 at Chromium 2x, 425 / 72 at 3x: over its old floors 173 / 17 and 318 / 55, under SHOW);
+  // entries 2 and 3, v8's base sock under boots and overshoes without wool socks (the leg wear above the cuff back to 70 / 26 and 110 / 42
+  // on deep brown); entry 4, the knee band to y 266 over wool socks with no cover (92 / 50); entry 5, the leg wear with wool socks above shoe
+  // covers ending at y 262 again (260 / 148 at Chromium 3x, 264 / 148 at WebKit 3x; at 2x it reads, 128 / 64)
+  ['v9-boots38', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return ids.includes('boots') ? t.split('fill=\"#B0343A\"').join('fill=\"#3A2F2A\"') : t;")],
+  ['v9a1-thin', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return ids.includes('boots') && !ids.includes('socks-wool') && ids.some(x=>" + LEGJS + ".includes(x)) ? t.split('fill=\"#B0343A\"').join('fill=\"#3A2F2A\"').replace('<path d=\"M128 286V262H104V286Z\" fill=\"#3A2F2A\"/>', '$&<path d=\"M78 280H90V281.4H78ZM110 280H122V281.4H110Z\" fill=\"#B0343A\" stroke=\"none\"/>') : t;")],
+  ['v9a2-basesock', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return (ids.includes('boots') || ids.includes('overshoes')) && !ids.includes('socks-wool') && !ids.some(x=>" + LEGJS + ".includes(x) || x==='knees') ? t.replace(/<path d=\"M72 262H96V278H72Z|<path d=\"M70 284C70 274 78 272 86 272H96V286H72Z\"/, " + JSON.stringify(BASESOCK) + " + '$&') : t;")],
+  ['v9a4-kneeband', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return ids.includes('knees') && ids.includes('socks-wool') && !ids.some(x=>" + COVJS + ".includes(x)) ? t.split('M84 250V263').join('M84 250V266').split('M116 250V263').join('M116 250V266').split('M74 263H94M106 263H126').join('M74 266H94M106 266H126').split('M76 259.5H92M108 259.5H124').join('M76 262.5H92M108 262.5H124') : t;")],
+  ['v9a5-legtop', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return ids.includes('shoes') && ids.includes('socks-wool') && !ids.some(x=>['overshoes','boots','knees'].includes(x)) && ids.some(x=>" + LEGJS + ".includes(x)) ? t.split('M84 248V260').join('M84 248V262').split('M116 248V260').join('M116 248V262').split('M90 254V257M122 254V257').join('M90 256V260M122 256V260') : t;")],
   ['v8a-dump', 'strip', s => fwWrap(s, "if(r && r.skin==='deep' && ids.includes('boots') && !ids.includes('socks-wool')) ids=ids.filter(x=>!" + LEGJS + ".includes(x)); return ro(r, ids, e);"), dir => ({ Q99_ACCEPT_DUMP: path.join(dir, 'dump.jsonl') })],
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mutants.log');

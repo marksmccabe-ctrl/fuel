@@ -1,7 +1,8 @@
 // node q99.test.mjs <null.html> [main null.html]   (cd into this folder first) -- item 99: Your rider, and the rider on the Closet card.
 // Every numbered point, QA line and decision (DECISIONS.md "Item 99"):
-//   cache    sw.js CACHE and APP_BUILD match, v123 or later; the bundle is the design chat's v8 (FW.built 2026-11-17 14:45) or later, and each
-//            inlined block is that build byte for byte (its sha1 in BUILDS: a hand edit fails; a newer build fails until its sha1 is added)
+//   cache    sw.js CACHE and APP_BUILD match, v123 or later; the bundle is the design chat's v9 (FW.built 2026-11-20 17:38) or later (item
+//            100 takes v9 first: a v8 page fails here), and each inlined block is that build byte for byte (its sha1 in BUILDS: a hand edit
+//            fails; a newer build fails until its sha1 is added)
 //   row      99.1: Settings › You has the row Your rider (a sheet row, searchable; with Settings on Running, a search for it names
 //            the row under Cycling, one tap away, never a blank page; and back: on Cycling, a Running-only match is named under
 //            Running; the button 4.5:1), "Not set" until a rider is built, then the jersey; it opens
@@ -111,7 +112,7 @@
 //            the strip centred in its box (within 1 px: here, the Clothing-only results, the computer layout and fit); (review round 7) every
 //            list with an outer layer judged for both riders in every jersey with every other fade, sleeves, shorts and pattern (the wide
 //            sweep); the strip built in the app for riders on which v7's dark jackets read poorly; (bundle v8) each item's own colour is
-//            v8's (OWN: the covers #4F6478, the thermal jacket #5B4E9E, the winter jacket #2F6B4F; the gloves their fill, the #C9D1DA cuff
+//            v8's (OWN: the covers #4F6478, the thermal jacket #5B4E9E, the winter jacket #2F6B4F; since item 100 v9's boots #B0343A; the gloves their fill, the #C9D1DA cuff
 //            being shared by every glove and the overshoe hem; the thermal jersey the jersey's colour or its white cuff, which it alone draws);
 //            (v8 check round 1) each former hold over its whole v7 width: every item of an entry and each part judged on a ride's list (each leg
 //            wear under overshoes with and without wool socks: six more closets on the Hard freezing and Recovery cold rides, and direct lists in
@@ -123,16 +124,17 @@
 //            and every item that shows within half again of SHOW (Chromium at 2x) measured again as other screens draw it (Chromium at 3x,
 //            WebKit at 2x and 3x: Safari, an iPhone), against SHOW in CSS px (30 / 10 CSS px: 270 / 90 device px at 3x);
 //            (bundle v8 accepted) item 99 ships on v8 (Mark's decision; FROM-APP-CHAT-7 asks the design chat for polish, a v9 a later
-//            item takes): ACCEPTED_V8 names the six cases that read under SHOW on v8, each tied to its FROM-APP-CHAT-7 point and exactly as
-//            wide as measured on v8 (its lists; per screen, item and skin): boots over leg wear with no wool socks (their own colour; point
-//            1); leg wear above boots and above overshoes with no wool socks, on the skins and screens where it reads under SHOW (point 2);
-//            wool socks under knee warmers with toe covers or bare shoes (point 3); wool socks over leg wear above shoe covers at 3x (point
-//            4); dark gloves on deep brown skin, read by their #C9D1DA cuff ("for the record"). Inside its width a reading under SHOW passes
+//            item takes): ACCEPTED_V8 named the six cases that read under SHOW on v8, each tied to its FROM-APP-CHAT-7 point and exactly as
+//            wide as measured on v8 (its lists; per screen, item and skin). (item 100, bundle v9) v9 answers points 1-4: entries 1-5 (boots
+//            over leg wear with no wool socks; leg wear above boots and above overshoes with no wool socks; wool socks under knee warmers
+//            with toe covers or bare shoes; wool socks over leg wear above shoe covers at 3x) each printed "now shows" and "never under SHOW"
+//            on every screen of its width on an otherwise green run, so they are gone and those cases are judged in full as any item; one
+//            entry is left, dark gloves on deep brown skin, read by their #C9D1DA cuff ("for the record", unchanged in v9). Inside its width a reading under SHOW passes
 //            at or over the entry's floor for that item on that screen (90% of the item's least v8 reading there, pixels changed and own
 //            colour separately: per item, since the fingerless gloves could lose their cuff over the full-finger gloves' floor), and
 //            is measured on the other screens too; at SHOW it prints "now shows" (a note); every cell of each width must be judged; each
-//            prints a note with its reading. Anything else under SHOW fails as before; SHOW, PAT_SHOW, OWN and the by-design rules are
-//            unchanged. Q99_ACCEPT_DUMP=<file> measures the widths again (each entry as wide as its lists; every reading, one JSON line):
+//            prints a note with its reading. Anything else under SHOW fails as before; SHOW, PAT_SHOW, OWN (but v9's boots, #B0343A) and the
+//            by-design rules are unchanged. Q99_ACCEPT_DUMP=<file> measures the widths again (each entry as wide as its lists; every reading, one JSON line):
 //            a measuring run with no widths or floors, so it always ends FAIL (its first strip check)
 //   painted  (review round 3) the strip, the sheet's live rider and both avatars as the page paints them: the spot's svg screenshot at dpr 2
 //            against FW.plain of the same drawing at that size on the colour behind it (at most 0.5% of the pixels more than 48 apart, the
@@ -179,10 +181,11 @@ const AVWATCH = HOOK + "new MutationObserver(R=>R.forEach(m=>{ if(m.target.nodeT
 const AVW = hooked(PAGE, 'q99-av.html', AVWATCH); MADE.push(AVW); const AVW_SYNCED = syncOf(AVW);
 
 const NOW = '2026-10-29T15:00:00-07:00';
-// the bundle builds this item may ship: the sha1 of each handoff file, trimmed (as fw-inline.mjs inlines it). v8 14:45, the build the
-// independent check confirmed (probe99/verify-bundle6.json; handoff file sha1 js 80c2f827..., css 547317a8...). v7 09:29 (css 71e5e2c4...,
-// js fa84301f...) went with v8, as v6 went with v7: the strip and sheet hold nothing now, so a v7 page is not this item
-const BUILDS = { '2026-11-17 14:45 EST': { css: 'e24007a53d3794ee03302175b7afcefe8d2afa06', js: '455487635b91b21bea2fba2a54f5334e6ae2a884' } };
+// the bundle builds this item may ship: the sha1 of each handoff file, trimmed (as fw-inline.mjs inlines it). v9 17:38, the build the
+// independent check confirmed and item 100 takes first (probe100/verify-bundle7.json; handoff file sha1 js 3efc2de2..., css a621409b...).
+// v8 14:45 (css e24007a5..., js 45548763...), item 99's, went with v9, as v7 went with v8: ACCEPTED_V8's entries 1-5 were v8's and are gone,
+// so a v8 page is not this item any more (Item 100, Bundle v9)
+const BUILDS = { '2026-11-20 17:38 EST': { css: 'bf5dc54651cc367cc2d0dfb0131a62d74d9690a0', js: '5b51b1e40b7938d290fb3f6a6d667ec790e0bcdf' } };
 // a page: athlete A, the hooked copy, a made-up forecast (wx: its day's temperatures and rain), motion on unless o.motion === false
 const openH = (o = {}) => open(o.file || HOOKED, Object.assign({ athlete: 'A', browser, motion: true, repo: REPO, now: NOW, settle: 600 }, o, {
   route: (r, u) => (o.route && o.route(r, u)) || (o.forecast === false ? null : weatherRouteFor(o.wx || {})(r, u)) })).then(x => { if (!o.noErrs) ERRS.push(x.errors); x.p.on('dialog', d => d.accept()); return x; });
@@ -323,7 +326,7 @@ section('cache', async () => {
   const b = (SRC.match(/const APP_BUILD='([^']+)'/) || [])[1], c = (swf.match(/const CACHE = '([^']+)'/) || [])[1];
   ok(!!b && b === c && +(b.match(/v(\d+)$/) || [])[1] >= 123, 'cache: APP_BUILD = sw.js CACHE, v123 or later', { b, c });
   const built = (/window\.FW = \{[^\n]*built: '([^']+)'/.exec(SRC) || [])[1], ver = (/window\.FW = \{ version: '(\d+)'/.exec(SRC) || [])[1];
-  ok(!!built && built >= '2026-11-17 14:45 EST' && +ver >= 8, 'cache: the bundle is the design chat\'s v8 (14:45) or later (FW.version ' + ver + ', built ' + built + ')', { ver, built });
+  ok(!!built && built >= '2026-11-20 17:38 EST' && +ver >= 9, 'cache: the bundle is the design chat\'s v9 (17:38) or later (FW.version ' + ver + ', built ' + built + ')', { ver, built });
   // each block is the design chat's file byte for byte (as q97's byte check, which skips when the handoff folder holds a newer build): a
   // hand edit inside the bundle fails here whatever that folder holds; the item that takes a new build adds its sha1 here
   const sha = t => crypto.createHash('sha1').update(t).digest('hex'), blk = re => (re.exec(SRC) || [])[1];
@@ -1023,7 +1026,12 @@ section('avatar', async () => {
 // only where that holds as measured (review round 5, probe99/r5/p/socks.mjs, the least over both riders and all 8 skins). On v8 (v8 check
 // round 1, probe99/v8fix1/m.mjs socks, every cover and shin, both riders, all 8 skins): by design with knee warmers under any cover (0-28 px
 // changed) and with leg wear under overshoes or boots (28 / 0, 16 / 0); judged everywhere else, as v8 draws them: over bare shins above shoe
-// covers (332 / 300), overshoes (196 / 164; v7 0) and boots (156 / 136), and over leg wear above shoe covers (128 / 64; v7 96 / 32);
+// covers (332 / 300), overshoes (196 / 164; v7 0) and boots (156 / 136), and over leg wear above shoe covers (128 / 64; v7 96 / 32). On v9
+// (item 100; fwcheck7/app probe/bydesign.mjs and probe100/main/legs.cjs) the rule holds as it is: the socks' own colour stays 0-12 there
+// (2x and 3x, both engines); what changes is the knee warmer's band, which ends at y 263 over wool socks (else 266) and moves its ink line
+// (164 px changed under shoe covers, 60 under overshoes, 0 under boots, the sock's own 0, 12 and 0); under leg wear with overshoes or boots
+// the socks read 68 and 20 changed, own 0. v9 no longer draws the white base sock under boots and overshoes without wool socks: no check
+// here expected it (its going lifts the leg wear above the cuff, ACCEPTED_V8 2 and 3's case; mut99's v9a2-basesock puts it back);
 // everything under the rain jacket, now outermost (the vest, the windbreaker, the thermal and winter jackets, a thermal jersey); a thermal
 // jersey under any sleeved outer piece (with the vest alone its sleeves show and are judged)
 const UNDER = new Set(['jersey-light', 'jersey-med', 'bibs', 'base-ls', 'base-ss', 'base-sleeveless', 'base-thermal', 'socks-summer']);
@@ -1039,7 +1047,8 @@ const byDesign = (id, L) => UNDER.has(id) || ((id === 'arms' || id === 'sun-slee
 // 8: patterns that drew nothing on some jerseys). v8 answers each, so each case is judged in full as any other (FIXED_BY_V8 for the strip,
 // PAT_WAS for the sheet's patterns), must be judged, and is printed with its least measurement beside v7's. A case that fails on v8 fails
 // here: it is never held again (the app chat's decision), but for ACCEPTED_V8 below: the six cases Mark accepted on v8 (Bundle v8 accepted,
-// Mark's decision), each as wide as measured on v8 and with its floor; nothing held outside ACCEPTED_V8
+// Mark's decision), each as wide as measured on v8 and with its floor, of which v9 left one (the dark gloves; Item 100, Bundle v9); nothing
+// held outside ACCEPTED_V8
 const PAT_SHOW = 24; // a pattern reads: at least 24 device px (a fifth of SHOW.d48, as STRIP_APART) more than 48 apart from Plain (the v8 ask's measure)
 // the patterns v7 drew as nothing on some jerseys (PAT_AWAIT until v8): the band in #F26B5B (the Coral jersey's own colour), the side stripe in
 // #F0708A and splatter in #2F5FB5, none outlined; as measured on v7 for the default rider and RIDER99 alike (probe99/r6/plook/patr.mjs). v8 gives
@@ -1065,11 +1074,12 @@ const riderDiffs = (p, groups) => p.evaluate(async G => { const W = 240, H = 360
       D.push([i, j, d8, d24, d48]); } out.push(D); } return out; }, groups);
 // each item's own colour (knee grey and the like): the bundle's OUTFIT_LOOK colours, v8's (the covers' COVER #4F6478, the thermal jacket
 // #5B4E9E, the winter jacket #2F6B4F; v7's #1E1E24, #2F3B6E and #1E2A4A went: #1E2A4A was within 10 of the ink, so its count took outline
-// pixels). The gloves keep their fill: v8's #C9D1DA cuff is drawn by all four gloves and the overshoes' hem, so it is no one item's own.
+// pixels); v9's boots #B0343A (FROM-APP-CHAT-7 point 1: v8's #3A2F2A was within 48 of the leg wear, and v9 draws it nowhere, so boots counted
+// in it read 0-12 own on v9 where they read 648 in #B0343A: Item 100, Bundle v9). The gloves keep their fill: v8's #C9D1DA cuff is drawn by all four gloves and the overshoes' hem, so it is no one item's own.
 // The thermal jersey ('jersey-heavy', set where it is judged) is the jersey's colour ('kit': its sleeves) or #FFFFFF, the cuff only it draws
 // (o.cuff, set by jersey-heavy alone when it sets the sleeves). An entry may list several colours: a pixel within 10 of any is the item's
 const OWN = { toes: '#8E949A', knees: '#B9C2CF', skullcap: '#8FA7C4', 'socks-wool': '#8E949A', gaiter: '#2ABCBB', vest: '#BFE6E6', windbreaker: '#DCE1E8', 'jacket-thermal': '#5B4E9E', 'jacket-winter': '#2F6B4F', 'jacket-rain': '#F2D64B',
-  boots: '#3A2F2A', 'tights-heavy': '#14141A', 'tights-light': '#1E1E24', legs: '#1E1E24', arms: '#1E1E24', 'sun-sleeves': '#FFFFFF', gloves: '#2A2A30', 'gloves-finger': '#2A2A30', 'gloves-thermal': '#1E1E24', 'gloves-lobster': '#1E1E24', balaclava: '#1E1E24', head: '#2ABCBB', shoes: '#4F6478', overshoes: '#4F6478' };
+  boots: '#B0343A', 'tights-heavy': '#14141A', 'tights-light': '#1E1E24', legs: '#1E1E24', arms: '#1E1E24', 'sun-sleeves': '#FFFFFF', gloves: '#2A2A30', 'gloves-finger': '#2A2A30', 'gloves-thermal': '#1E1E24', 'gloves-lobster': '#1E1E24', balaclava: '#1E1E24', head: '#2ABCBB', shoes: '#4F6478', overshoes: '#4F6478' };
 const OWN_HEAVY = { 'jersey-heavy': ['kit', '#FFFFFF'] }; // the thermal jersey's own, where the strip judges it
 // shows: at the strip's size on a 2x screen (100 x 150 CSS px, 200 x 300 device px), at least 120 device px (30 CSS px) changed by more than 48 in
 // a channel (the bundle check's "clearly visible"), and of them at least 40 (10 CSS px) in the item's own colour where it has one (2x: a thin
@@ -1188,7 +1198,9 @@ const FOUND_SEEN = new Map();
 // (per item, not per entry: an entry-wide floor is its weakest item's, and left room for another item to lose what it reads by: the fingerless
 // gloves, 320 / 8 at Chromium 2x, could lose their cuff, 200 / 28, over the full-finger gloves' 184 / 0; skeptic, Bundle v8 accepted). As measured on v8
 // (probe99/accept/dump1.jsonl, every reading of the entries' items on their lists, both riders, 8 skins, every jersey and what the sweeps vary,
-// Chromium and WebKit at 2x and 3x; no cell mixed, the rest of each list at SHOW):
+// Chromium and WebKit at 2x and 3x; no cell mixed, the rest of each list at SHOW); entries 1-5 went with v9 (item 100: on a green run, OWN.boots
+// #B0343A, each printed "now shows" and "never under SHOW" on every screen of its width; probe100/main/runs/q99-keep6.log; v9's least
+// readings beside v8's in DECISIONS.md Item 100, Bundle v9), so their cases fail under SHOW as any item; as they were on v8:
 //   1 boots over leg wear, no wool socks: every skin, every screen (192-193 / 18-19 at Chromium 2x; over bare shins 506 / 192, outside)
 //   2 leg wear above boots, no wool socks: at 2x (both engines) leg warmers and light tights on tan to deep brown, heavy tights on olive to
 //     deep brown (fair to ruddy read 126-130 / 44-50); at 3x (both engines) leg warmers and light tights on dark and deep brown, heavy tights
@@ -1198,25 +1210,12 @@ const FOUND_SEEN = new Map();
 //     reads (no width there); with wool socks it reads (192 / 144)
 //   4 wool socks under knee warmers, no cover (toe covers 92 / 50, bare shoes 114 / 52 at Chromium 2x): every skin, every screen
 //   5 wool socks over leg wear above shoe covers: Chromium and WebKit at 3x, every skin (260 and 264 / 148); at 2x they read (128 / 64)
-//   6 dark gloves on deep brown skin (full-finger 204 / 0, fingerless 320 / 8 at Chromium 2x): every screen (dark brown 516 / 312 reads)
+// the one left:
+//   6 dark gloves on deep brown skin (full-finger 204 / 0, fingerless 320 / 8 at Chromium 2x): every screen (dark brown 516 / 312 reads); on
+//     v9 every reading as v8's (the art unchanged)
 const SK8 = ['fair', 'light', 'ruddy', 'tan', 'olive', 'brown', 'dark', 'deep'], SCR = ['Chromium 2x', 'Chromium 3x', 'WebKit 2x', 'WebKit 3x'];
-const SK_TAN = SK8.slice(3), SK_OLIVE = SK8.slice(4), SK_BROWN = SK8.slice(5), SK_DARK = SK8.slice(6), SK_DEEP = ['deep'], all4 = W => Object.fromEntries(SCR.map(s => [s, W]));
-const per = (id, L) => Object.fromEntries(Object.entries(L).map(([s, v]) => [s, { [id]: v }])); // an entry of one item: screen -> that item -> its least
-const ACCEPTED_V8 = [
-  { n: 1, point: 'point 1', ids: ['boots'], when: L => L.includes('boots') && !L.includes('socks-wool') && L.some(x => LEG.includes(x)), what: 'boots over leg warmers or tights with no wool socks: the boots\' own colour (#3A2F2A within 48 of the leg wear: they read by their outline)',
-    width: all4({ boots: SK8 }), least: per('boots', { 'Chromium 2x': [192, 18], 'Chromium 3x': [353, 61], 'WebKit 2x': [194, 18], 'WebKit 3x': [334, 46] }) },
-  { n: 2, point: 'point 2', ids: LEG, when: L => L.includes('boots') && !L.includes('socks-wool'), what: 'leg warmers or tights above boots with no wool socks, on the skins where they read under SHOW',
-    width: { 'Chromium 2x': { legs: SK_TAN, 'tights-light': SK_TAN, 'tights-heavy': SK_OLIVE }, 'Chromium 3x': { legs: SK_DARK, 'tights-light': SK_DARK, 'tights-heavy': SK_DEEP },
-      'WebKit 2x': { legs: SK_TAN, 'tights-light': SK_TAN, 'tights-heavy': SK_OLIVE }, 'WebKit 3x': { legs: SK_DARK, 'tights-light': SK_DARK, 'tights-heavy': SK_DEEP } },
-    least: { 'Chromium 2x': { legs: [70, 26], 'tights-light': [70, 26], 'tights-heavy': [74, 28] }, 'Chromium 3x': { legs: [228, 82], 'tights-light': [228, 82], 'tights-heavy': [228, 84] },
-      'WebKit 2x': { legs: [67, 23], 'tights-light': [67, 23], 'tights-heavy': [74, 29] }, 'WebKit 3x': { legs: [233, 84], 'tights-light': [233, 84], 'tights-heavy': [233, 88] } } },
-  { n: 3, point: 'point 2', ids: LEG, when: L => L.includes('overshoes') && !L.includes('socks-wool'), what: 'leg warmers or tights above overshoes with no wool socks, on the skins and screens where they read under SHOW',
-    width: { 'Chromium 2x': { legs: SK_BROWN, 'tights-light': SK_BROWN, 'tights-heavy': ['brown', 'deep'] }, 'WebKit 2x': { legs: SK_TAN, 'tights-light': SK_TAN, 'tights-heavy': SK_BROWN } },
-    least: { 'Chromium 2x': { legs: [110, 42], 'tights-light': [110, 42], 'tights-heavy': [114, 44] }, 'WebKit 2x': { legs: [103, 39], 'tights-light': [103, 39], 'tights-heavy': [110, 45] } } },
-  { n: 4, point: 'point 3', ids: ['socks-wool'], when: L => L.includes('knees') && !L.some(x => COVERS.includes(x)), what: 'wool socks under knee warmers with toe covers or bare shoes',
-    width: all4({ 'socks-wool': SK8 }), least: per('socks-wool', { 'Chromium 2x': [92, 50], 'Chromium 3x': [196, 174], 'WebKit 2x': [90, 48], 'WebKit 3x': [202, 176] }) },
-  { n: 5, point: 'point 4', ids: ['socks-wool'], when: L => L.includes('shoes') && !L.some(x => x === 'overshoes' || x === 'boots' || x === 'knees') && L.some(x => LEG.includes(x)), what: 'wool socks over leg warmers or tights above shoe covers, on the 3x screens',
-    width: { 'Chromium 3x': { 'socks-wool': SK8 }, 'WebKit 3x': { 'socks-wool': SK8 } }, least: per('socks-wool', { 'Chromium 3x': [260, 148], 'WebKit 3x': [264, 148] }) },
+const SK_DEEP = ['deep'], all4 = W => Object.fromEntries(SCR.map(s => [s, W]));
+const ACCEPTED_V8 = [ /* entries 1-5 went with v9 (item 100); n keeps its number, as FROM-APP-CHAT-7 and the notes name it */
   { n: 6, point: '"for the record"', ids: ['gloves', 'gloves-finger'], when: () => true, what: 'full-finger and fingerless dark gloves on deep brown skin, which read by their #C9D1DA cuff',
     width: all4({ gloves: SK_DEEP, 'gloves-finger': SK_DEEP }), least: { 'Chromium 2x': { gloves: [204, 0], 'gloves-finger': [320, 8] }, 'Chromium 3x': { gloves: [400, 0], 'gloves-finger': [740, 56] },
       'WebKit 2x': { gloves: [212, 0], 'gloves-finger': [316, 8] }, 'WebKit 3x': { gloves: [396, 0], 'gloves-finger': [740, 56] } } },
@@ -1545,6 +1544,10 @@ section('fit', async () => {
 
 section('main', async () => {
   if (!MAIN) { console.log('  note: no main page given: the main checks are skipped'); return; }
+  /* item 100: main has item 99 since 8c66750, so a main without the row and strip is gone; as q97's and q98's main sections skip once main has
+     their item. The check stands for a main from before item 99 (it bites: main's page with that marker hidden, 'function riderStrip (', fails it: Item 100, Bundle v9) */
+  const MS = fs.readFileSync(MAIN, 'utf8'), mb = (/window\.FW = \{[^\n]*built: '([^']+)'/.exec(MS) || [])[1];
+  if (/\nfunction riderStrip\(/.test(MS)) { console.log('  note: the main page already has item 99 (function riderStrip): the main check (it needs a main from before it) is skipped' + (BUILDS[mb] ? '' : '; its bundle (built ' + mb + ') is not one BUILDS names, so the cache section fails on it as the item page')); return; }
   const x = await open(MAIN, { athlete: 'A', browser, motion: true, now: NOW, route: weatherRouteFor({ lo: 40, hi: 44 }) }), p = x.p;
   const m = await p.evaluate(() => ({ row: !!document.getElementById('prowBtn-rider'), strip: !!document.getElementById('rRider') }));
   ok(!m.row && !m.strip, 'main: no Your rider row and no strip on main (the row and strip checks fail there)', m);

@@ -1,6 +1,7 @@
 // node q97.test.mjs <null.html> [main null.html]   (cd into this folder first) -- item 97: fred world: the bundle, motion plumbing and
 // switch. Every numbered point and QA line:
-//   cache    sw.js CACHE and APP_BUILD match, v121 or later
+//   cache    sw.js CACHE and APP_BUILD match, v121 or later; (item 100) the bundle is the design chat's v9 (FW.built 2026-11-20 17:38) or later,
+//            the build the queue ships from item 100 on (a v8 page fails here, as in q98 and q99)
 //   bundle   point 1: the page has the design chat's bundle exactly once, each file whole in its own block between its markers: the CSS in
 //            <style id="fwCss"> in the <head>, before the app's own stylesheet; the JS in <script id="fwJs"> before the app's main script,
 //            so window.FW exists when the main script starts (checked from its first line); both blocks carry the same version, and the JS
@@ -149,6 +150,9 @@ section('cache', async () => {
   const swf = fs.readFileSync(path.join(path.dirname(PAGE), 'sw.js'), 'utf8');
   const b = (SRC.match(/const APP_BUILD='([^']+)'/) || [])[1], c = (swf.match(/const CACHE = '([^']+)'/) || [])[1];
   ok(!!b && b === c && +(b.match(/v(\d+)$/) || [])[1] >= 121, 'cache: APP_BUILD = sw.js CACHE, v121 or later', { b, c });
+  // item 100 takes fred world v9 (Item 100, Bundle v9): the bundle's version and build, as q98's and q99's cache sections read them
+  const built = (/window\.FW = \{[^\n]*built: '([^']+)'/.exec(SRC) || [])[1], ver = (/window\.FW = \{ version: '(\d+)'/.exec(SRC) || [])[1];
+  ok(!!built && built >= '2026-11-20 17:38 EST' && +ver >= 9, 'cache: the bundle is the design chat\'s v9 (17:38) or later (FW.version ' + ver + ', built ' + built + ')', { ver, built });
 });
 
 // the bundle blocks of a page source: {css, js, cssAt, jsAt, mainCss, mainJs, n}

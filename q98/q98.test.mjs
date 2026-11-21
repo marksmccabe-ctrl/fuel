@@ -1,6 +1,7 @@
 // node q98.test.mjs <null.html> [main null.html]   (cd into this folder first) -- item 98: Weather card: fred in the living sky. Every
 // numbered point, QA line and decision (DECISIONS.md "Item 98"):
-//   cache    sw.js CACHE and APP_BUILD match, v122 or later; the bundle is the design chat's v5 (FW.built 2026-11-06 19:46) or later
+//   cache    sw.js CACHE and APP_BUILD match, v122 or later; the bundle is the design chat's v9 (FW.built 2026-11-20 17:38) or later (item
+//            100 takes v9: v5, 19:46, until then; a v8 page fails here, as in q97 and q99)
 //   looks    98.1-2, the decision on the looks: on the ride's #rWeather and the run's #runWx (graphite: html.run-theme), each of the eight
 //            skies (?sky=) and a clear night (the ride at 8 pm: no sky, the still moon) have fred drawn as FW.bird({wear:
 //            FW.WX_WEAR[kind]}) exactly (the drawing, ids aside, is that call's), the night one in FW.WX_WEAR.night (the vest only: no
@@ -143,8 +144,8 @@ section('cache', async () => {
   const swf = fs.readFileSync(path.join(path.dirname(PAGE), 'sw.js'), 'utf8');
   const b = (SRC.match(/const APP_BUILD='([^']+)'/) || [])[1], c = (swf.match(/const CACHE = '([^']+)'/) || [])[1];
   ok(!!b && b === c && +(b.match(/v(\d+)$/) || [])[1] >= 122, 'cache: APP_BUILD = sw.js CACHE, v122 or later', { b, c });
-  const built = (/window\.FW = \{[^\n]*built: '([^']+)'/.exec(SRC) || [])[1];
-  ok(!!built && built >= '2026-11-06 19:46 EST', 'cache: the bundle is the design chat\'s v5 (19:46) or later (FW.built ' + built + ')', built);
+  const built = (/window\.FW = \{[^\n]*built: '([^']+)'/.exec(SRC) || [])[1], ver = (/window\.FW = \{ version: '(\d+)'/.exec(SRC) || [])[1];
+  ok(!!built && built >= '2026-11-20 17:38 EST' && +ver >= 9, 'cache: the bundle is the design chat\'s v9 (17:38) or later (FW.version ' + ver + ', built ' + built + ')', { ver, built }); /* item 100 (Bundle v9); v5 (19:46) until then */
 });
 
 // ---- the looks: the drawing in each box is FW.bird({wear: FW.WX_WEAR[kind]}), ids aside
