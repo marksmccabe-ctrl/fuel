@@ -2146,3 +2146,96 @@
   file, the code and the logs, and nine wrong or stale lines were corrected. npm test on the merge: 1777 pass, 0 fail. fred/null.html
   rebuilt from main: sha a3ea1d76, the same as fred99's. Item 100 takes fred world v9 first (probe99/v9-1738-copy/CHECKS.md);
   ACCEPTED_V8's entries 1-5 go only by HANDOFF's drop rule, and entry 6 (the dark gloves, unchanged in v9) stays.
+
+## Item 100 · Front page: the sky card and the crew (cache v124)
+- Bundle v9 (item 100's first step: the design chat's fred world v9, FW.version '9', built 2026-11-20 17:38 EST, asked for in
+  handoff/FROM-APP-CHAT-7.md; its claims in probe99/v9-1738-copy/FROM-DESIGN-CHAT-7.md). Decisions already made (Mark's and the app
+  chat's): item 99 shipped on v8 with ACCEPTED_V8 (Mark: "Ship on v8"); item 100 takes v9 first, checked on its own (probe100/
+  verify-bundle7.json, its probes in fwcheck7/<label>/); the cache goes to v124 once, in item 100's build step, not now; q97, q98 and q99
+  move to v9 with nothing loosened; an ACCEPTED_V8 entry goes only by HANDOFF's rule; entry 6 stays; no app change for item 99 unless a
+  check needs one (none did).
+  - The app (q100-front, worktree wt-q100 from main 8c66750): `node scripts/fw-inline.mjs probe99/v9-1738-copy` (the snapshot first
+    checked: fred-world.js 100,487 bytes sha1 3efc2de2..., fred-world.css 16,996 bytes sha1 a621409b...), 11a8d56 "q100: fred world v9
+    (built 2026-11-20 17:38 EST) inlined with scripts/fw-inline.mjs", pushed. Only the two bundle blocks change (index.html with both
+    blocks taken out is byte-identical to main's); the blocks are the snapshot's files trimmed (css bf5dc546..., js 5b51b1e4...); run again
+    it changes nothing; sw.js CACHE and APP_BUILD stay fred-shell-v123. fred100/null.html (mknull) sha1 0bfd9161, the same as the
+    checker's fwcheck7/app/fredv9/null.html. Loaded in Chromium and WebKit, motion on and Reduce Motion (probe100/main/load.mjs): FW.version
+    '9', built '2026-11-20 17:38 EST', both markers v9, fred in the wet box and the strip drawn; no console errors in WebKit; in Chromium the
+    one weberror is the kit's init script reading localStorage on about:blank, which main's page gives the same (fwcheck7/app/weberr.mjs).
+  - What v9 changed for the rider (verify-bundle7.json; probe100/main/d89.cjs): only cast.js's person changed. Boots #B0343A (v8
+    #3A2F2A, within 48 of the leg wear). No white base sock under boots or overshoes without wool socks (so leg wear above both cuffs
+    replaces skin, not the sock's top and ink, in the leave-one-out). With wool socks, leg warmers and tights end at y 260 (was 262), and
+    the knee band at y 263 (else 266) with its ink line and highlight moved up. The thermal jersey's cuff is two butt-capped dashes on the
+    arm path, under the hand and clipboard. Every other drawing, the avatars and the default rider are byte-identical to v8; no box,
+    class, id or animation changed.
+  - ACCEPTED_V8, entry by entry (v8's least -> v9's least in its v8 width, pixels changed / own; C Chromium, W WebKit; v9 from
+    probe100/main/mpx.mjs, q99's pxMany method on bare lists, which read as the ride lists within a skin):
+    1. Boots over leg wear, no wool socks (point 1): C2x 192 / 18 -> 962 / 648; C3x 353 / 61 -> 1860 / 1568; W2x 194 / 18 -> 964 / 648;
+       W3x 334 / 46 -> 1856 / 1568 (own counted in #B0343A). Dropped.
+    2. Leg wear above boots, no wool socks (point 2): C2x legs and light tights 70 / 26 -> 168 / 116, heavy tights 74 / 28 -> 180 / 116;
+       C3x 228 / 82 -> 440 / 310, heavy 228 / 84 -> 436 / 308; W2x 67 / 23 -> 154 / 122, heavy 74 / 29 -> 160 / 122; W3x 233 / 84 ->
+       426 / 308, heavy 233 / 88 -> 438 / 308. Dropped.
+    3. Leg wear above overshoes, no wool socks (point 2): C2x legs and light tights 110 / 42 -> 204 / 144, heavy 114 / 44 -> 220 / 144;
+       W2x 103 / 39 -> 212 / 152, heavy 110 / 45 -> 220 / 152. Dropped.
+    4. Wool socks under knee warmers, toe covers or bare shoes (point 3): C2x 92 / 50 -> 328 / 154; C3x 196 / 174 -> 828 / 382; W2x
+       90 / 48 -> 326 / 152; W3x 202 / 176 -> 834 / 384. Dropped.
+    5. Wool socks over leg wear above shoe covers, 3x (point 4): C3x 260 / 148 -> 436 / 292; W3x 264 / 148 -> 436 / 292. Dropped.
+    6. Dark gloves on deep brown skin ("for the record"): every reading as v8's on every screen (q99's notes: full-finger C2x 204 / 0,
+       C3x 400 / 0, W2x 212 / 0, W3x 396 / 0; fingerless 320 / 8, 740 / 56, 316 / 8, 740 / 56; 468 and 24 readings under SHOW per
+       screen, each at or over its floor). Kept with its v8 widths and floors.
+    The drop, by HANDOFF's rule: q99 with BUILDS v9, OWN.boots #B0343A, the main fix and all six entries, on fred100 with main's page
+    second, not a dump run (probe100/main/runs/q99-keep6.log, 907 s): `OK: item 99: Your rider, and the rider on the Closet card (8647
+    checks)`; entries 1-5 print "never under SHOW" for every item on every screen of their widths (accnotes.py) and "now shows" on each
+    (1: 224 readings on each of the four screens; 2: 121, 91, 121, 91; 3: 156 and 164; 4: 188 on each; 5: 461 and 461), and each width
+    check passes (every cell judged). Then entries 1-5 were removed (n 6 keeps its number).
+  - q99 (kit): BUILDS v9 only (v8 went with v9, as v7 with v8); the cache check asks v9 (17:38) or later and v9's sha1s; OWN.boots
+    #B0343A (v9 draws #3A2F2A nowhere: the BUILDS-only q99 on v9 failed 379 boots lines, 0-12 own, fwcheck7/app/logs/q99-strip.log); the
+    by-design rules unchanged, as v9 measures them (the wool socks' own colour stays 0-12 under covers with knee warmers or leg wear; the
+    knee band's move changes 164 / 60 / 0 px under shoe covers / overshoes / boots, none of it the sock's; fwcheck7/app/logs/bydesign.log),
+    their comment brought to v9; v9 no longer draws the base sock, which no check expected (mut99's v9a2-basesock puts it back). SHOW,
+    PAT_SHOW, OWN otherwise, FIXED_BY_V8, FOUND, EDGES, the band and other-screens checks: unchanged. Lost: entries 1-5 (their cases now
+    fail under SHOW as any item), and the v8 build. Gained: v9's build and boot colour.
+  - q99's main section (my decision): main's page is 8c66750 (item 99 in, v8), so "no Your rider row and no strip on main" can no longer
+    hold there (fwcheck7/app/logs/q99main-on-v8.log: the unchanged q99 fails it on main itself). As q97 (main has item 97) and q98 (main has
+    item 98) already do, it skips with a note once main has item 99 (`\nfunction riderStrip(`), and names main's bundle when BUILDS lacks it
+    ("its bundle (built 2026-11-17 14:45 EST) is not one BUILDS names, so the cache section fails on it as the item page"); for a main from
+    before item 99 the old check runs as before. Proof (Q99_ONLY=main): main's page `OK (1 checks)` with the note; fred98/null.html (item 98,
+    no rider) `OK (2 checks)`, the old check passing; main's page with that marker hidden ('function riderStrip (', mainnorider/null.html)
+    `FAIL 1` ("no Your rider row and no strip on main ... {"row":true,"strip":true}"): the check still bites.
+  - q97 and q98: q98's cache check asked v5 (19:46) or later, now v9 (17:38) or later with FW.version 9 or more; q97 had no version check,
+    and gains the same one in its cache section (its handoff byte check passes on v9: the Dropbox handoff holds v9). Main's page (v8) as the
+    item page (Q9N_ONLY=cache): q99 `FAIL 2` (the version and "no sha1 here for this build"), q98 `FAIL 1`, q97 `FAIL 1` (probe100/main/runs/
+    v8-*-cache.log). Nothing else in either changed.
+  - mut99: SRC fred100/null.html and BASE probe100 (MUT_SRC, MUT_BASE override). Retired: v8a1-floor (the boots without their outline over
+    leg wear: v9's boots read by their colour without it, 1152 / 1152) and v8a5-floor (a grey rib on the socks' band above shoe covers:
+    v9's band still reads, 196 / 112 at 2x, 438 / 266 at C3x); fwcheck7/app/logs/mut-v9drop.log showed both passing v9. New, each putting
+    back what v8 drew for one case (probe100/main/mpx.mjs reads v8's least exactly): v9-boots38 (every boots in #3A2F2A: own 0, OWN);
+    v9a1-thin (entry 1's case in #3A2F2A with a thin #B0343A band: 240 / 24 at C2x, 425 / 72 at C3x, 242 / 24 and 406 / 72 on WebKit, over
+    entry 1's old floors and under SHOW); v9a2-basesock (entries 2 and 3: v8's base sock under boots and overshoes without wool socks:
+    C2x deep brown 70 / 26 and 110 / 42); v9a4-kneeband (entry 4: the knee band to y 266 over wool socks with no cover: 92 / 50);
+    v9a5-legtop (entry 5: leg wear with wool socks ending at y 262 above shoe covers: 260 / 148 at C3x, 264 / 148 at W3x). Against the q99
+    that kept entries 1-5 (probe100/main/q99.keep6.mjs, probe100/w/mutants-keep6.log): v9a1-thin, v9a2-basesock, v9a4-kneeband `OK (8363
+    checks)`, v9a5-legtop `OK (8357 checks)`, so each is caught only because its entry is gone; v9-boots38 `FAIL 379` there too (OWN is
+    v9's in that copy; the old OWN, #3A2F2A, failed the real v9 with the same 379). "A page drawing nothing for wool socks under knee
+    warmers" is v8c2-kneesock (no cover; under a cover they are by design).
+  - Proof, one at a time on fred100/null.html (probe100/main/runs.sh, logs in probe100/main/runs/, summary.txt; Mac Studio, load 3-7
+    from other work): q99 with main's page second `OK: item 99: Your rider, and the rider on the Closet card (8561 checks)` (905 s;
+    8647 with entries 1-5, which the drop removes); q97 (main second, Q97_REPO wt-q100) `OK (128 checks)` (127 + the new version check;
+    its handoff byte check ran and passed); q98 in its parts (main second) `OK (253 checks)`, `OK (49)`, `OK (21)`; motion on the 16
+    rider screens `OK ... (27 checks)`; smoke `OK (14 checks)`; inventory `OK: inventory nothing removed (7 checks)`; contrast `OK:
+    contrast AA on 16 screens ... (58 checks)`; layout (LAYOUT_ONLY=rider) 320 px 13 screens (39 opened) and 390 px 16 (48), `OK`, no new
+    failures; budgets `OK: fred world budgets: 16 screens (15 with fred world art) ... (host reference 1.6-1.6 ms, quiet at most 1.8) ...
+    (62 checks)`, no host busy line outside its self-tests; npm test in wt-q100 1824 tests, 1777 pass, 0 fail, 47 todo.
+  - Mutants: all 155 of q99/mut99.mjs (152 - v8a1-floor - v8a5-floor + the five v9 ones) on fred100 against this q99, detached (probe100/w/mutants.log, per-mutant logs probe100/mut-<name>/q99.log): running at this commit; the result is logged below when they end.
+  - The app code for item 99 is unchanged (no check needed a change); cache stays v123 until item 100's build step bumps it to v124.
+  - For the design chat (none blocks this step; from the independent check, verify-bundle7.json): (1) the v9 boots #B0343A are a brick
+    red within 48 a channel of the app's warning red --red #C4162A (20 / 30 / 16), and QUEUE's round rules say "Red is warnings only":
+    the app chat or Mark decides (accept, logged, or a v10 boot that is not red and still clears 48 from the leg wear, ink and covers);
+    (2) on the run (graphite) theme the crew's ink and dark kit sink into the page #26262C (25-65% of each friend's pixels within 48),
+    a decision before item 100's crew ships (leave the crew out under html.run-theme, or an on-dark keyline from the design chat; a plain
+    --fw-ink override is not enough); (3) with wool socks under overshoes a one-device-row grey line shows between the tights (now ending
+    at y 260) and the overshoe cuff; (4) build-check gaps also in v8, none in the real sources: a raw newline in a CSS string, '<!--' and
+    '-->' in the JS ('-->' also passes fw-inline.mjs), the '.' after 0x1F / 1e5 / 1n and #private names; HANDOFF.md's Known limits do not
+    name them, :26 still says Kitty's Z is in Zwift's style, the Files table leaves out the two test files; test-bundle.js always exits 0
+    and its two cuff-under-jacket checks look for v8's cuff string, so they cannot fail on v9; FROM-DESIGN-CHAT-7 says 33 new unit cases
+    fail on v8, 30 do; the design chat's boot numbers run about 10 px over q99's method (a harness difference).

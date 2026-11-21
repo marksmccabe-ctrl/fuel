@@ -15,6 +15,7 @@ because the laptop sleeps (two long runs died with it) and has 16 GB. This file 
 | `q97-fw-plumbing` | Item 97, built, reviewed (6 rounds, round 6 dry, ended at 3dce12f, v121), kit step OK after a skeptic (Nov 6), logged | Merged into main (2f8c5c9) |
 | `q98-wx-fred` | Item 98, built on fred world v5, reviewed (5 rounds), kit step OK after skeptics (Nov 7), logged | Merged into main (8c19078) |
 | `q99-rider` | Item 99, built on fred world v7 (09:29), acceptance checks and 7 review rounds; fred world v8 (14:45) inlined at 6a8bb4e (v123); v8 check rounds 1 and 2 done; v8 accepted (Mark: item 99 ships on v8; FROM-APP-CHAT-7 asks the design chat for polish, a v9 a later item takes); q99 green on v8 with ACCEPTED_V8 (DECISIONS.md Item 99 "Bundle v8 accepted": `OK (8608 checks)`, main second `OK (8609)`; all 152 mutants fail); kit step done Nov 21 (runkit `kit: OK: 18 steps passed, 0 item tests skipped (8937 s)`, no app change, one motion audit fix, no exemption); its skeptic found nothing; logged (61bf62d) | Merged into main (8c66750) |
+| `q100-front` | Item 100 (Front page: the sky card and the crew), from main 8c66750: first step fred world v9 (built Nov 20, 17:38) inlined with fw-inline.mjs at 11a8d56 (cache still v123; the build step bumps to v124); q97, q98 and q99 take v9 (a v8 page fails their cache sections), q99 OWN.boots #B0343A, ACCEPTED_V8 entries 1-5 dropped by the rule (entry 6 stays); q99 `OK (8561 checks)` with main second, and the rider screens' audits pass (DECISIONS.md Item 100, Bundle v9) | Bundle v9 taken; the build (sky card, crew) next |
 | `claude/lucid-thompson-dc7gqa` | The Nov 1 cloud handoff (HANDOFF.md, old kit copy) | Old: superseded by this file |
 
 Folder layout (recreate it on the Studio; the laptop used exactly this):
@@ -117,7 +118,10 @@ Laptop timings: a review took 25–60 min, a full kit run ~75 min. Item 94 is Ma
   Copied to `probe99/v9-1738-copy/`; its CHECKS.md records the checks that need no browser (all pass: 76 build-check cases, the
   bundle test, the v8 bundle failing exactly the 7 new checks, a byte-identical rebuild from the sources, every non-rider drawing
   unchanged) and the ones still to run (pixel numbers at 2x/3x, WebKit, the thermal cuff in all 11 poses, clipping, motion, q97-q99).
-- **Next: item 100 (Front page: the sky card and the crew), which takes fred world v9 first:** run CHECKS.md's browser checks on an
+- Nov 21 (Mac Studio): item 100's first step on `q100-front` (worktree wt-q100): fred world v9 inlined (11a8d56, v123), checked on its
+  own first (probe100/verify-bundle7.json); q97-q99 moved to v9 with nothing loosened, ACCEPTED_V8 1-5 dropped by the rule below, entry 6
+  kept; mut99 on fred100/probe100 with five v9 mutants (155). DECISIONS.md Item 100, Bundle v9.
+- **Next: item 100's build (the sky card and the crew) on `q100-front`.** Its first step, as planned here, is done: run CHECKS.md's browser checks on an
   idle Mac, inline v9 with fw-inline.mjs, add its sha1s to q99's BUILDS, and
   drop an ACCEPTED_V8 entry only when, on a run that is otherwise green (and not a Q99_ACCEPT_DUMP run, which always ends FAIL), q99
   prints it as "now shows" and "never under SHOW" on every screen of its width.
