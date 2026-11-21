@@ -13,8 +13,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style id="fwCss">
-/* fred world v8 start */
-/* fred world v8 (2026-11-17 14:45 EST): built by build-bundle.py. Reads three app motion tokens (--t-slow, --ease-out, --ease-spring); every colour is its own --fw-* art token. */
+/* fred world v9 start */
+/* fred world v9 (2026-11-20 17:38 EST): built by build-bundle.py. Reads three app motion tokens (--t-slow, --ease-out, --ease-spring); every colour is its own --fw-* art token. */
 
 /* ===== cast.css ===== */
 /* fred world: shared tokens + character rig (style guide §3.1, §3.5–3.6) */
@@ -225,7 +225,7 @@
 .fw-rm .fw-deco *{animation:none!important}
 @media (prefers-reduced-motion:reduce){.fw-deco *{animation:none!important}}
 
-/* fred world v8 end */
+/* fred world v9 end */
 </style>
 <style>
 :root{
@@ -8082,8 +8082,8 @@ Then tell me: "Open fred, tap Volume, tap Import training history, and choose th
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script id="fwJs">
-/* fred world v8 start */
-/* fred world v8 (2026-11-17 14:45 EST): characters, the world scene and holiday looks for fred (fuel.bluebirdmultisport.com).
+/* fred world v9 start */
+/* fred world v9 (2026-11-20 17:38 EST): characters, the world scene and holiday looks for fred (fuel.bluebirdmultisport.com).
    Built by build-bundle.py from cast.js, world.js, holidays.js. Do not edit by hand: edit the sources and rebuild.
    One global: window.FW. Every function returns an SVG string; the art is decorative (aria-hidden).
    Classes, keyframes and custom properties all start with fw-. SVG ids are deterministic (a counter, or o.idp). */
@@ -8232,8 +8232,18 @@ function person(o={}){
   const hand=(x,y,deg=90)=>o.fingerless&&!o.gloves?`<circle cx="${x}" cy="${y}" r="11" fill="${f(skin)}" stroke="${INK}" stroke-width="5"/><g transform="translate(${x} ${y}) rotate(${deg})"><path d="M1 -10.9A11 11 0 0 0 1 10.9Z" fill="${f(o.fingerless)}" stroke="${INK}" stroke-width="4"/>${sil?'':`<path d="M-5 -8.5V8.5" stroke="#C9D1DA" stroke-width="4"/>`}</g>`
     :o.gloves?`<circle cx="${x}" cy="${y}" r="${o.mitts?13.5:11}" fill="${f(o.gloves)}" stroke="${INK}" stroke-width="5"/>${sil?'':`<path transform="translate(${x} ${y}) rotate(${deg})" d="${o.mitts?'M-7.5 -10.5V10.5':'M-5.5 -8.8V8.8'}" stroke="#C9D1DA" stroke-width="4"/>`}`
     :`<circle cx="${x}" cy="${y}" r="11" fill="${f(skin)}" stroke="${INK}" stroke-width="5"/>`;
-  /* the thermal jersey's cuff: a light band on the sleeve just before the hand (o.cuff), so it shows even when the sleeve matches arm warmers */
-  const cuff=(x,y,deg)=>o.cuff?`<g transform="translate(${x} ${y}) rotate(${deg})"><path d="M-17 -10.5V10.5" stroke="${INK}" stroke-width="10"/><path d="M-17 -10.5V10.5" stroke="${f(o.cuff)}" stroke-width="5"/></g>`:'';
+  /* the thermal jersey's cuff: a light band across the sleeve just before the hand (o.cuff), so it shows even when the sleeve
+     matches arm warmers. It is drawn as a short dash of the arm's own path at the sleeve's widths (26 ink, a hair inside its 27, and 19 cuff), so it
+     follows the arm's curve and never reaches past the sleeve's outline in any pose. Its centre sits 17 back from the hand. */
+  const cuff=p=>{
+    if(!o.cuff) return '';
+    const [x0,y0,qx,qy,x1,y1]=p.d.match(/-?[\d.]+/g).map(Number);
+    let L=0, px=x0, py=y0;
+    for(let i=1;i<=48;i++){ const s=i/48, u=1-s, x=u*u*x0+2*u*s*qx+s*s*x1, y=u*u*y0+2*u*s*qy+s*s*y1; L+=Math.hypot(x-px,y-py); px=x; py=y; }
+    const c=L-(17-Math.hypot(p.h[0]-x1,p.h[1]-y1)), r=v=>Math.round(v*10)/10;
+    const dash=(w,len,col)=>`<path d="${p.d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="butt" stroke-dasharray="0 ${r(c-len/2)} ${len} 999"/>`;
+    return dash(26,10,INK)+dash(19,5,f(o.cuff));
+  };
   const fing=(d,w=6)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w+7}"/><path d="${d}" fill="none" stroke="${f(skin)}" stroke-width="${w}"/>`;
   const knuck=(x,y)=>sil?'':`<path d="M${x} ${y}h7M${x} ${y+5}h7" stroke="${INK}" stroke-width="2.5" opacity=".7"/>`;
   /* right-arm poses; the left arm is the same pose mirrored */
@@ -8261,7 +8271,7 @@ function person(o={}){
     if(name==='wave'&&o.itemR==='bottle'&&side==='R') item=`<g stroke="${INK}" stroke-width="5"><rect x="167" y="80" width="22" height="40" rx="6" fill="${f(o.bottle||'var(--fw-green)')}" transform="rotate(12 178 120)"/>
       <rect x="171" y="70" width="14" height="12" rx="3" fill="${f('var(--fw-teal)')}" transform="rotate(12 178 120)"/></g>`;
     const [ex,ey]=p.d.trim().split(/[^\d.-]+/).filter(Boolean).map(Number).slice(-2), deg=Math.round(Math.atan2(p.h[1]-ey, p.h[0]-ex)*180/Math.PI);
-    const inner=part==='hand'?`${name!=='wheel'?item:''}${o.armSleeve?cuff(...p.h, deg):''}${hand(...p.h, deg)}${p.x||''}`:`${name==='wheel'?item:''}${limb(p.d,full||skin)}${full?'':limb(p.s,sleeve,21)}`;
+    const inner=part==='hand'?`${name!=='wheel'?item:''}${hand(...p.h, deg)}${p.x||''}`:`${name==='wheel'?item:''}${limb(p.d,full||skin)}${full?cuff(p):limb(p.s,sleeve,21)}`;
     const g=`<g class="${name==='wave'?'fw-ch-arm-f ':''}fw-ch-arm-${side==='L'?'l':'r'}" style="transform-origin:134px 166px">${inner}</g>`;
     return side==='L'?`<g transform="translate(200 0) scale(-1 1)">${g}</g>`:g;
   };
@@ -8329,11 +8339,11 @@ function person(o={}){
     ${hair.style==='long'?`<path d="M52 92C38 126 40 172 56 200H144C160 172 162 126 148 92Z" fill="${f(hair.c)}" stroke="${INK}" stroke-width="5"/>`:''}
     ${o.ride?'':`<g class="fw-ch-legs" stroke="${INK}" stroke-width="5">
       ${limb('M84 248V272',skin,legW)}${limb('M116 248V272',skin,legW)}
-      ${o.legC&&!o.longSocks?'':limb(o.longSocks?'M84 254V276':'M84 268V276',sock,legW)+limb(o.longSocks?'M116 254V276':'M116 268V276',sock,legW)}
-      ${/* leg wear: with long socks it stops flat at mid-shin (y 262) and the sock shows from there to the shoe */''}
-      ${o.legC?(o.longSocks?limb('M84 248V262',o.legC,legW,'butt')+limb('M116 248V262',o.legC,legW,'butt'):limb('M84 248V277',o.legC,legW)+limb('M116 248V277',o.legC,legW))+(sil?'':`<path d="${o.longSocks?'M90 256V260M122 256V260':'M90 256V272M122 256V272'}" stroke="#fff" stroke-width="2.5" opacity=".35"/>`):''}
-      ${/* knee warmers: a flat-ended band drawn after the socks and leg wear, so it shows over both */''}
-      ${o.knee?limb('M84 250V266',o.knee,legW+1,'butt')+limb('M116 250V266',o.knee,legW+1,'butt')+`<path d="M74 266H94M106 266H126" stroke="${INK}" stroke-width="2.5"/>`+(sil?'':`<path d="M76 262.5H92M108 262.5H124" stroke="#fff" stroke-width="2" opacity=".85"/>`):''}
+      ${(o.legC||o.boots||o.cover<=262)&&!o.longSocks?'':limb(o.longSocks?'M84 254V276':'M84 268V276',sock,legW)+limb(o.longSocks?'M116 254V276':'M116 268V276',sock,legW)}
+      ${/* leg wear: with long socks it stops flat at mid-shin (y 260) and the sock shows from there to the shoe */''}
+      ${o.legC?(o.longSocks?limb('M84 248V260',o.legC,legW,'butt')+limb('M116 248V260',o.legC,legW,'butt'):limb('M84 248V277',o.legC,legW)+limb('M116 248V277',o.legC,legW))+(sil?'':`<path d="${o.longSocks?'M90 254V257M122 254V257':'M90 256V272M122 256V272'}" stroke="#fff" stroke-width="2.5" opacity=".35"/>`):''}
+      ${/* knee warmers: a flat-ended band drawn after the socks and leg wear, so it shows over both; over wool socks it ends at y 263 so the sock shows below it */''}
+      ${o.knee?(kb=>limb(`M84 250V${kb}`,o.knee,legW+1,'butt')+limb(`M116 250V${kb}`,o.knee,legW+1,'butt')+`<path d="M74 ${kb}H94M106 ${kb}H126" stroke="${INK}" stroke-width="2.5"/>`+(sil?'':`<path d="M76 ${kb-3.5}H92M108 ${kb-3.5}H124" stroke="#fff" stroke-width="2" opacity=".85"/>`))(o.longSocks?263:266):''}
       ${/* shoe covers ('shoes') and overshoes: a cuff above the shoe in their own shape, over any sock or leg wear, with a light hem */''}
       ${o.cover?`<path d="M72 ${o.cover}H96V278H72ZM104 ${o.cover}H128V278H104Z" fill="${f(COVER)}" stroke-width="3"/>${sil||o.cover>262?'':`<path d="M75 ${o.cover+3.5}H93M107 ${o.cover+3.5}H125" stroke="#C9D1DA" stroke-width="2"/>`}`:''}
       <path d="M70 284C70 274 78 272 86 272H96V286H72Z" fill="${f(o.shoes||'#fff')}"/><path d="M130 284C130 274 122 272 114 272H104V286H128Z" fill="${f(o.shoes||'#fff')}"/>
@@ -8560,6 +8570,8 @@ function riderValid(r){
 }
 /* shoe covers and overshoes: slate, apart from the leg wear (#1E1E24, #14141A), the ink, toe covers and boots */
 const COVER='#4F6478';
+/* boots: brick red, more than 48 apart in a channel from the leg wear, the ink, toe covers, the slate covers and every skin */
+const BOOT='#B0343A';
 function riderBase(r){
   r=riderValid(r);
   return {skin:SKIN[r.skin]||SKIN.light, hair:{c:r.hair, style:r.hairStyle}, hat:{type:'road', c:r.helmet},
@@ -8589,7 +8601,7 @@ const OUTFIT_LOOK={
   'balaclava':o=>{o.balaclava='#1E1E24';}, 'gaiter':o=>{o.gaiter='#2ABCBB';},
   'socks-summer':o=>{o.socks='#fff';}, 'socks-wool':o=>{o.socks='#8E949A'; o.longSocks=true;},
   'toes':o=>{o.toes='#8E949A';}, 'shoes':o=>{o.shoes=COVER; o.cover=Math.min(o.cover||266,266);},
-  'overshoes':o=>{o.shoes=COVER; o.cover=262;}, 'boots':o=>{o.boots='#3A2F2A';}
+  'overshoes':o=>{o.shoes=COVER; o.cover=262;}, 'boots':o=>{o.boots=BOOT;}
 };
 function riderOutfit(rider, ids=[], extra={}){
   const o=riderBase(rider);
@@ -8909,9 +8921,9 @@ function komPhase(date = new Date()){
   return md <= KOM_SEASON.chaseEnd ? 'chase' : 'takeover';
 }
 
-window.FW = { version: '8', built: '2026-11-17 14:45 EST', bird, ashley, person, friend, FRIENDS, SKIN, birdWear, holidayWear, NOCAP, riderOutfit, riderAvatar, riderBase, RIDER_DEFAULT, RIDER_OPTIONS, RIDER_NAMES, OUTFIT_LOOK, scene, SEASONS, WX_WEAR, WX_KINDS, HOLIDAYS: GROUPS, DECO, SKY, kitty, bike, KOM_SEASON, komPhase, plain, box };
+window.FW = { version: '9', built: '2026-11-20 17:38 EST', bird, ashley, person, friend, FRIENDS, SKIN, birdWear, holidayWear, NOCAP, riderOutfit, riderAvatar, riderBase, RIDER_DEFAULT, RIDER_OPTIONS, RIDER_NAMES, OUTFIT_LOOK, scene, SEASONS, WX_WEAR, WX_KINDS, HOLIDAYS: GROUPS, DECO, SKY, kitty, bike, KOM_SEASON, komPhase, plain, box };
 })();
-/* fred world v8 end */
+/* fred world v9 end */
 </script>
 <script>
 (function(){
