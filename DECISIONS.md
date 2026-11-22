@@ -2632,3 +2632,75 @@
   - Open as before: Mark on the v9 boots and on the crew on graphite (provisional), docs/LEGAL.md "Crew likenesses" (consent dates and
     scope from Mark) before merge, whether worldMotion should also survive an old backup; and now the weather.gov limit (8 s, then the
     estimate) applies to Crunch too, a change from main Mark may want to know of.
+- Review round 3 (the reviewers on 0137d7a: 9 confirmed findings, 3 in the app (state 1, a11y 1, perf 1), 6 in q100 (tests lens); each
+  reproduced first (the app ones by the new checks on the unfixed page, probe100/rv3/base/null.html sha1 ebc5aaa1: `FAIL 4`,
+  rv3/base-new.log; the test ones by the reviewers' mutants passing the old q100, rv3-tests/logs, and now built into mut100); all fixed;
+  cache still v124, no bundle change).
+  - App (wt-q100 index.html, c894d7b):
+    - A saved forecast is no live one for the box (low, state): after Crunch fell back on the cached copy (a failing network or offline,
+      main's fallback, kept), the network back and the results taken away with the key unchanged (a timed run), skyBoxFetch counted the
+      saved copy as a forecast in hand (`wxAccepted && wxKey===R.key && !wxOld()`) while skyLive refused it as stale: the cap with no
+      request until the copy was an hour old (reviewers' p8: about 40 minutes online). Now the box counts only a live shared forecast
+      (not stale, not typical), and fetchWeather lets the quiet lookup past a saved or typical copy; a Crunch tapped while that lookup is
+      out waits for it as for any other (wxBusy), else it would take the saved copy under results the lookup then replaces. A success
+      replaces the saved copy in the shared state (the box asks only with no results up); a failure writes nothing and stamps the
+      10 minutes, as before. Crunch alone is unchanged from main (a saved copy under an hour old is still in hand for it). One
+      reviewer read the item's "the same hour-old rule as Crunch" as covering this; two did not, and round 2 counted the same symptom
+      a defect ("the box's normal 10 minutes apply"), so it is fixed.
+    - The box named for the session (low, a11y): `aria-label="Ride forecast"` was fixed in the HTML, so on the run VoiceOver heard a ride
+      word the screen no longer showed. runApply (boot, a sport change, a synced change) now sets "Run forecast" or "Ride forecast",
+      beside the other words it relabels (q47); the HTML keeps "Ride forecast" for the first paint.
+    - The line kept in place (low, perf): skyBoxRender's guard compared `P.innerHTML` with a string holding U+00A0, which innerHTML
+      writes back as `&nbsp;` (and esc's `&#39;` as `'`), so every render (each Plan open, visibilitychange, resize, online) replaced the
+      line: a selection on it lost (cut short on WebKit), a screen reader's place rebuilt, a refit queued. It now compares against the
+      last string written (`P._l`).
+  - Kit (q100/q100.test.mjs, 276 checks, was 249):
+    - keep: a forecast saved earlier, Crunch taking it in on a failing network, the network back, the sport to a timed run: no request
+      inside the 10 minutes, then one place search and one forecast, the box live, wxLast.stale empty, wxKey the ride's.
+    - theme: the box's accessible name on the run exactly `- region "Run forecast":`, back on the ride `- region "Ride forecast":`.
+    - fetch: a MutationObserver on #planSkyL across 8 tab switches, then the app back in front, online and a resize with a selection on
+      the line: 0 writes and the selection kept (the unfixed page: 9 writes, the selection empty).
+    - backup (the file's own values; one restored file never held crewShow): a backup made with crewShow false carries it, and restored on
+      a device with the crew on turns it off (no crew, no art, settings and storage false, the switch aria-pressed false); the same for
+      crewNames (names gone).
+    - fetch, the failing network: the box's stamp set (absolute) to 20 s short of the 10 minutes: no request; just past them: one place
+      search (any retry under about 9 min 40 s now fails; before, anything from about 20 s passed).
+    - race, hung for good: the new ride's place search 14-16.5 s after the box's first, by the HOOK's stamps (15006 ms), beside the old
+      21 s outer bound; fetch: a Crunch 7 s after the box's place search with weather.gov at 18 s takes the box's lookup (one request of
+      each kind, results within 3 s: 1079 ms; a 6 s give-up makes 2 of each and 8.1 s).
+    - fetch, weather.gov at 18 s: the box live 7.5-9.5 s after the weather.gov request (the page's own clock: a MutationObserver on
+      data-wx against the HOOK's stamp; 8016 ms), and a Crunch 3 s into that wait done within 6.5 s (was 8; 4951 ms). The line now
+      prints what it measured instead of "8 s at most".
+    - motion: after the settle, "Show their names" on and then off (Settings and back): nothing in #view-plan moves for 1.5 s and the six
+      svg nodes (fred and the five) are the same ones; sync: B's five svg nodes kept when A's names arrive.
+    - room: the 12 sizes now on the page with sign-in configured (SYNCED, signed out, its own Backend: privInit shows Privacy from the
+      boot, its own 44 px row under the science link), each checking Privacy shown and the element at its own centre, and the crew's
+      room measured with it there; one Firebase-off size (390 x 844, 100%) keeps the null page (no Privacy, as main). sync: Privacy in the
+      middle of the screen and the element at its own centre (it sat under the tab bar at the page's top, so the check scrolls it in).
+      A reviewer noted the layout audit's 'privacy' screen (kitcloud.html, at every width and text size) already fails rv-mut-priv320
+      at 320 px; q100 now holds its own QA line too.
+  - mut100.mjs gains 15 mutants (r3-*): savedbox and savedfw (the box's guard, fetchWeather's early return, each as the branch had it),
+    label, linehtml, bkshow and bknames (a restore keeping this device's value over the file's), retry60 and retry9, quiet6 and quiet12,
+    nws10 and nws65, namesredo (the names in crewRender's key), priv320 and privcover (the crew pulled 44 px over a shown Privacy);
+    hourold follows the changed guard; 95 in all.
+  - Runs on fred100/null.html (q100-front c894d7b, v124, sha1 5a8ace92), main page fred/null.html (8c66750), Mac Studio, one at a time
+    (probe100/rv3: runs.sh, logs and summary.txt in rv3/runs):
+    - q100 (main second) `OK: item 100: Front page, the sky card and the crew (276 checks)` (318 s); the new checks on the unfixed page
+      (rv3/base) `FAIL 4`: the line rewritten (9 writes, the selection lost), the saved copy and the network back (no request, the cap),
+      the run's label, and the sync Privacy check as first written (it measured Privacy under the tab bar: now scrolled to the middle).
+    - mut100, all 95: all FAIL (3154 s; rv3/w/mut100.log, per-mutant logs rv3/mut100-<name>/): r3-savedbox 1, r3-savedfw 1, r3-label 1,
+      r3-linehtml 1 (9 writes), r3-bkshow 1, r3-bknames 3 (the old restore checks catch it too), r3-retry60 1, r3-retry9 1, r3-quiet6 2
+      (the 7 s Crunch; the new ride asked 6006 ms after), r3-quiet12 1 (12007 ms), r3-nws10 3 (10011 ms), r3-nws65 1 (6514 ms),
+      r3-namesredo 3 (motion on and off, sync), r3-priv320 3 (320 px at each text size), r3-privcover 13; hourold, stale, c1-typical and
+      c2-hourlive (on or beside the changed guards) FAIL as before; the rest as before, now against the room loop on the sign-in page.
+    - q99 (main second) `OK: item 99: Your rider, and the rider on the Closet card (8650 checks)` (985 s); q98 in parts `OK (253
+      checks)`, `OK (49)`, `OK (21)`; q97 `OK: item 97: fred world, the bundle, motion plumbing and switch (128 checks)`.
+    - motion `OK: motion audit: Reduce Motion still on 14 screens ... (27 checks)`; budgets `OK: fred world budgets: 15 screens (15 with
+      fred world art) ... (host reference 1.1-1.41 ms, quiet at most 1.8) ... (62 checks)`, no host busy line outside its self-tests;
+      smoke `OK (14 checks)`; contrast `OK: contrast AA on 14 screens ... (54 checks)`; layout 320 px and 390 px on the new screens `OK`;
+      inventory `OK: inventory nothing removed (7 checks)`; npm test in wt-q100 1829 tests, 1782 pass, 0 fail, 47 todo; every inline
+      script compiles (probe100/rv3/syn/syn.mjs: 5 scripts OK; a first try reused `ps` in runApply, caught there, renamed `sk`).
+  - Open as before: Mark on the v9 boots and on the crew on graphite (provisional), docs/LEGAL.md "Crew likenesses" (consent dates and
+    scope from Mark) before merge, whether worldMotion should also survive an old backup, the weather.gov limit for Crunch (a change
+    from main); and now a Crunch tapped while the box's lookup is out with a saved copy in hand waits for that lookup (a small change
+    to main's Crunch in that one state, as it already waits on the box's lookup otherwise).
