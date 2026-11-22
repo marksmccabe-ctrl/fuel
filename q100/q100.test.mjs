@@ -335,11 +335,16 @@ section('sync', async () => {
   await toSettings(A.p); await A.p.click('#prowBtn-crewnames'); await settle(A.p, 200);
   const up = await until(() => (doc().settings || {}).crewNames === true, 20000), at = doc().settingsAt || {};
   ok(!!up && typeof at.crewNames === 'number' && !('crewShow' in (doc().settings || {})), 'sync: A\'s "Show their names" reaches the cloud as its own key (settings.crewNames, one settingsAt stamp; crewShow untouched, not stored)', { s: doc().settings && doc().settings.crewNames, at: Object.keys(at) });
-  const bOk = await nudge(async () => { await B.p.evaluate(() => document.querySelector('nav.tabs button[data-view=plan]').click()); const c = await crewOf(B.p); return c.names.length === 5 ? c : null; });
-  ok(!!bOk, 'QA: the crew switches sync: B shows the names A turned on', bOk || await crewOf(B.p));
+  /* B stays on Plan: once A's value is in B's settings (a pull), B's crew follows it with nothing else happening (the settings applied
+     redraw it: no tab tap, no app-open) */
+  await B.p.evaluate(() => document.querySelector('nav.tabs button[data-view=plan]').click()); await settle(B.p, 200);
+  const got = await nudge(() => B.p.evaluate(() => window.__q100.settings.crewNames === true));
+  await sleep(600); const bOk = await crewOf(B.p);
+  ok(!!got && bOk.names.length === 5, 'QA: the crew switches sync: B (on Plan) shows the names A turned on as soon as they arrive', bOk);
   await toSettings(B.p); await B.p.click('#prowBtn-crewshow'); await settle(B.p, 200);
-  const aOff = await nudge(async () => { await A.p.evaluate(() => document.querySelector('nav.tabs button[data-view=plan]').click()); const c = await crewOf(A.p); return !c.on && c.art === 0 && (doc().settings || {}).crewShow === false ? c : null; });
-  ok(!!aOff && typeof (doc().settingsAt || {}).crewShow === 'number', 'QA: B turns the crew off: A\'s crew goes (settings.crewShow false in the cloud, its own stamp)', aOff || await crewOf(A.p));
+  await A.p.evaluate(() => document.querySelector('nav.tabs button[data-view=plan]').click()); await settle(A.p, 200);
+  const gotA = await nudge(() => A.p.evaluate(() => window.__q100.settings.crewShow === false)); await sleep(600); const aOff = await crewOf(A.p);
+  ok(!!gotA && !aOff.on && aOff.art === 0 && (doc().settings || {}).crewShow === false && typeof (doc().settingsAt || {}).crewShow === 'number', 'QA: B turns the crew off: A\'s crew goes as soon as it arrives (settings.crewShow false in the cloud, its own stamp)', aOff);
   await A.close(); await B.close();
 });
 
@@ -352,8 +357,8 @@ async function restore(p, d) {
 section('backup', async () => {
   const x = await openH({ settings: { crewNames: true } }), ex = await x.p.evaluate(() => JSON.parse(JSON.stringify(window.__q100.backupData()))); await x.close();
   ok(ex.settings && ex.settings.crewNames === true, 'backup: a backup made here carries the switches (backupData().settings.crewNames)', ex.settings && ex.settings.crewNames);
-  const y = await openH(), p = y.p; await restore(p, ex); await tab(p, 'plan'); await until(async () => (await crewOf(p)).names.length === 5, 8000);
-  ok((await crewOf(p)).names.length === 5, 'backup: restored on a fresh page, the names show', await crewOf(p));
+  const y = await openH(), p = y.p; await restore(p, ex); await sleep(400); const r1 = await crewOf(p); /* (before the Plan tab: the restore itself redraws the crew) */
+  ok(r1.names.length === 5, 'backup: restored on a fresh page, the names show (the restore redraws the crew)', r1); await tab(p, 'plan');
   const old = JSON.parse(JSON.stringify(ex)); delete old.settings.crewNames; delete old.settings.crewShow; await restore(p, old); await tab(p, 'plan'); await sleep(300);
   const c = await crewOf(p), st = await p.evaluate(() => window.__q100.settings);
   ok(c.on && !c.names.length && !('crewNames' in st) && !('crewShow' in st), 'backup: a backup without them gives the defaults (the crew on, no names), as worldMotion', { c, st: [st.crewShow, st.crewNames] });

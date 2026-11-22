@@ -2342,3 +2342,151 @@
     change adds readings to the strip section's other-screens pass and three checks, and takes nothing away, so a mutant that failed
     still fails.
   - App: no change (both gaps were in the kit); q100-front stays at 11a8d56, cache v123, fred world v9.
+- Build (item 100's build step, Mac Studio, 2026-11-22; q100-front from 11a8d56, fred world v9 as inlined there, no bundle change).
+  - Decisions already made (Mark's and the app chat's), followed:
+    - Cache v124 (sw.js CACHE and APP_BUILD), once, in this step.
+    - Bundle v9 as inlined at 11a8d56. Its boots (brick red #B0343A) sit within 48 a channel of the warning red --red #C4162A against
+      the round's rule "Red is warnings only": Mark decides (accept, or a v10 boot colour from the design chat). No app change and no
+      work-around here; open.
+    - The crew's first names live in the app (BUNDLE FIXES for 100), CREW_NAMES in FW.FRIENDS order: 0 Ryan, 1 Dustin, 2 Chelsea, 3 Bobby,
+      4 Anne, 5 Heather, 6 Luke, 7 Mark, 8 Maria, 9 Rob, 10 Marc, 11 Katie, 12 Bentley, 13 John, 14 Steve, 15 Julia, 16 Chiara, 17 Rob,
+      18 Paul; checked against the sources' cast.js (~/Dropbox/00_T/fred-world/fred-world/cast.js, FRIENDS lines 311-330: the same 19
+      people in the same order; the app takes the first word of each name only, never surnames, teams, towns or quirks).
+    - Rotation: five friends a day from the local date alone. The scheme: day d = the local date's day number (Date.UTC of its year,
+      month and day / 86 400 000: no clock time, no daylight saving); the five are friends 5d to 5d+4 round the 19 (s = 5d mod 19, then
+      s, s+1 ... s+4 mod 19). Since 5 and 19 share no factor, every friend shows on exactly 5 days of every 19, every 3 or 4 days, never
+      two days running; the two Robs (9 and 17) are 8 apart in the order, more than a window of 5, so never on one day. The same five all
+      day, on every reload and every device (nothing stored). tests/engine/crew.test.mjs holds the rule over 3000 days and across
+      daylight saving.
+    - Motion by the round rules: each friend a kept fwMount spot (key crew:<i>, its own id prefix cw<i>-, never a string reused), with
+      the bundle's fw-vm0 and --fw-d (-0.6 s a slot) so the bobs are offset without adding a loop (verify-bundle7's finding): a friend
+      runs its bob, and a blink for 1, 2 and 13; it moves for 6-8 s when first seen in an app open, then still; still under Reduce Motion
+      and with Animate the world off (item 97's gate). Equal body size: each slot is its friend's FW.box width at the body's scale
+      (friends 10, 12 and 17 are 241, 212 and 212 units wide against the body's 200).
+    - Where: after the Plan's "Planning tool, not medical advice · The science behind it →" footer (kept), on the page background, no
+      band. Main's Plan footer already has the Privacy link the spec names (button.privlink[data-privacy], shown once sign-in is
+      configured, privInit; hidden on the kit's Firebase-off null.html, as on main): no line added. At least 8 px clear of the tab bar at
+      the end of the scroll, else left out, decided on layout changes only. Not on the computer layout (html.dk).
+    - The run (graphite) theme, provisional: the box follows the run's sky mix and text colours (item 98's run box: the panel #34343C,
+      color-mix of the sky, light words); the crew is left out while html.run-theme is on (v9's ink #1C2440 and dark kit sink into
+      #26262C; a --fw-ink override turns the faces light; no on-dark option in the bundle). One switch: the CSS rule `html.dk
+      #planCrew,html.run-theme #planCrew{display:none!important}` (take `html.run-theme #planCrew` out of it to show the crew there).
+      Mark decides later: this, an on-dark crew from the design chat, or a band.
+    - Settings › fred world: "Show the crew" (on) and "Show their names" (off), settings.crewShow / settings.crewNames, stored only once
+      tapped (no DEFAULT_SETTINGS entries, as worldMotion and rider), synced key by key by item 96's code unchanged (one settingsAt stamp
+      each), kept by Back up / Restore like worldMotion (a backup without them gives the defaults). Item 97 made the group (sg-fw, "items
+      100 and 101 add their switches here"): the two rows go there, after Animate the world, drawn the same way (prow-sw rows, gr-swb
+      buttons, aria-pressed). Names on: the first name under each friend as real text (the list labelled "The crew"; the art aria-hidden);
+      off: no name element at all and the list aria-hidden. worldMotion is not in the privacy note's "What's stored" nor in DBG_DROP_SET,
+      so neither crew switch is added there.
+    - The box (100.1) and its forecast (100.2), Crunch hiding it and the computer layout (100.3), print and forced colours: as below.
+    - docs/LEGAL.md "Crew likenesses" is not written: each person's consent date and scope come from Mark. Its shape is in
+      probe100/legal-crew-draft.md (the 19 first names, date and scope "(to come)", how to withdraw: an email to Mark, removed in the next
+      build). Item 100 cannot merge until Mark gives the details.
+  - Built (index.html):
+    - The sky box `section#planSky.r-wx.pv-sky` (aria-label "Ride forecast") right after the ride ticket (#rideSec) in #planSecs, so
+      before Settings on the ride and before the run's Carry box and Settings on the run. A plain Plan box (white panel, border var(--ol)
+      solid var(--chip-line), radius var(--r-panel), the Settings box's style), min-height var(--wxf) x 1.3 (114 px), never a height.
+      Item 87/98's scoped CSS now names #planSky beside #results>.r-wx and #runResults>.r-wx where the box needs it (position, isolation,
+      overflow; the words over the sky's z-index; the feather on the line, light and graphite; the print rules); the weather card's own
+      rules are unchanged. Its parts are the card's: .rwx-g (data-sky, data-fred) holds the one line `p#planSkyL.pvs-l`; wxDress (wxSkySet:
+      item 87's masked .rwx-scene layer and fog; wxFred: item 98's looks, WX_WEAR, a clear night still; wxLoop) dresses it in place (the same
+      sky and look keep their layers and fred; another cross-fades as on the card). fred always shows in the box (`#planSky>.rwx-fred
+      {display:block}`, no container cut): the line keeps item 98's room beside him (padding-right var(--wxf) x 1.21 - 10 px) and wraps
+      there (the time never split: 8:00 AM with a no-break space). Never FW.wxSky or .fw-wx (v9 has neither).
+    - The line: "Thu 8:00 AM · Carmel · 61°": the ride's weekday and start (the ticket's own formats), the place's first part (the
+      forecast's place, or the Where field's), and the forecast's temperature at the start (wxTempAt, the weather card's first number) in
+      bold. Uppercase caps style. No explanation line (item 76).
+    - Only a live forecast of this ride (wxLast under the current fetchWeather key, not a saved one from the cache, not typical weather)
+      draws a sky and a number; otherwise (no place the lookup finds, no forecast, offline, a failing network with a saved forecast, a date
+      over 10 days out) the box shows fred in his cap: data-fred 'clouds' (FW.WX_WEAR.clouds is [], so FW.bird with no wear, the cap), no
+      sky, the line time · place. My decisions: a saved forecast is not shown as a live one (the box has no note line to say "saved"), and
+      typical weather (a date 11+ days out) counts as no forecast (no lookup from the box for it).
+    - The lookup (100.2): wxReq() (new) is the ride a lookup is for, taken out of fetchWeather unchanged (place, date, start, length, the
+      picked place, the key), so Crunch and the box share one key. fetchWeather(quiet) is Crunch's lookup with a quiet mode for the box (its
+      notes go to no element) and one lookup at a time (wxBusy: a Crunch during the box's lookup of the same ride waits for it and finds
+      its forecast; if it failed, Crunch tries again and says so). The box asks (skyBoxFetch) when Plan opens: at boot, on the Plan tab, the
+      app back in front (visibilitychange), the Plan sheet closed (updateSummaries: a changed ride), the results gone, a resize; never while
+      the Plan sheet is open, offline (navigator.onLine false), with results shown, or for a forecast under an hour old (Crunch's rule);
+      and a ride's key tried from the box is not tried again from there for 10 minutes (wxAutoRefresh's interval), success or not. So a
+      Crunch after the box's lookup makes no request at all, and tab switches, the app coming back and a failing network make no storm.
+    - After Crunch (100.3): a MutationObserver on #results' style, #runResults' hidden and #view-plan's data-ride sets the box's hidden from
+      the computed display of the results (skyShown), before the next frame, so fred is once on the page in every frame; results gone (the
+      sport changed, a new ride) bring it back. On the computer layout the box sits under the ticket in the Plan-a-ride column (column 3
+      with the form) and is out whenever Results is shown beside it; with a scheduled ride's plan shown instead (Results hidden by its rule)
+      it shows.
+    - The crew `ul#planCrew.crew` after the footer in #view-plan: crewRender builds the day's five (li.crew-f, each a .crew-a spot with
+      --bw and --fw-d, and a span.crew-n with names on), sizes from FW.box on the strip (--sw the five boxes' widths in bodies, --ch the
+      tallest box's height), mounts each with fwMount (F.friend(i, {idp:'cw'+i+'-'}), key crew:<i>, {cls:'fw-vm0'}). Widths by container
+      query units (100cqw less the four 8 px gaps), a vw fallback; the svg top-aligned in a box of --ch, so feet and names line up. With
+      names on, a slot is at least its name's width and the row wraps (flex-wrap): at 150% and 200% text the five go to two rows, one body
+      size, nothing cut or overlapping. crewSoon runs it after settings change (renderProfileRows: a tap, a sync, a restore), on the Plan
+      tab, an app open and the app back in front (a new day's five).
+    - The room (crewFit): the crew's bottom on the screen at the end of the scroll against the highest of the tab bar and a fixed or sticky
+      bar over it (#planBar, #planSaved); under 8 px it is hidden (U.dataset.room keeps the gap). Run by a ResizeObserver on #view-plan, the
+      tab bar, #planBar and #planSaved and on resize (text size, a phone turned, a bar coming or going), never on scroll. Measured: 33-46 px
+      at 320-430 px wide, 100-200% text; after "Saved to Journal" on a phone (#planSaved fixed over the page end, no padding for it on
+      main) it can be under 8: left out then.
+    - Settings: rows prowBtn-crewshow and prowBtn-crewnames in #pgB-fw (data-kw for search), drawn by renderProfileRows with
+      worldMotion's switch line (crewShow on unless false, crewNames only when true), each tap saves and calls crewRender.
+    - Print: no crew, no sky or fred in the box (q87's print rule covers the box as .r-wx), the line's room and feather off. Forced
+      colours: item 97's spot rule hides fred's and the crew's drawings; the box's sky and fog out too (#planSky only), the crew's art
+      boxes collapsed, the box's edge kept.
+  - My decisions (beyond the list): the box carries .r-wx so item 87's load-time sky loops stay inside the motion audit's ON_LOAD_OK
+    entry ('.r-wx .rwx-scene': the living sky keeps its loops, rule b) and the card's feather and print rules reach it; aria-label "Ride
+    forecast" (a label, not an explanation line); the box shows fred at every width (its line wraps beside him) rather than item 98's
+    305 px cut, which was sized for the card's big temperature; a crew turned off keeps no art (its spots emptied); the names list is a
+    ul labelled "The crew" only while names show.
+  - Tests (app): tests/engine/crew.test.mjs in npm test (5 tests: CREW_NAMES against the list and FW.FRIENDS' length; crewDay by the local
+    date at any clock time and across daylight saving; five a day, 5 in 19, every 3-4 days, never two running, never both Robs, over 3000
+    days; the same five all day and another the next).
+  - Kit: lib/screens.mjs: 14 screens (needs '#planSky' or '#planCrew', skipped on main), each checked on a screenshot: plan-sky-sun, -rain,
+    -snow (?sky=), -night (start 8 pm: no sky, fred in his vest), -none (no forecast), -noplace (the place search finds nothing), -offline
+    (offline before Plan opens again), -run (graphite, rain); plan-crew and plan-crew-names (scrolled to the end above the tab bar),
+    plan-crew-names-320-200 (the row wraps) and plan-crew-names-430-150; desktop-plan-sky (the box under the ticket) and
+    desktop-plan-sky-results (Results beside it, the box out). A screen may carry its own route (tried before the kit's). No new @keyframes
+    (the motion audit needs no entry: the crew's loops are the bundle's, run in .fwm.fwm-go; the box's sky in .r-wx .rwx-scene). q100/
+    q100.test.mjs (sections cache, place, looks, nofc, fetch, once, desk, crew, motion, room, theme, switch, names, sync, backup, media,
+    fit, main; a hooked copy logs every lookup from the main script's first line). q100/mut100.mjs: 40 mutants. runkit.sh runs the item
+    tests in item order (q100 after q99).
+  - Kit changes the new screens needed: q97 'still' LATER allows item 100's spots (#planSky, #planCrew) and crewRender on a page that has
+    it, and q97 'switch' expects the fred world group's rows to be Animate the world then item 100's two (on such a page); q98 'once'
+    (none): with no results up, the only fred on the page is the sky box's (on a page that has it; none before item 100); budgets: the
+    paused-scene self-test hides plan-before's own art (now the box and crew), and the Reduce Motion and gate-shut self-tests accept the
+    walk's second, correct failure there (the screen's own fwMount calls refused as "not opened as the walk opens a screen"); layout: a
+    sticky bar the page scrolls (no scroller between it and the page) that is not stuck (scrolled to its own place: the Crunch bar at
+    the end of a long Plan, under the header, on plan-crew-names-320-200 at 320 and 390 px) is page content, not a floating layer, so
+    the header over it is not an overlap of two tap targets. A first version without the "page scrolls" part also took a sheet's
+    sticky title bar for page content (settings-profile-weigh-in: Done over the name field, a new failure in the full 390 px pass); with
+    it the full pass is clean on the item page and on main's.
+  - q100's sync and backup checks first passed a mutant that dropped crewSoon from the settings line (renderProfileRows): the test's
+    own tab taps and app-open nudges redrew the crew. They now wait for the value to arrive in the page's settings, then read the
+    crew with nothing else happening (sync: B and A on Plan; backup: before the Plan tab); the mutant fails 3.
+  - Runs on fred100/null.html (q100-front b7b8f1b + f639375, v124), main page fred/null.html (8c66750, v123), Mac Studio, one at a time
+    (probe100/b100/runs.sh, logs and summary.txt in probe100/b100/runs/; load 3-6 from other work):
+    - q100 (main second) `OK: item 100: Front page, the sky card and the crew (114 checks)` (137 s); on main's page as the item page
+      `FAIL 26`; mut100: all 40 mutants FAIL (probe100/w/mut100.log, per-mutant logs probe100/mut100-<name>/q100.log; nosync after the
+      fix above, `FAIL 3`).
+    - q99 (main second) `OK: item 99: Your rider, and the rider on the Closet card (8650 checks)` (957 s).
+    - q98 in parts (main second): `OK (253 checks)` (after the once fix; before it `FAIL 9`, all the sky box's fred counted as a stray),
+      `OK (49)`, `OK (21)`.
+    - q97 (main second) `OK: item 97: fred world, the bundle, motion plumbing and switch (128 checks)` (after the switch fix; before it
+      `FAIL 1`, the group's three rows).
+    - motion on the 14 new screens `OK: motion audit: Reduce Motion still on 14 screens, nothing moves before a tap (0 first loads + every
+      screen), only transform / opacity / bar widths animate (27 checks)`; no new @keyframes.
+    - budgets on the new screens and plan-before `OK: fred world budgets: 15 screens (15 with fred world art) ... (host reference
+      1.06-1.51 ms, quiet at most 1.8) ... (62 checks)` (after the self-test fixes; before them `FAIL 3`, the three self-tests, every real
+      rule ok): most FW nodes 609 (desktop-plan-sky-results), most running 13 (plan-sky-sun), costliest frame 1.35 ms at 6x
+      (plan-sky-rain), slowest fwMount 14.2 ms at 6x; plan-before 469 nodes in 6 spots, 7 running.
+    - smoke `OK: kit2 smoke: every tab opens, no errors (14 checks)`; inventory `OK: inventory nothing removed (7 checks)` (allow.json
+      unchanged: item 100 only adds).
+    - contrast on the new screens `OK: contrast AA on 14 screens, no new solid colour blocks (0 known on main) (54 checks)`.
+    - layout on the new screens: 320 px `OK` (12 screens x 3 text sizes, 32 opened), 390 px `OK` (14 x 3, 38 opened); the whole 390 px pass
+      `OK: ... 159 screens (469 opened), no new failures, 38 known on main` on the item page and `145 screens (431 opened), 14 skipped
+      (needs #planSky, #planCrew), no new failures, 38 known on main` on main's.
+    - npm test in wt-q100: 1829 tests, 1782 pass, 0 fail, 47 todo (crew.test.mjs's 5 among them).
+    The whole kit (runkit.sh) is the kit step's.
+  - Open: Mark's decisions on the v9 boots (#B0343A against "red is warnings only") and on the crew on the run's graphite (provisional:
+    left out); docs/LEGAL.md "Crew likenesses" waits for each person's consent date and scope (probe100/legal-crew-draft.md): item 100
+    cannot merge before it. Not checked: a real VoiceOver on the names list; a real phone's Dynamic Type (the kit's text sizes are a
+    root font size).
