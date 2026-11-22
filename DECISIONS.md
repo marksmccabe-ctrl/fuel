@@ -2259,3 +2259,34 @@
     name them, :26 still says Kitty's Z is in Zwift's style, the Files table leaves out the two test files; test-bundle.js always exits 0
     and its two cuff-under-jacket checks look for v8's cuff string, so they cannot fail on v9; FROM-DESIGN-CHAT-7 says 33 new unit cases
     fail on v8, 30 do; the design chat's boot numbers run about 10 px over q99's method (a harness difference).
+- v9 check round 1 (the acceptance checkers on item 100's first step; one problem, low, tests lens; fixed in the kit, no app change).
+  - The problem: on v9, q99 no longer judged FROM-APP-CHAT-7 point 2's case (leg wear above boots and overshoes, no wool socks) on Safari
+    or at 3x for skins outside the retired entries' v8 widths. Item 99's q99 judged those cells on v8 through the band (fair to ruddy read
+    126 / 44 above boots and 166 / 60 above overshoes at Chromium 2x, inside half again of SHOW); v9 reads them 252 / 116 and 292 / 144,
+    past the band, and FORMER_V8 put back only the width cells (tan and darker, heavy tights olive or brown and darker). Reproduced: the
+    checker's probe100/mut9-wkfair/null.html (sha1 bc6bdc9d; Safari only, no leg wear above boots and overshoes without wool socks on fair
+    skin, and no heavy tights there on tan) with q99 at ee2e551, Q99_ONLY=strip: `OK: item 99: Your rider, and the rider on the Closet card
+    (8363 checks)` (437 s, probe100/v9r1/runs/old-wkfair-1.log). Real, on the kit's side; not the band's decided scope (my call): these are
+    the cases FROM-APP-CHAT-7 named, and item 99's q99 judged every skin of them on every screen.
+  - The fix (q99, nothing loosened): FORMER_V8 measures each retired entry's case on every screen whatever the skin (formerElsewhere
+    without the width test: every reading of the case at Chromium 2x is measured again on Chromium 3x, WebKit 2x and WebKit 3x), and its
+    per-entry check now asks every screen, item and all 8 skins judged ("ACCEPTED_V8 n (..., retired with v9): its case is still judged on
+    every screen, item and skin, against SHOW"), a superset of the old width cells. width and least stay v8's: each note prints v9's least
+    over every skin and, where a v8 width was, the least inside it beside v8's. On fred100 the other screens' pass takes 3387 riders and
+    lists (3240 before); each retired item is judged as often on every screen as at Chromium 2x (legs above boots 94 times on each).
+  - The check bites: the same mutant with the new q99 `FAIL 35` (437 s, probe100/v9r1/runs/new-wkfair-1.log): every fair-skin leg wear and
+    tan heavy tights list above boots and overshoes on WebKit 2x and 3x reads 0 / 0, and the band check (0%). mut99 gains it as
+    v9c1-wkfair (byte-identical to mut9-wkfair).
+  - Proof, one at a time on fred100/null.html (probe100/v9r1/runs.sh, logs and summary.txt in probe100/v9r1/runs/; load 4-7 from other
+    work): q99 with main's page second `OK: item 99: Your rider, and the rider on the Closet card (8647 checks)` (910 s; the same checks,
+    each wider; the band's widest gap 79% as before, WebKit 2x light tights on tan skin, 248 -> 196); q97 (main second) `OK (128 checks)`;
+    q98 in its parts (main second) `OK (253 checks)`, `OK (49)`, `OK (21)`; motion on the 16 rider screens `OK ... (27 checks)`; budgets
+    `OK: fred world budgets: 16 screens ... (host reference 1.48-1.48 ms, quiet at most 1.8) ... (62 checks)` (host busy only in its
+    self-tests); smoke `OK (14 checks)`; npm test in wt-q100 1824 tests, 1777 pass, 0 fail, 47 todo. Contrast, layout and inventory not
+    rerun (the change is in q99's strip section alone; no app change).
+  - Mutants (probe100/w/mutants.log; mut99 now 156): v9c1-wkfair `FAIL 35`; the strip mutants of entries 2, 3 and 5's cases again:
+    v8a2-out `FAIL 31` (10 before: ruddy skin is now judged on the other screens too), v8a3-out `FAIL 24` (21 before), v8c2-wksock `FAIL 5`
+    (its first run hit the runner's 900 s limit under load and ended on a closed page, `FAIL 1`, not counted; run again alone it read as
+    before). The change only widens what the strip section measures and asks of FORMER_V8, so the other mutants, each already FAIL, cannot
+    pass through it: not run again.
+  - App: no change (the gap was in the kit); q100-front stays at 11a8d56, cache v123.

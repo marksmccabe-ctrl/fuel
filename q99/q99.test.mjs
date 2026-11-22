@@ -129,7 +129,8 @@
 //            over leg wear with no wool socks; leg wear above boots and above overshoes with no wool socks; wool socks under knee warmers
 //            with toe covers or bare shoes; wool socks over leg wear above shoe covers at 3x) each printed "now shows" and "never under SHOW"
 //            on every screen of its width on an otherwise green run, so they are gone and those cases are judged in full as any item (and
-//            every cell of their v8 widths still measured on each screen of them, FORMER_V8, so Safari and 3x keep judging them); one
+//            each case measured on every screen in every skin, FORMER_V8, so Safari and 3x keep judging them as item 99's q99 did on v8,
+//            where they read close to the line; v9 check round 1: the v8 widths alone left fair skin's leg wear above boots out); one
 //            entry is left, dark gloves on deep brown skin, read by their #C9D1DA cuff ("for the record", unchanged in v9). Inside its width a reading under SHOW passes
 //            at or over the entry's floor for that item on that screen (90% of the item's least v8 reading there, pixels changed and own
 //            colour separately: per item, since the fingerless gloves could lose their cuff over the full-finger gloves' floor), and
@@ -1223,11 +1224,13 @@ const ACCEPTED_V8 = [ /* entries 1-5 went with v9 (item 100); n keeps its number
     width: all4({ gloves: SK_DEEP, 'gloves-finger': SK_DEEP }), least: { 'Chromium 2x': { gloves: [204, 0], 'gloves-finger': [320, 8] }, 'Chromium 3x': { gloves: [400, 0], 'gloves-finger': [740, 56] },
       'WebKit 2x': { gloves: [212, 0], 'gloves-finger': [316, 8] }, 'WebKit 3x': { gloves: [396, 0], 'gloves-finger': [740, 56] } } },
 ];
-// FORMER_V8: the entries v9 retired (item 100), as they were. No floor: each case is judged against SHOW as any item. Each keeps its v8 width,
-// though, so every cell of it is still measured on each screen of the width: on Chromium at 2x as every reading is, and on the other screens
-// whatever Chromium at 2x reads (as accElsewhere did for them). Without that, dropping an entry dropped those cells from the other screens:
-// on v9 the socks over leg wear above shoe covers read 196 / 128 at Chromium 2x, outside the band, and mut99's v8c2-wksock (Safari alone
-// drawing them as nothing) passed. Each prints its least on every screen beside v8's (least: v8's, never a floor)
+// FORMER_V8: the entries v9 retired (item 100), as they were. No floor: each case is judged against SHOW as any item. But each case (its
+// lists, every skin) is measured on every screen whatever Chromium at 2x reads, as item 99's q99 measured it on v8, where all of it read
+// close to the line: v9 reads it well past the band, which alone would drop it from the other screens (the socks over leg wear above shoe
+// covers read 196 / 128 at Chromium 2x, and mut99's v8c2-wksock, Safari alone drawing them as nothing, passed). The v8 widths alone were not
+// enough (v9 check round 1): fair skin's leg wear above boots reads 126 / 44 on v8, inside the band and outside entry 2's width (tan and
+// darker), and v9's 252 / 116 dropped it from Safari and 3x: v9c1-wkfair, Safari alone drawing it as nothing, passed. width and least stay
+// v8's, printed beside v9's least inside the width (never a floor)
 const FORMER_V8 = [
   { n: 1, point: 'point 1', ids: ['boots'], when: L => L.includes('boots') && !L.includes('socks-wool') && L.some(x => LEG.includes(x)), what: 'boots over leg warmers or tights with no wool socks: the boots\' own colour (#3A2F2A within 48 of the leg wear: they read by their outline)',
     width: all4({ boots: SK8 }), least: per('boots', { 'Chromium 2x': [192, 18], 'Chromium 3x': [353, 61], 'WebKit 2x': [194, 18], 'WebKit 3x': [334, 46] }) },
@@ -1244,10 +1247,12 @@ const FORMER_V8 = [
   { n: 5, point: 'point 4', ids: ['socks-wool'], when: L => L.includes('shoes') && !L.some(x => x === 'overshoes' || x === 'boots' || x === 'knees') && L.some(x => LEG.includes(x)), what: 'wool socks over leg warmers or tights above shoe covers, on the 3x screens',
     width: { 'Chromium 3x': { 'socks-wool': SK8 }, 'WebKit 3x': { 'socks-wool': SK8 } }, least: per('socks-wool', { 'Chromium 3x': [260, 148], 'WebKit 3x': [264, 148] }) },
 ];
-const formerElsewhere = (id, L, r) => FORMER_V8.some(e => e.ids.includes(id) && e.when(L, r) && SCR.slice(1).some(s => ((e.width[s] || {})[id] || []).includes(r.skin)));
-const FORMER_SEEN = new Map(); // entry|screen|item -> judged how often, the skins, the least changed and the least own
-function formerRec(id, L, r, v, scr, tag) { for (const e of FORMER_V8) { if (!e.ids.includes(id) || !e.when(L, r) || !((e.width[scr] || {})[id] || []).includes(r.skin)) continue;
-  const k = e.n + '|' + scr + '|' + id, w = FORMER_SEEN.get(k) || { n: 0, cells: new Set() }; w.n++; w.cells.add(r.skin); if (!w.d || v.d48 < w.d.v.d48) w.d = { v, tag }; if (v.own != null && (!w.o || v.own < w.o.v.own)) w.o = { v, tag }; FORMER_SEEN.set(k, w); } }
+const formerElsewhere = (id, L, r) => FORMER_V8.some(e => e.ids.includes(id) && e.when(L, r));
+const FORMER_SEEN = new Map(); // entry|screen|item -> judged how often, the skins, the least changed and own; and the same inside its v8 width (q)
+const lowest = (w, v, tag) => { w.n++; if (!w.d || v.d48 < w.d.v.d48) w.d = { v, tag }; if (v.own != null && (!w.o || v.own < w.o.v.own)) w.o = { v, tag }; };
+function formerRec(id, L, r, v, scr, tag) { for (const e of FORMER_V8) { if (!e.ids.includes(id) || !e.when(L, r)) continue;
+  const k = e.n + '|' + scr + '|' + id, w = FORMER_SEEN.get(k) || { n: 0, cells: new Set(), q: { n: 0 } }; lowest(w, v, tag); w.cells.add(r.skin);
+  if (((e.width[scr] || {})[id] || []).includes(r.skin)) lowest(w.q, v, tag); FORMER_SEEN.set(k, w); } }
 // Q99_ACCEPT_DUMP=<file>: measure the widths again (every entry taken as wide as its lists, on every skin and screen; no floors): each reading
 // of an entry's items on its lists, on every screen, one JSON line each (the entries' widths and least readings come from such a run on v8).
 // A measuring run, never a verdict: with it set the strip section fails its first check, so the run ends FAIL, and its accepted readings
@@ -1490,12 +1495,13 @@ section('strip', async () => {
       if (w && w.now.length) console.log('  note: ACCEPTED_V8 ' + e.n + ' now shows on ' + scr + ' (' + w.now.length + ' readings at SHOW inside its width; a later item can drop it, on a run that is otherwise green: a build that loses what an item reads by can reach SHOW on one screen and fall under its floor on another): ' + w.now.slice(0, 3).join('; '));
       for (const [id, sks] of Object.entries(W)) for (const sk of sks) if (!(w && w.cells.has(id + '|' + sk))) miss.push(scr + ': ' + id + ' on ' + sk + ' skin'); }
     ok(!miss.length, 'strip: ACCEPTED_V8 ' + e.n + ' (FROM-APP-CHAT-7 ' + e.point + '): every screen, item and skin of its v8 width is judged (' + (Object.entries(e.width).map(([s, W]) => s + ' ' + Object.values(W).reduce((a, x) => a + x.length, 0)).join(', ') || 'none') + ')' + (DUMP ? ' (Q99_ACCEPT_DUMP: every reading counts, no width applied)' : ''), miss); }
-  // FORMER_V8: every cell of each retired entry's v8 width still judged on its screen (against SHOW, as any item), its least beside v8's
+  // FORMER_V8: each retired entry's case judged on every screen, item and skin (against SHOW, as any item); its least, and inside its v8 width beside v8's
+  const lq = w => 'judged ' + w.n + ' times, the least ' + w.d.v.d48 + ' px changed (' + w.d.tag + '), the least in its own colour ' + (w.o ? w.o.v.own + ' (' + w.o.tag + ')' : 'none');
   for (const e of FORMER_V8) { const miss = [];
-    for (const scr of SCR) for (const [id, sks] of Object.entries(e.width[scr] || {})) { const w = FORMER_SEEN.get(e.n + '|' + scr + '|' + id);
-      console.log('  note: retired with v9, ACCEPTED_V8 ' + e.n + ' (FROM-APP-CHAT-7 ' + e.point + '), ' + e.what + ': ' + scr + ': ' + id + ' ' + (w ? 'judged ' + w.n + ' times in its v8 width, the least ' + w.d.v.d48 + ' px changed (' + w.d.tag + '), the least in its own colour ' + (w.o ? w.o.v.own + ' (' + w.o.tag + ')' : 'none') : 'not judged') + '; v8\'s least ' + ((e.least[scr] || {})[id] || ['-', '-']).join(' / '));
-      for (const sk of sks) if (!(w && w.cells.has(sk))) miss.push(scr + ': ' + id + ' on ' + sk + ' skin'); }
-    ok(!miss.length, 'strip: ACCEPTED_V8 ' + e.n + ' (FROM-APP-CHAT-7 ' + e.point + ', retired with v9): every screen, item and skin of its v8 width is still judged, against SHOW (' + Object.entries(e.width).map(([s, W]) => s + ' ' + Object.values(W).reduce((a, x) => a + x.length, 0)).join(', ') + ')', miss); }
+    for (const scr of SCR) for (const id of e.ids) { const w = FORMER_SEEN.get(e.n + '|' + scr + '|' + id), W = (e.width[scr] || {})[id];
+      console.log('  note: retired with v9, ACCEPTED_V8 ' + e.n + ' (FROM-APP-CHAT-7 ' + e.point + '), ' + e.what + ': ' + scr + ': ' + id + ' ' + (w ? lq(w) + ' (' + w.cells.size + ' skins)' : 'not judged') + '; ' + (W ? 'in its v8 width (' + W.join(' ') + ') ' + (w && w.q.n ? lq(w.q) : 'not judged') + ', v8\'s least ' + ((e.least[scr] || {})[id] || ['-', '-']).join(' / ') : 'no v8 width here'));
+      for (const sk of SK8) if (!(w && w.cells.has(sk))) miss.push(scr + ': ' + id + ' on ' + sk + ' skin'); }
+    ok(!miss.length, 'strip: ACCEPTED_V8 ' + e.n + ' (FROM-APP-CHAT-7 ' + e.point + ', retired with v9): its case is still judged on every screen, item and skin, against SHOW (' + SCR.length + ' screens, ' + e.ids.join(' ') + ', ' + SK8.length + ' skins; v8 width ' + Object.entries(e.width).map(([s, W]) => s + ' ' + Object.values(W).reduce((a, x) => a + x.length, 0)).join(', ') + ')', miss); }
   const unseen = FIXED_BY_V7.flatMap((f, n) => f.ids.filter(id => !FIXED_SEEN.has(n + ':' + id)).map(id => f.point + ' ' + id));
   ok(!unseen.length, 'strip: each v6 gap v7 fixed (' + FIXED_BY_V7.length + ' entries, every item of each) is judged on v7, on a ride or a direct list', unseen);
   // the detector itself: an item that draws nothing in every version (bib shorts: the rider's default look) is judged as not showing; the
