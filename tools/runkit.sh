@@ -18,7 +18,7 @@
 #              host reference, budgets/hostref.html, read with the screen held still): on a busy machine (screen sharing with a busy
 #              screen, another browser test) it fails with "host busy ... frame not judged" lines, which give the page no verdict,
 #              neither OK nor FAIL on its frame (its other rules are still judged): run it again when the machine is quiet
-#   qNN        every item test qNN/qNN.test.mjs, alphabetically, when item NN is in <checkout>: its history has a commit "qNN: ...",
+#   qNN        every item test qNN/qNN.test.mjs, in item order (q100 after q99), when item NN is in <checkout>: its history has a commit "qNN: ...",
 #              "qNN WIP ..." or "Merge item NN ..." (main before an item is merged has none, so that item test is skipped and says so).
 #              KIT_ITEMS="91 93" runs just those, KIT_ITEMS=all runs every one, KIT_ITEMS=none none. A test KIT_ITEMS leaves out whose
 #              item IS in the checkout prints "skipped, not chosen (KIT_ITEMS=...), but item NN is in this checkout", and the kit line
@@ -96,7 +96,8 @@ else step inventory "$KIT/inventory" env "INV_REPO=$CO" node inventory.mjs "$PAG
 step motion "$KIT/motion" node motion.test.mjs "$PAGE"
 step budgets "$KIT/budgets" node budgets.test.mjs "$PAGE"
 
-for t in "$KIT"/q*/q*.test.mjs; do
+# in item order (q91 ... q99, then q100: a plain glob would put q100 first); the folder holds no spaces
+for t in $(for f in "$KIT"/q*/q*.test.mjs; do n="${f##*/q}"; echo "${n%.test.mjs} $f"; done | sort -n | cut -d" " -f2); do
   [ -f "$t" ] || continue
   dir="$(dirname "$t")"; name="$(basename "$t" .test.mjs)"; n="${name#q}"
   if ! applies "$n"; then

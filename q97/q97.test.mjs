@@ -109,7 +109,9 @@ const SRC = fs.readFileSync(PAGE, 'utf8');
 const LATER = [{ item: 98, has: /\nfunction wxFred\(/, spots: ['.rwx-fred'], fns: ['wxFred'] },
   // item 99: the rider (still): the Closet card's strip, the avatars' art and the sheet's live rider, and the functions that check, name
   // and draw it (each reads FW's rider options or draws with fwMount)
-  { item: 99, has: /\nfunction riderStrip\(/, spots: ['#rRider', '.av-r', '#rdFig'], fns: ['riderNorm', 'riderIds', 'riderStrip', 'riderAv', 'rdOpts', 'rdName', 'rdSwatch', 'rdColour', 'riderRowV', 'riderSheet', 'riderSheetSync'] }].filter(l => l.has.test(SRC));
+  { item: 99, has: /\nfunction riderStrip\(/, spots: ['#rRider', '.av-r', '#rdFig'], fns: ['riderNorm', 'riderIds', 'riderStrip', 'riderAv', 'rdOpts', 'rdName', 'rdSwatch', 'rdColour', 'riderRowV', 'riderSheet', 'riderSheetSync'] },
+  // item 100: the Plan's sky box (its fred is wxFred's, item 98's) and the crew after the footer (crewRender mounts five friends)
+  { item: 100, has: /\nfunction crewRender\(/, spots: ['#planSky', '#planCrew'], fns: ['crewRender'] }].filter(l => l.has.test(SRC));
 const LATER_SPOTS = LATER.flatMap(l => l.spots), LATER_FNS = LATER.flatMap(l => l.fns);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function until(fn, ms = 15000, step = 100) { const t = Date.now(); let v; while (Date.now() - t < ms) { try { v = await fn(); } catch (e) { v = null; } if (v) return v; await sleep(step); } return v; }
