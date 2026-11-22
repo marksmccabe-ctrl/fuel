@@ -5760,10 +5760,11 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
    rows below him have the box's width (no explanation line, item 76). The crew
    (#planCrew, after the footer, on the page, no band): five friends at one body size: a slot is its friend's FW.box width at the
    body's scale (--bw: friends 10, 12 and 17 are wider; --sw the five boxes' widths in bodies, so one row fills the column; --ch the
-   tallest box's height, so the names under them line up). With names on, a slot is at least as wide as its name: at 150% and 200% text
+   tallest box's height, so the names under them line up), at most 76 px a body (a tablet or a phone turned keeps a large phone's size,
+   the row centred, rather than friends twice fred's size). With names on, a slot is at least as wide as its name: at 150% and 200% text
    the row wraps, nothing cut or on top of another. Not on the computer layout. The run's graphite: left out (provisional, Mark's call:
    v9's crew outline and dark kit sink into #26262C; the bundle has no on-dark crew yet; this one rule is the switch). Print: no sky,
-   fred or crew. Forced colours: the art out (item 97's spot rule), the box's edge kept, the sky out with it ---------- */
+   fred or crew (nor fred's room or height). Forced colours: the art out (item 97's spot rule), the box's edge kept, the sky out with it ---------- */
 #planSky{margin:0;min-height:calc(var(--wxf) * 1.3);padding:14px 16px;border:var(--ol) solid var(--chip-line);border-radius:var(--r-panel);background:var(--panel);color:var(--text)}
 #planSky[hidden]{display:none}
 #planSky .rwx-g{padding:0;border:0;border-radius:0;background:none}
@@ -5775,11 +5776,11 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 .crew{container-type:inline-size;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:8px;margin:10px 0 0;padding:0;list-style:none}
 .crew[hidden]{display:none}
 .crew-f{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;max-width:100%;margin:0;padding:0}
-.crew-a{position:relative;width:calc((100vw - 65px) * var(--bw,1) / var(--sw,5));width:calc((100cqw - 33px) * var(--bw,1) / var(--sw,5));aspect-ratio:var(--bw,1) / var(--ch,1.5);line-height:0}
+.crew-a{position:relative;width:min(calc((100vw - 65px) * var(--bw,1) / var(--sw,5)), calc(76px * var(--bw,1)));width:min(calc((100cqw - 33px) * var(--bw,1) / var(--sw,5)), calc(76px * var(--bw,1)));aspect-ratio:var(--bw,1) / var(--ch,1.5);line-height:0}
 .crew-a>svg{position:absolute;left:0;top:0;display:block;width:100%;height:auto;overflow:visible}
 .crew-n{display:block;max-width:100%;margin:4px 0 0;font:600 .75rem/1.25 var(--font);color:var(--text-body);text-align:center;overflow-wrap:anywhere}
 html.dk #planCrew,html.run-theme #planCrew{display:none!important}
-@media print{ #planCrew{display:none!important} #planSky .pvs-l::before{display:none} }
+@media print{ #planCrew{display:none!important} #planSky{min-height:0!important} #planSky .pvs-l::before{display:none} }
 @media (forced-colors:active){ #planSky>.rwx-scene,#planSky>.rwx-fog{display:none!important} #planCrew .crew-a{display:none!important} }
 /* }} q100 front */
 /* q88 volume colour {{ ---------- q88 (item 88, fred Oct 15): Volume's colour (PDF p.4, fred-motion-3.html › Volume). The season card is
@@ -12186,10 +12187,12 @@ function wxCardNone(i){ return `<div class="rwx-g"><div class="rwx-main"><span c
    forecast's sky for the ride the Plan has set, through the weather card's own parts (item 87's masked layer by wxSkySet, fred by wxFred
    in item 98's looks, its loops by wxLoop), and one line of the app's words: time · place · temperature. Only a live forecast of this
    ride draws a sky and a number: with no place the lookup finds, no forecast (a failed lookup, a saved one from the cache, typical
-   weather past ~10 days) or offline, fred wears his cap (the bundle's clouds look: FW.bird with no wear) and the line is time · place.
+   weather past ~10 days, one over an hour old) or offline, fred wears his cap (the bundle's clouds look: FW.bird with no wear) and the line is time · place.
    The forecast is fetchWeather's, Crunch's own lookup (its key, its hour-old rule, its cache), asked quietly when Plan opens (the tab, the
    app back in front, the Plan sheet closed on a changed ride, back online): one lookup at a time, none offline, and a ride whose lookup
-   failed is not asked again from here for 10 minutes (as wxAutoRefresh), so tab switches and a failing network make no storm. The box
+   failed is not asked again from here for 10 minutes (as wxAutoRefresh), so tab switches and a failing network make no storm; a failed
+   lookup from here takes nothing in (Crunch keeps main's own fallback on the saved forecast), and a Crunch tapped during the box's lookup
+   takes it over (fetchWeather: wxBusy). The box
    keeps its own copy of each live forecast it saw this session (SKY_KEPT, by ride key), so a ride reset by Save or + New ride, or a day
    the rider comes back to, keeps its sky and number until that forecast is an hour old (Crunch's rule), with no lookup. Offline the box
    shows the cap even with a forecast in hand (100.2), and its sky again when the device is back online. After Crunch the box is
@@ -12197,14 +12200,14 @@ function wxCardNone(i){ return `<div class="rwx-g"><div class="rwx-main"><span c
    beside the Plan-a-ride column it sits in; a new ride (or results taken away) brings it back. ---------- */
 const SKY_RETRY=10*60e3, SKY_KEPT=new Map();
 function skyShown(){ const R=$('results'), N=$('runResults'); return !!(R && getComputedStyle(R).display!=='none') || !!(N && !N.hidden); } /* results up, either sport (computed: a scheduled ride's plan hides the ride's results on the computer layout) */
-function skyLive(R){ if(!R || navigator.onLine===false) return null; const w=wxLast; if(w && wxAccepted && wxKey===R.key && !w.stale && !w.typical){ SKY_KEPT.set(R.key, w); return w; } return skyKept(R); } /* this ride's forecast, live (not the cache's saved one, not typical weather; offline: none) */
+function skyLive(R){ if(!R || navigator.onLine===false) return null; const w=wxLast; if(w && wxAccepted && wxKey===R.key && !w.stale && !w.typical && !wxOld()){ SKY_KEPT.set(R.key, w); return w; } return skyKept(R); } /* this ride's forecast, live (not the cache's saved one, not typical weather, under an hour old as Crunch's rule; offline: none) */
 function skyKept(R){ const w=SKY_KEPT.get(R.key); return w && Date.now()-(w.checkedAt||0)<=WX_MAX_AGE ? w : null; } /* the box's copy of a live forecast of this ride (Crunch's or its own; planReset and a day change drop the shared one), under an hour old */
 function skyBoxRender(){ const W=$('planSky'); if(!W) return; const out=skyShown(), R=wxReq(), w=skyLive(R); if(W.hidden!==out) W.hidden=out; if(out) return; /* (read while the results are up too: Crunch's forecast is kept for after Save) */
   const sk=w ? wxSkyOf(w) : null, fk=w ? sk||'night' : 'clouds', st=R ? R.start : $('startTime').value||'',
     day=R && /^(\d{4})-(\d{2})-(\d{2})$/.exec(R.date), city=s=>String(s||'').split(',')[0].trim();
   let t=''; if(day && /^\d{2}:\d{2}$/.test(st)){ const d=new Date(+day[1], +day[2]-1, +day[3], +st.slice(0,2), +st.slice(3)); t=d.toLocaleDateString(undefined,{weekday:'short'})+' '+d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}).replace(/\s/g, '\u00a0'); } /* (8:00 AM never split) */
-  const tp=w ? wxTempAt(w, w.startMin) : null, deg=w ? tempDisp(tp!=null ? tp : w.air) : null, pl=city(w ? w.place : shortPlace(wxPlace())), L=[t && esc(t), pl && `<span class="pvs-p">${esc(pl)}</span>`].filter(Boolean); /* (the place one piece: too long for the room beside fred, it goes under him whole) */
-  const line=L.join(' · ')+(deg!=null ? (L.length ? ' · ' : '')+`<b class="pvs-t">${deg}°</b>` : '');
+  const tp=w ? wxTempAt(w, w.startMin) : null, deg=w ? tempDisp(tp!=null ? tp : w.air) : null, pl=city(w ? w.place : shortPlace(wxPlace())), num=deg!=null ? `<b class="pvs-t">${deg}°</b>` : '', PW=pl ? pl.split(/\s+/).map(esc) : [];
+  const line=[t && esc(t), PW.map((s,k)=>`<span class="pvs-p">${s}${num && k===PW.length-1 ? '\u00a0·' : ''}</span>`).join(' ')].filter(Boolean).join('\u00a0· ')+(num ? (PW.length ? ' ' : t ? '\u00a0· ' : '')+num : ''); /* (each word of the place one piece: a word too long for the room beside fred goes under him whole, a place of several words fills that room word by word; each dot held to the word before it, the place's last one inside its piece, so no row starts with a dot) */
   let g=W.querySelector(':scope>.rwx-g'); if(!g){ g=document.createElement('div'); g.className='rwx-g'; g.innerHTML='<p class="pvs-l" id="planSkyL"></p>'; W.append(g); }
   if(sk) g.dataset.sky=sk; else delete g.dataset.sky; g.dataset.fred=fk; W.dataset.wx=w ? 'live' : 'none';
   const P=g.firstElementChild; if(P.innerHTML!==line) P.innerHTML=line;
@@ -14428,8 +14431,8 @@ async function nwsWBGT(lat, lon, d0, d1){
   // NDFD XML REST time-series for the 'wbgt' element; returns [{t:Date, f:°F}] or throws
   const iso=d=>d.toISOString().slice(0,19);
   const url='https://digital.weather.gov/xml/sample_products/browser_interface/ndfdXMLclient.php?lat='+lat+'&lon='+lon+'&product=time-series&begin='+iso(d0)+'&end='+iso(d1)+'&Unit=e&wbgt=wbgt';
-  const r=await fetch(url); if(!r.ok) throw new Error('NWS '+r.status);
-  const xml=new DOMParser().parseFromString(await r.text(),'application/xml');
+  const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(), 8000); /* q100: 8 s at most (as the place search), then the estimate: a slow weather.gov no longer sets how long a lookup takes (Crunch's or the sky box's) */
+  let xml; try{ const r=await fetch(url,{signal:ctl.signal}); if(!r.ok) throw new Error('NWS '+r.status); xml=new DOMParser().parseFromString(await r.text(),'application/xml'); } finally{ clearTimeout(tm); }
   const el=xml.querySelector('wbgt, [type="wet bulb globe temperature"], temperature[type="wet bulb globe temperature"]');
   if(!el) throw new Error('no wbgt element');
   const layoutKey=el.getAttribute('time-layout'); const layout=[...xml.querySelectorAll('time-layout')].find(l=>l.querySelector('layout-key') && l.querySelector('layout-key').textContent===layoutKey);
@@ -14657,14 +14660,14 @@ function wxReq(){ const q=wxPlace(), date=$('wxDate').value;
   if(!(i.durMin>0)) return null;
   const pick=pickedPlace(); // a picked suggestion or "Use my location": its coordinates go straight to the forecast
   const rest=[date,start,i.durMin].join('|'); return {q, date, start, i, pick, rest, key:q+'|'+rest+(pick?'|'+pick.lat+','+pick.lon:''), ahead:Math.round((new Date(date+'T12:00:00')-new Date(todayISO()+'T12:00:00'))/864e5)}; }
-let wxBusy=null; /* q100: the lookup in flight ({key, p, quiet}): a Crunch during the sky box's lookup of the same ride waits for it (no second request) */
-const WX_QUIET_MS=15e3, WX_WAIT_MS=4e3; /* q100: the box's lookup gives up after 15 s (a hung network: its late answer is dropped, and the box may ask another ride); a Crunch waits at most 4 s for it, then looks up itself */
+let wxBusy=null, wxLatest=null; /* q100: the lookup in flight ({key, p, quiet, fc}): a Crunch during the sky box's lookup of the same ride waits for it (no second request); wxLatest: the last one started */
+const WX_QUIET_MS=15e3, WX_WAIT_MS=4e3; /* q100: the box's lookup stops holding the box after 15 s (a hung network: the box may ask another ride; a late answer is still taken if no lookup started since and the ride is the same); a Crunch waits 4 s for one that has no forecast yet (hung), then looks up itself, and for one that has it (only weather.gov's WBGT out, 8 s at most) until it ends */
 async function fetchWeather(quiet){ const R=wxReq(); if(!R) return false; /* quiet: the sky box's lookup (item 100), no note under the form */
   if(wxAccepted && wxKey===R.key && !wxOld()) return true; // q63: an hour-old forecast is looked up again
-  if(wxBusy && wxBusy.key===R.key){ const ok=await (quiet ? wxBusy.p : Promise.race([wxBusy.p, new Promise(r=>setTimeout(r, WX_WAIT_MS, 'late'))])).catch(()=>false); if(ok!=='late' && ((ok && wxKey===R.key) || quiet)) return ok; } /* (one that failed or hangs: a Crunch looks up itself, and says so) */
-  const b=wxBusy={key:R.key, quiet}; b.p=wxLookup(R, quiet, b); try{ return await (quiet ? Promise.race([b.p, new Promise(r=>setTimeout(r, WX_QUIET_MS, false))]) : b.p); } finally{ if(wxBusy===b) wxBusy=null; } }
+  if(wxBusy && wxBusy.key===R.key){ const b=wxBusy, ok=await (quiet ? b.p : Promise.race([b.p, new Promise(r=>setTimeout(()=>{ if(!b.fc) r('late'); }, WX_WAIT_MS))])).catch(()=>false); if(ok!=='late' && ((ok && wxKey===R.key) || quiet)) return ok; } /* (one that failed or hangs: a Crunch looks up itself, and says so) */
+  const b=wxBusy=wxLatest={key:R.key, quiet}; b.p=wxLookup(R, quiet, b); try{ return await (quiet ? Promise.race([b.p, new Promise(r=>setTimeout(r, WX_QUIET_MS, false))]) : b.p); } finally{ if(wxBusy===b) wxBusy=null; } }
 async function wxLookup(R, quiet, own){ const {q, date, start, i, pick, rest, key}=R, out=quiet ? document.createElement('div') : $('wxOut'); /* (quiet: its notes go nowhere) */
-  const gone=()=>quiet && (wxBusy!==own || (wxReq()||{}).key!==key); /* q100: the box's lookup overtaken (the ride changed, a Crunch took over, or it gave up): it writes nothing (null) */
+  const gone=()=>quiet && (wxLatest!==own || (wxReq()||{}).key!==key); /* q100: the box's lookup overtaken (the ride changed, or a lookup started since: a Crunch took over): it writes nothing (null) */
   out.style.display='block'; out.innerHTML='<div class="note info">Looking up the forecast…</div>';
   try{
     const g=pick ? {lat:pick.lat, lon:pick.lon, name:shortPlace(pick.name)} : await geocode(q);
@@ -14674,6 +14677,7 @@ async function wxLookup(R, quiet, own){ const {q, date, start, i, pick, rest, ke
     const url='https://api.open-meteo.com/v1/forecast?latitude='+g.lat+'&longitude='+g.lon+'&hourly=apparent_temperature,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,shortwave_radiation,direct_radiation,diffuse_radiation,direct_normal_irradiance,cloud_cover,precipitation_probability,weather_code,dew_point_2m,is_day,precipitation&temperature_unit=fahrenheit&precipitation_unit=inch&wind_speed_unit=mph&timezone=auto&start_date='+iso(d0)+'&end_date='+iso(d1);
     const ahead=Math.round((new Date(date+'T12:00:00')-new Date(todayISO()+'T12:00:00'))/864e5), typical=ahead>10; // q44: past ~10 days, typical weather for the date and place
     const j = typical ? await upcTypicalWx(g, d0, d1, iso) : await (async()=>{ const r=await fetch(url); const j=await r.json(); if(!r.ok||j.error) throw new Error(j.reason||'Forecast unavailable (max ~16 days ahead)'); return j; })();
+    own.fc=true; /* q100: the forecast is in (a Crunch waiting on this lookup now waits for its end: weather.gov's 8 s at most) */
     const H=j.hourly; const pts=[];
     H.time.forEach((t,k)=>{ const dt=new Date(t); const min=(dt.getDate()===d0.getDate()?0:1440)+dt.getHours()*60+dt.getMinutes(); if(min>=startMin-30 && min<=endMin+30) { const TaC=(H.temperature_2m[k]-32)*5/9, rh=H.relative_humidity_2m[k], u10=H.wind_speed_10m[k]*0.44704, u2=u10*0.67, S=H.shortwave_radiation[k]||0, Sdir=H.direct_radiation[k]||0, Sdif=H.diffuse_radiation[k]||0, dni=H.direct_normal_irradiance[k]||0; const cz = dni>0 ? Math.min(1, Sdir/dni) : 0.3;
         const wC=estimateWBGT(TaC, rh, u2, S, Sdir, Sdif, cz);
@@ -14702,8 +14706,8 @@ async function wxLookup(R, quiet, own){ const {q, date, start, i, pick, rest, ke
     { const R=pts.filter(p=>p.min>startMin && p.min-60<endMin && p.rain!=null); wxLast.rainRide=R.length ? Math.max(...R.map(p=>p.rain)) : wxLast.rain; } // review (item 66)
     out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br><b>WBGT ${tempOut(minW)}–${tempOut(maxW)}, avg ${tempOut(avgW)}</b> (${wbSource}) — heat-stress category: <b>${wbgtCategory(avgW)}</b><br><span style="color:var(--muted)">Feels-like ${tempOut(minF)}–${tempOut(maxF)} (avg ${tempOut(avgF)}) · air ${tempOut(air)} · humidity ${f0(rh)}% · wind ${f0(wind)} mph · sun ${f0(sun)} W/m² · cloud ${f0(cloud)}%</span><br>→ <b>${b.name}</b> band by WBGT, bottles suggested ≤ <b>${b.pct}%</b>.${drift}</div>`;
     const hrs=wxRideHours(pts, startMin, i.durMin); wxLast.hrs=hrs; // q49: each ride hour's own feels-like
-    $('tempF').value=tempDisp(avgF); wxAccepted={wbgtF:avgW, cat:wbgtCategory(avgW), source:wbSource, minF, maxF, rain: avg(pts.map(p=>p.rain==null?0:p.rain)), hrs}; wxKey=key; if($('wxLoc').value.trim()) rememberPlace(pick||g); wxCachePut(key,{ts:Date.now(), wxAccepted, wxLast:Object.assign({},wxLast,{pts:undefined}), tempF:avgF, lat:g.lat, lon:g.lon}); return true;
-  }catch(e){ if(gone()) return null;
+    $('tempF').value=tempDisp(avgF); wxAccepted={wbgtF:avgW, cat:wbgtCategory(avgW), source:wbSource, minF, maxF, rain: avg(pts.map(p=>p.rain==null?0:p.rain)), hrs}; wxKey=key; if($('wxLoc').value.trim()) rememberPlace(pick||g); wxCachePut(key,{ts:Date.now(), wxAccepted, wxLast:Object.assign({},wxLast,{pts:undefined}), tempF:avgF, lat:g.lat, lon:g.lon}); if(quiet) skySoon(); /* q100: the box drawn (a late answer too) */ return true;
+  }catch(e){ if(gone()) return null; if(quiet) return false; /* q100: the box's failed lookup writes nothing: no saved copy taken in (the box never shows one), so Crunch looks up as main does, the cache its own fallback */
     const cached=wxCacheFind(key, q, rest, pick);
     if(cached){ wxAccepted=cached.wxAccepted; wxLast=Object.assign({},cached.wxLast,{stale:ago(cached.ts)}); wxKey=key; $('tempF').value=tempDisp(cached.tempF); out.style.display='none'; return true; }
     wxAccepted=null; wxKey=null; wxLast=null; out.style.display='block';
