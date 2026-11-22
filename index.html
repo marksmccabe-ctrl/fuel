@@ -5756,7 +5756,8 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
    Settings): a plain Plan box (white, the 1.5 px outline, the panel radius; graphite on the run, its sky mixed in as item 98's run box),
    at least tall enough for fred and never a fixed height. Its top is the forecast's sky (item 87's masked layer, wxSkySet: the rules
    above name #planSky beside the weather boxes) with fred in it, always shown here: his room is kept beside the one line (time · place
-   · temperature, over the sky with the card's feather), which wraps rather than run under him (no explanation line, item 76). The crew
+   · temperature, over the sky with the card's feather) by a float of his height, so the line wraps rather than run under him and the
+   rows below him have the box's width (no explanation line, item 76). The crew
    (#planCrew, after the footer, on the page, no band): five friends at one body size: a slot is its friend's FW.box width at the
    body's scale (--bw: friends 10, 12 and 17 are wider; --sw the five boxes' widths in bodies, so one row fills the column; --ch the
    tallest box's height, so the names under them line up). With names on, a slot is at least as wide as its name: at 150% and 200% text
@@ -5767,7 +5768,9 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 #planSky[hidden]{display:none}
 #planSky .rwx-g{padding:0;border:0;border-radius:0;background:none}
 #planSky>.rwx-fred{display:block}
-#planSky .pvs-l{margin:0;padding-right:calc(var(--wxf) * 1.21 - 10px);font:700 var(--t-caps)/1.5 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--text-body);overflow-wrap:anywhere}
+#planSky .pvs-l{margin:0;font:700 var(--t-caps)/1.5 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--text-body);overflow-wrap:anywhere}
+#planSky .pvs-p{display:inline-block;max-width:100%}
+#planSky .pvs-l::before{content:'';float:right;width:calc(var(--wxf) * 1.21 - 10px);height:calc(var(--wxf) * 1.14 - 14px)} /* fred's room beside him only (his box's height from the top): the rows under him take the box's width, and a word too long for the room beside him goes under him whole rather than break ("INDIANAPO / LIS" at 320 px, 200% text) */
 #planSky .pvs-t{font:700 1.25rem/1 var(--font);letter-spacing:0;color:var(--text);white-space:nowrap}
 .crew{container-type:inline-size;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:8px;margin:10px 0 0;padding:0;list-style:none}
 .crew[hidden]{display:none}
@@ -5776,7 +5779,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 .crew-a>svg{position:absolute;left:0;top:0;display:block;width:100%;height:auto;overflow:visible}
 .crew-n{display:block;max-width:100%;margin:4px 0 0;font:600 .75rem/1.25 var(--font);color:var(--text-body);text-align:center;overflow-wrap:anywhere}
 html.dk #planCrew,html.run-theme #planCrew{display:none!important}
-@media print{ #planCrew{display:none!important} }
+@media print{ #planCrew{display:none!important} #planSky .pvs-l::before{display:none} }
 @media (forced-colors:active){ #planSky>.rwx-scene,#planSky>.rwx-fog{display:none!important} #planCrew .crew-a{display:none!important} }
 /* }} q100 front */
 /* q88 volume colour {{ ---------- q88 (item 88, fred Oct 15): Volume's colour (PDF p.4, fred-motion-3.html › Volume). The season card is
@@ -12185,18 +12188,22 @@ function wxCardNone(i){ return `<div class="rwx-g"><div class="rwx-main"><span c
    ride draws a sky and a number: with no place the lookup finds, no forecast (a failed lookup, a saved one from the cache, typical
    weather past ~10 days) or offline, fred wears his cap (the bundle's clouds look: FW.bird with no wear) and the line is time · place.
    The forecast is fetchWeather's, Crunch's own lookup (its key, its hour-old rule, its cache), asked quietly when Plan opens (the tab, the
-   app back in front, the Plan sheet closed on a changed ride): one lookup at a time, none offline, and a ride whose lookup failed is not
-   asked again from here for 10 minutes (as wxAutoRefresh), so tab switches and a failing network make no storm. After Crunch the box is
+   app back in front, the Plan sheet closed on a changed ride, back online): one lookup at a time, none offline, and a ride whose lookup
+   failed is not asked again from here for 10 minutes (as wxAutoRefresh), so tab switches and a failing network make no storm. The box
+   keeps its own copy of each live forecast it saw this session (SKY_KEPT, by ride key), so a ride reset by Save or + New ride, or a day
+   the rider comes back to, keeps its sky and number until that forecast is an hour old (Crunch's rule), with no lookup. Offline the box
+   shows the cap even with a forecast in hand (100.2), and its sky again when the device is back online. After Crunch the box is
    out (the weather card carries the forecast and fred: fred once on the page), so too on the computer layout whenever Results is shown
    beside the Plan-a-ride column it sits in; a new ride (or results taken away) brings it back. ---------- */
-const SKY_RETRY=10*60e3;
+const SKY_RETRY=10*60e3, SKY_KEPT=new Map();
 function skyShown(){ const R=$('results'), N=$('runResults'); return !!(R && getComputedStyle(R).display!=='none') || !!(N && !N.hidden); } /* results up, either sport (computed: a scheduled ride's plan hides the ride's results on the computer layout) */
-function skyLive(R){ const w=wxLast; return R && w && wxAccepted && wxKey===R.key && !w.stale && !w.typical ? w : null; } /* this ride's forecast, live (not the cache's saved one, not typical weather) */
-function skyBoxRender(){ const W=$('planSky'); if(!W) return; const out=skyShown(); if(W.hidden!==out) W.hidden=out; if(out) return;
-  const R=wxReq(), w=skyLive(R), sk=w ? wxSkyOf(w) : null, fk=w ? sk||'night' : 'clouds', st=R ? R.start : $('startTime').value||'',
+function skyLive(R){ if(!R || navigator.onLine===false) return null; const w=wxLast; if(w && wxAccepted && wxKey===R.key && !w.stale && !w.typical){ SKY_KEPT.set(R.key, w); return w; } return skyKept(R); } /* this ride's forecast, live (not the cache's saved one, not typical weather; offline: none) */
+function skyKept(R){ const w=SKY_KEPT.get(R.key); return w && Date.now()-(w.checkedAt||0)<=WX_MAX_AGE ? w : null; } /* the box's copy of a live forecast of this ride (Crunch's or its own; planReset and a day change drop the shared one), under an hour old */
+function skyBoxRender(){ const W=$('planSky'); if(!W) return; const out=skyShown(), R=wxReq(), w=skyLive(R); if(W.hidden!==out) W.hidden=out; if(out) return; /* (read while the results are up too: Crunch's forecast is kept for after Save) */
+  const sk=w ? wxSkyOf(w) : null, fk=w ? sk||'night' : 'clouds', st=R ? R.start : $('startTime').value||'',
     day=R && /^(\d{4})-(\d{2})-(\d{2})$/.exec(R.date), city=s=>String(s||'').split(',')[0].trim();
   let t=''; if(day && /^\d{2}:\d{2}$/.test(st)){ const d=new Date(+day[1], +day[2]-1, +day[3], +st.slice(0,2), +st.slice(3)); t=d.toLocaleDateString(undefined,{weekday:'short'})+' '+d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}).replace(/\s/g, '\u00a0'); } /* (8:00 AM never split) */
-  const tp=w ? wxTempAt(w, w.startMin) : null, deg=w ? tempDisp(tp!=null ? tp : w.air) : null, L=[t, city(w ? w.place : shortPlace(wxPlace()))].filter(Boolean).map(esc);
+  const tp=w ? wxTempAt(w, w.startMin) : null, deg=w ? tempDisp(tp!=null ? tp : w.air) : null, pl=city(w ? w.place : shortPlace(wxPlace())), L=[t && esc(t), pl && `<span class="pvs-p">${esc(pl)}</span>`].filter(Boolean); /* (the place one piece: too long for the room beside fred, it goes under him whole) */
   const line=L.join(' · ')+(deg!=null ? (L.length ? ' · ' : '')+`<b class="pvs-t">${deg}°</b>` : '');
   let g=W.querySelector(':scope>.rwx-g'); if(!g){ g=document.createElement('div'); g.className='rwx-g'; g.innerHTML='<p class="pvs-l" id="planSkyL"></p>'; W.append(g); }
   if(sk) g.dataset.sky=sk; else delete g.dataset.sky; g.dataset.fred=fk; W.dataset.wx=w ? 'live' : 'none';
@@ -12205,9 +12212,9 @@ function skyBoxRender(){ const W=$('planSky'); if(!W) return; const out=skyShown
 function skySoon(){ if(skySoon.t) return; skySoon.t=setTimeout(()=>{ skySoon.t=0; skyBoxFetch(); }, 0); }
 function skyBoxFetch(){ skyBoxRender(); const W=$('planSky'), T=skyBoxFetch.t||(skyBoxFetch.t={}); if(!W || W.hidden || skyBoxFetch.p) return;
   if(!$('view-plan').classList.contains('active') || $('planSheet').classList.contains('open') || document.visibilityState==='hidden' || navigator.onLine===false) return; /* Plan open and showing; offline: no lookup */
-  const R=wxReq(); if(!R || R.ahead>10 || (wxAccepted && wxKey===R.key && !wxOld())) return; /* no ride, typical weather only, or Crunch's rule: a forecast under an hour old is kept */
+  const R=wxReq(); if(!R || R.ahead>10 || (wxAccepted && wxKey===R.key && !wxOld()) || skyKept(R)) return; /* no ride, typical weather only, or Crunch's rule: a forecast under an hour old is kept (the box's own copy too) */
   if(Date.now()-(T[R.key]||0)<SKY_RETRY) return; T[R.key]=Date.now();
-  skyBoxFetch.p=fetchWeather(true).catch(()=>false).then(()=>{ skyBoxFetch.p=null; skyBoxRender(); }); }
+  skyBoxFetch.p=fetchWeather(true).catch(()=>false).then(ok=>{ skyBoxFetch.p=null; if(ok===null) delete T[R.key]; skySoon(); }); } /* a try overtaken (null: the ride changed, a Crunch took over) is no failed one: no 10 minutes for it; then the ride as it is now (changed meanwhile: its own lookup) */
 /* ---------- q100 (item 100): the crew (#planCrew, after the Plan's footer, on the page): five friends a day, by the local date alone
    (the same five all day, on every device and reload): the five after the last day's in FW.FRIENDS' order, round the 19 (day d: friends
    5d to 5d+4, mod 19), so each friend comes round every 3 or 4 days, never two days running, 5 days in 19; the two Robs (9 and 17) are 8
@@ -12246,6 +12253,7 @@ function crewSoon(){ if(crewSoon.t) return; crewSoon.t=setTimeout(()=>{ crewSoon
 if('ResizeObserver' in window){ const ro=new ResizeObserver(roDefer(crewFit)); ['view-plan','planBar','planSaved'].forEach(id=>ro.observe($(id))); ro.observe(document.querySelector('nav.tabs')); }
 addEventListener('resize', ()=>{ crewFit(); skySoon(); }); /* (a phone turned or a window resized: the computer layout comes or goes) */
 document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible'){ skySoon(); crewSoon(); } }); /* the app back in front: a lookup if due, a new day's crew */
+addEventListener('online', skySoon); addEventListener('offline', skySoon); /* offline: the cap; online: the sky again (and a lookup if due) */
 onAppOpen(crewSoon); skySoon(); crewSoon();
 function renderWeather(r, mode){ // q87 (item 87): mode as render's; any but a fresh Crunch or an opened plan changes the shown card in place (wxPut)
   const W=$('rWeather'), M=$('rWxMore'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
@@ -14649,12 +14657,14 @@ function wxReq(){ const q=wxPlace(), date=$('wxDate').value;
   if(!(i.durMin>0)) return null;
   const pick=pickedPlace(); // a picked suggestion or "Use my location": its coordinates go straight to the forecast
   const rest=[date,start,i.durMin].join('|'); return {q, date, start, i, pick, rest, key:q+'|'+rest+(pick?'|'+pick.lat+','+pick.lon:''), ahead:Math.round((new Date(date+'T12:00:00')-new Date(todayISO()+'T12:00:00'))/864e5)}; }
-let wxBusy=null; /* q100: the lookup in flight ({key, p}): a Crunch during the sky box's lookup of the same ride waits for it (no second request) */
+let wxBusy=null; /* q100: the lookup in flight ({key, p, quiet}): a Crunch during the sky box's lookup of the same ride waits for it (no second request) */
+const WX_QUIET_MS=15e3, WX_WAIT_MS=4e3; /* q100: the box's lookup gives up after 15 s (a hung network: its late answer is dropped, and the box may ask another ride); a Crunch waits at most 4 s for it, then looks up itself */
 async function fetchWeather(quiet){ const R=wxReq(); if(!R) return false; /* quiet: the sky box's lookup (item 100), no note under the form */
   if(wxAccepted && wxKey===R.key && !wxOld()) return true; // q63: an hour-old forecast is looked up again
-  if(wxBusy && wxBusy.key===R.key){ const ok=await wxBusy.p.catch(()=>false); if((ok && wxKey===R.key) || quiet) return ok; } /* (one that failed: a Crunch tries again, and says so) */
-  const p=wxLookup(R, quiet), b=wxBusy={key:R.key, p}; try{ return await p; } finally{ if(wxBusy===b) wxBusy=null; } }
-async function wxLookup(R, quiet){ const {q, date, start, i, pick, rest, key}=R, out=quiet ? document.createElement('div') : $('wxOut'); /* (quiet: its notes go nowhere) */
+  if(wxBusy && wxBusy.key===R.key){ const ok=await (quiet ? wxBusy.p : Promise.race([wxBusy.p, new Promise(r=>setTimeout(r, WX_WAIT_MS, 'late'))])).catch(()=>false); if(ok!=='late' && ((ok && wxKey===R.key) || quiet)) return ok; } /* (one that failed or hangs: a Crunch looks up itself, and says so) */
+  const b=wxBusy={key:R.key, quiet}; b.p=wxLookup(R, quiet, b); try{ return await (quiet ? Promise.race([b.p, new Promise(r=>setTimeout(r, WX_QUIET_MS, false))]) : b.p); } finally{ if(wxBusy===b) wxBusy=null; } }
+async function wxLookup(R, quiet, own){ const {q, date, start, i, pick, rest, key}=R, out=quiet ? document.createElement('div') : $('wxOut'); /* (quiet: its notes go nowhere) */
+  const gone=()=>quiet && (wxBusy!==own || (wxReq()||{}).key!==key); /* q100: the box's lookup overtaken (the ride changed, a Crunch took over, or it gave up): it writes nothing (null) */
   out.style.display='block'; out.innerHTML='<div class="note info">Looking up the forecast…</div>';
   try{
     const g=pick ? {lat:pick.lat, lon:pick.lon, name:shortPlace(pick.name)} : await geocode(q);
@@ -14686,14 +14696,14 @@ async function wxLookup(R, quiet){ const {q, date, start, i, pick, rest, key}=R,
     const b=bandWBGT(avgW); const bEnd=bandWBGT(wb[wb.length-1]);
     const drift = bEnd.name!==b.name ? ` It ends in the <b>${bEnd.name}</b> band, so the last hour runs ${bEnd.pct<b.pct?'hotter':'cooler'} than the plan assumes.` : '';
     const when=new Date(date+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
-    out.style.display='none';
+    if(gone()) return null; out.style.display='none';
     wxLast={place:g.name, when, startMin, endMin, minW, maxW, avgW, wbSource, cat:wbgtCategory(avgW), minF, maxF, avgF, air, rh, wind, gust:Math.max(...pts.map(p=>p.gust==null?0:p.gust)), wdir:meanDir(pts.map(p=>p.wdir).filter(x=>x!=null)), uv:Math.max(...pts.map(p=>p.uv==null?0:p.uv)), sun, cloud, rain:Math.max(...pts.map(p=>p.rain==null?0:p.rain)), band:b.name, pct:b.pct, bandEnd:bEnd.name, pts, ...wxSky(pts, startMin, endMin)};
     wxLast.typical=typical; wxLast.checkedAt=Date.now(); // q44
     { const R=pts.filter(p=>p.min>startMin && p.min-60<endMin && p.rain!=null); wxLast.rainRide=R.length ? Math.max(...R.map(p=>p.rain)) : wxLast.rain; } // review (item 66)
     out.innerHTML=`<div class="note info"><b>${esc(g.name)} · ${when} ${fmtMin(startMin)}–${fmtMin(endMin%1440)}</b><br><b>WBGT ${tempOut(minW)}–${tempOut(maxW)}, avg ${tempOut(avgW)}</b> (${wbSource}) — heat-stress category: <b>${wbgtCategory(avgW)}</b><br><span style="color:var(--muted)">Feels-like ${tempOut(minF)}–${tempOut(maxF)} (avg ${tempOut(avgF)}) · air ${tempOut(air)} · humidity ${f0(rh)}% · wind ${f0(wind)} mph · sun ${f0(sun)} W/m² · cloud ${f0(cloud)}%</span><br>→ <b>${b.name}</b> band by WBGT, bottles suggested ≤ <b>${b.pct}%</b>.${drift}</div>`;
     const hrs=wxRideHours(pts, startMin, i.durMin); wxLast.hrs=hrs; // q49: each ride hour's own feels-like
     $('tempF').value=tempDisp(avgF); wxAccepted={wbgtF:avgW, cat:wbgtCategory(avgW), source:wbSource, minF, maxF, rain: avg(pts.map(p=>p.rain==null?0:p.rain)), hrs}; wxKey=key; if($('wxLoc').value.trim()) rememberPlace(pick||g); wxCachePut(key,{ts:Date.now(), wxAccepted, wxLast:Object.assign({},wxLast,{pts:undefined}), tempF:avgF, lat:g.lat, lon:g.lon}); return true;
-  }catch(e){
+  }catch(e){ if(gone()) return null;
     const cached=wxCacheFind(key, q, rest, pick);
     if(cached){ wxAccepted=cached.wxAccepted; wxLast=Object.assign({},cached.wxLast,{stale:ago(cached.ts)}); wxKey=key; $('tempF').value=tempDisp(cached.tempF); out.style.display='none'; return true; }
     wxAccepted=null; wxKey=null; wxLast=null; out.style.display='block';
@@ -16043,7 +16053,7 @@ $('backupFile').addEventListener('change',ev=>{
 // restore a backup (d: the parsed file). Profile, closet, bikes and products are replaced; journal entries and races merge, newest edit wins.
 function restoreAll(d){
   const ms=v=>typeof v==='number' ? v : (Date.parse(v)||0), oldTombs=Object.assign({}, settings.bikeTombs);
-  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pwa=settings.weightAt, pmb=settings.myBottles, pba=settings.bottleAsk, prd=riderOwn(settings); // an older backup without a mode / birthday / gender keeps this device's
+  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pwa=settings.weightAt, pmb=settings.myBottles, pba=settings.bottleAsk, prd=riderOwn(settings), pcw={crewShow:settings.crewShow, crewNames:settings.crewNames}; // an older backup without a mode / birthday / gender (item 100: the crew switches) keeps this device's
   normalizeJournal(d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
   journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); dropBrands(lib); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings){ const ds={}; Object.keys(d.settings).forEach(k=>{ if(k!=='__proto__') ds[k]=d.settings[k]; }); settings=Object.assign({},DEFAULT_SETTINGS,ds); } /* item 99: a file's own "__proto__" key (JSON.parse makes one) is never copied: Object.assign would make it the settings' prototype, and every key it holds (a rider) would read as set without being stored */
@@ -16053,6 +16063,7 @@ function restoreAll(d){
   if(!(d.settings && 'raceName' in d.settings)){ if(pn) settings.raceName=pn; else delete settings.raceName; } else if(typeof settings.raceName!=='string') settings.raceName='';
   if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
   if(riderOwn(d.settings)==null){ if(prd) settings.rider=prd; else delete settings.rider; } riderSetNorm(settings); /* item 99: a backup without a rider (no key, or null: riderNorm's "no rider") keeps this device's (as birthday and gender); a tampered one draws the default */
+  Object.keys(pcw).forEach(k=>{ if(!(d.settings && k in d.settings)){ if(pcw[k]!==undefined) settings[k]=pcw[k]; else delete settings[k]; } }); /* item 100: a backup without the crew switches keeps this device's (no change, so nothing to sync) */
   if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday=''; if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender='';
   if(d.settings){ // a bike you bring back is yours again: one that was deleted (here or in its own file) gets a new id, so no tombstone removes it
     const dead=Object.assign({}, oldTombs, d.settings.bikeTombs), ren={}; if(Object.keys(dead).length) settings.bikeTombs=dead;
