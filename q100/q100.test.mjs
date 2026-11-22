@@ -9,7 +9,9 @@
 //            layer) and fred is dressed as item 98 dresses him (the key wx:<look>, the drawing FW.bird of FW.WX_WEAR[look], ids aside; the
 //            night still); the one line reads time · place · temperature ("Thu 8:00 AM · Carmel · 61°"), no other words (the box's whole
 //            text is the line), in the caps style (uppercase), painted over the sky (each of its rows looks different with the line hidden:
-//            check round 2), and its number is the weather card's after Crunch; the sky lives (rain and snow: their loops run, as the card's)
+//            check round 2), and its number is the weather card's after Crunch; the sky lives (rain and snow: their loops run, as the card's);
+//            review round 4: in metric units the number is the forecast's in C and the card's; Units changed in Settings, it follows with
+//            no new lookup
 //   nofc     100.2, QA: no forecast (the lookup answered by nothing), no place the lookup can find, offline (no request at all), and a
 //            saved forecast from the cache (a failing network: the box takes nothing in; Crunch then falls back on it itself, as main), and a
 //            ride 11 or more days out (typical weather only: no lookup from the box), a forecast now over an hour old whose new lookup fails
@@ -39,6 +41,8 @@
 //            the box asks for the new ride and shows it (one place search, one forecast), 14-16.5 s after its first (review round 3)
 //   once     100.3, QA: after Crunch the box is out and only one fred is on the page, in every frame of the Crunch; the run's results too;
 //            back (the results gone) the box shows again, one fred
+//   land     100.3 (review round 4), WebKit (no scroll anchoring): a fresh Crunch on the ride, the run, Plan for Clothing, the
+//            Clothing-only results and the ride at 320 px / 200% lands as main does (the results' top within 2 px of main's under the header)
 //   desk     100.3: the computer layout: the box under the ticket in the Plan-a-ride column; out when Results is shown beside it; the crew
 //            is not on the computer layout
 //   crew     100.4: five friends after the footer (the next thing after it), on the page (no band): today's five by the local date
@@ -57,7 +61,8 @@
 //            on the page with sign-in configured, so Privacy too, at every size; one Firebase-off size, no Privacy); left out when there
 //            is no room (a taller tab bar), back when there is; at the edge: 4 px of room: left out, 9 px: shown, 8 or more clear; judged on
 //            layout changes, never on a scroll; a tablet and a phone turned (768 x 1024, 1024 x 768, 844 x 390): each friend at most 76 px a
-//            body, the crew no taller than that, the row centred (check round 2)
+//            body, the crew no taller than that, the row centred (check round 2); review round 4: the home indicator's 34 px inset (CDP's
+//            safe-area override: 375 / 390 / 430 px, 17 and 21 px text, one with sign-in configured): the crew shows, 8 px or more clear
 //   theme    100.6: the run's graphite: the box follows the run (the panel #34343C, its sky's first stop 26% of the sky in it, light words,
 //            painted over the sky), on the run between the ticket and the Carry box and Settings (in the page and on the screen); the crew
 //            left out there (provisional decision), back on the ride; the box announced as "Run forecast" on the run, "Ride forecast" on
@@ -85,7 +90,7 @@
 // Q100_ONLY=section,section runs some sections.
 import fs from 'node:fs';
 import path from 'node:path';
-import { chromium } from 'playwright';
+import { chromium, webkit } from 'playwright';
 import { checker, open, reload } from '../lib/open.mjs';
 import { crunch, settle, tab, weatherRouteFor } from '../lib/screens.mjs';
 import { Backend, syncPageSource } from '../q91/fbmock.mjs';
@@ -128,6 +133,11 @@ const reqs = p => p.evaluate(() => window.__q100req.slice());
 const kinds = L => ({ geo: L.filter(u => /geocoding/.test(u)).length, fc: L.filter(u => /api\.open-meteo\.com\/v1\/forecast|archive-api/.test(u)).length, nws: L.filter(u => /weather\.gov/.test(u)).length, all: L.length });
 const freds = p => p.evaluate(() => [...document.querySelectorAll('.rwx-fred')].filter(f => !f.classList.contains('rwx-out') && f.getClientRects().length && f.querySelector('svg') && getComputedStyle(f.querySelector('svg')).display !== 'none').map(f => f.parentElement.id));
 async function toSettings(p) { await p.click('#syncHdrIn:visible, #syncHdr:visible, #sbAcct:visible'); await until(() => p.evaluate(() => document.getElementById('view-profile').classList.contains('active'))); await settle(p, 150); }
+// Settings (it opens on the side in use), Advanced, Units: one picked, the sheet closed, back to Plan (q98's steps)
+async function unitsTo(p, u) {
+  await toSettings(p); await p.click('#prowBtn-advanced'); await settle(p, 500); await p.click('#prowBtn-units'); await until(() => p.evaluate(() => document.getElementById('setSheet').classList.contains('open'))); await settle(p);
+  await p.selectOption('#sUnits', u); await sleep(300); await p.keyboard.press('Escape'); await until(() => p.evaluate(() => !document.getElementById('setSheet').classList.contains('open')), 5000);
+  await tab(p, 'plan'); await sleep(600); }
 const crewOf = p => p.evaluate(() => { const U = document.getElementById('planCrew'), T = U && U.cloneNode(true); if (T) T.querySelectorAll('svg').forEach(s => s.remove()); return { on: !!U && !U.hidden && getComputedStyle(U).display !== 'none', ids: U ? [...U.querySelectorAll('.crew-f')].map(li => +li.dataset.i) : [], art: U ? U.querySelectorAll('.crew-a svg').length : 0, names: U ? [...U.querySelectorAll('.crew-n')].map(n => n.textContent) : [], text: T ? T.textContent : '', /* (words outside the drawings: a drawing's own bib number is art) */ hid: U && U.getAttribute('aria-hidden'), room: U && U.dataset.room }; });
 // the rule, worked out here: the local date as a day number, five friends from 5 x day, round the 19
 const NAMES = ['Ryan', 'Dustin', 'Chelsea', 'Bobby', 'Anne', 'Heather', 'Luke', 'Mark', 'Maria', 'Rob', 'Marc', 'Katie', 'Bentley', 'John', 'Steve', 'Julia', 'Chiara', 'Rob', 'Paul'];
@@ -185,6 +195,7 @@ section('place', async () => {
 });
 
 section('looks', async () => {
+  let usNum = null;
   for (const k of ['sun', 'rain', 'snow', 'freeze', 'night']) {
     const x = await openH(k === 'night' ? { motion: true } : { query: '?sky=' + k, motion: true }), p = x.p;
     if (k === 'night') { await p.click('#locRow'); await until(() => p.evaluate(() => document.getElementById('planSheet').classList.contains('open'))); await p.fill('#startTime', '20:00'); await p.dispatchEvent('#startTime', 'change'); await p.click('#psAct'); }
@@ -198,7 +209,18 @@ section('looks', async () => {
     if (k === 'rain' || k === 'snow') { const lp = await skyLoops(p); ok(lp.length > 0 && lp.includes(k === 'rain' ? 'rwx-fall' : 'rwx-snow'), '100.1, round rule b: ' + k + ': the box\'s sky lives as the card\'s (item 87\'s loops run: ' + lp.length + ', ' + [...new Set(lp)].join(', ') + ')', lp); }
     const pt = await painted(p); ok(pt.rows >= 1 && pt.same === 0, '100.1: ' + k + ': the line is painted over the sky (each of its ' + pt.rows + ' rows looks different with the line hidden)', pt);
     if (k === 'sun') { await crunch(p); const t = await p.evaluate(() => { const e = document.querySelector('#rWeather .rwx-temp'); return e && e.textContent.trim(); });
-      ok(!!t && t === B.num, '100.1: the line\'s number is the weather card\'s (the forecast at the start: ' + B.num + ' and ' + t + ')', { box: B.num, card: t }); }
+      ok(!!t && t === B.num, '100.1: the line\'s number is the weather card\'s (the forecast at the start: ' + B.num + ' and ' + t + ')', { box: B.num, card: t }); usNum = B.num; }
+    await x.close(); }
+  /* review round 4: the rider's units (tempDisp is plain rounding in US units, so a box that skipped it passed in US units): opened in
+     metric, the number is the forecast's in C and the card's; changed in Settings with the box live, it follows with no new lookup */
+  const cOf = f => Math.round((parseFloat(f) - 32) * 5 / 9) + '°';
+  { const x = await openH({ query: '?sky=sun', settings: { units: 'metric' } }), p = x.p; await ready(p, 'live', 'sun'); const B = await boxOf(p);
+    await crunch(p); const t = await p.evaluate(() => { const e = document.querySelector('#rWeather .rwx-temp'); return e && e.textContent.trim(); });
+    ok(!!usNum && LINE.test(B.line || '') && B.num === cOf(usNum) && B.num !== usNum && t === B.num, '100.1: metric units: the line\'s number is the forecast\'s in C (' + B.num + ', not ' + usNum + ') and the weather card\'s (' + t + ')', { box: B.num, us: usNum, card: t, line: B.line });
+    await x.close(); }
+  { const x = await openH({ query: '?sky=sun' }), p = x.p; await ready(p, 'live', 'sun'); const n0 = kinds(await reqs(p)), a = (await boxOf(p)).num;
+    await unitsTo(p, 'metric'); const b = await boxOf(p); await unitsTo(p, 'us'); const c = await boxOf(p), n1 = kinds(await reqs(p));
+    ok(!!usNum && a === usNum && b.on && b.wx === 'live' && b.num === cOf(usNum) && c.num === usNum && LINE.test(b.line || '') && n1.fc === n0.fc && n1.geo === n0.geo, '100.1: Units changed in Settings with the box live: back on Plan the number follows (' + a + ', ' + b.num + ', ' + c.num + '), no new lookup (forecasts ' + n0.fc + ' then ' + n1.fc + ')', { a, b: b.num, c: c.num, n0, n1 });
     await x.close(); }
 });
 
@@ -406,6 +428,29 @@ section('once', async () => {
   await x.close();
 });
 
+/* review round 4: where a fresh Crunch lands, in WebKit (the iPhone's engine): the box above the results goes as they show, before their
+   scroll is measured; WebKit has no scroll anchoring, so a box hidden after the scroll left the results 118 px under the header (Chromium's
+   anchoring hides it). The results' top within 2 px of main's (13 px under the header): the ride, the run, Clothing (a full plan) and the
+   Clothing-only results (no gel or drink mix in the library: renderClothingOnly), and the ride at 320 px with 200% text */
+section('land', async () => {
+  const wk = await webkit.launch(), CASES = [['the ride', {}], ['the run', { settings: { sport: 'run' } }], ['Plan for Clothing', { settings: { planMode: 'clothing' } }], ['the Clothing-only results', { settings: { planMode: 'clothing' }, empty: true }], ['the ride at 320 px, 200% text', { width: 320, height: 568, scale: 2 }]];
+  const land = async (o, file) => { const x = await openH(Object.assign({ browser: wk, dpr: 2, settle: 1500, noErrs: true }, o, file ? { file } : {})), p = x.p;
+    if (o.empty) { await p.evaluate(() => localStorage.setItem('bluebird.library.v5', JSON.stringify({ gels: [], powders: [] }))); await reload(p); await settle(p, 1500); }
+    if (!file) await ready(p, 'live');
+    const box = await p.evaluate(() => { const b = document.getElementById('planSky'); return !!b && !b.hidden && b.getBoundingClientRect().height > 0; });
+    await crunch(p); await sleep(800);
+    const r = await p.evaluate(() => { const R = getComputedStyle(document.getElementById('results')).display !== 'none' ? document.getElementById('results') : document.getElementById('runResults'), hb = document.querySelector('body>header').getBoundingClientRect().bottom, b = document.getElementById('planSky');
+      return { id: R.id, wearOnly: R.dataset.wearOnly || null, y: Math.round(scrollY), gap: Math.round(R.getBoundingClientRect().top - hb), out: !b || b.hidden }; });
+    await x.close(); if (!file) ERRS.push(x.errors.filter(e => !/^console: Not allowed to load local resource: file:/.test(e))); /* (WebKit refuses a file page its own files: the manifest, fonts; every other error kept) */
+    return Object.assign(r, { box }); };
+  for (const [what, o] of CASES) {
+    const r = await land(o), m = MAIN ? await land(o, MAIN) : null, want = m ? m.gap : 13;
+    ok(r.box && r.out && (o.empty ? r.wearOnly === '1' : true) && (o.settings && o.settings.sport === 'run' ? r.id === 'runResults' : r.id === 'results') && Math.abs(r.gap - want) <= 2,
+      '100.3, WebKit: a fresh Crunch on ' + what + ' lands as main does: the results\' top ' + r.gap + ' px under the header (' + (m ? 'main ' + m.gap : '13') + '), the box (shown before) out', { r, m });
+  }
+  await wk.close();
+});
+
 section('desk', async () => {
   const x = await openH({ query: '?sky=sun', width: 1280, height: 800 }), p = x.p; await ready(p, 'live', 'sun');
   const g = await p.evaluate(() => { const W = document.getElementById('planSky').getBoundingClientRect(), T = document.getElementById('rideSec').getBoundingClientRect(), U = document.getElementById('planCrew');
@@ -499,6 +544,16 @@ section('room', async () => {
     ok(cloud ? g.priv : g.privHidden, cloud ? 'QA: ' + at + ': the Privacy link (sign-in configured) shown and not covered (the element at its own centre; review round 3)' : 'QA: ' + at + ': no Privacy link without sign-in configured (as main)', g);
     ok(g.shown ? g.gap >= 8 && g.foot >= 0 && !g.sx : true, '100.4, QA: ' + at + ': at the end of the scroll the crew sits ' + g.gap + ' px clear of the tab bar (8 or more), the footer clear of it, no sideways scroll', g);
     ok(g.shown, 'room: ' + at + ': the crew shows (there is room)', g);
+    await x.close(); }
+  /* review round 4: a Face ID iPhone, the installed app (viewport-fit=cover, standalone): the home indicator's inset, 34 px, the real env()
+     through CDP: the tab bar grows by it; the crew still shows, 8 px or more clear of it, at iOS's text sizes (17 and 21 px) */
+  for (const [w, h, sc, cloud] of [[375, 812, 17 / 16], [390, 844, 17 / 16], [430, 932, 17 / 16], [375, 812, 21 / 16], [430, 932, 21 / 16], [390, 844, 17 / 16, true]]) {
+    const x = await openH(Object.assign({ width: w, height: h, scale: sc }, cloud ? { file: SYNCED, route: be.handler('room') } : {})), p = x.p;
+    const cdp = await x.ctx.newCDPSession(p); await cdp.send('Emulation.setSafeAreaInsetsOverride', { insets: { top: 47, bottom: 34, left: 0, right: 0 } }); await reload(p); await sleep(600);
+    await until(async () => (await crewOf(p)).art === 5); await sleep(300); await endScroll(p);
+    const g = await p.evaluate(() => { const U = document.getElementById('planCrew'), u = U.getBoundingClientRect(), T = document.querySelector('nav.tabs').getBoundingClientRect(), F = document.querySelector('#view-plan>.fredfoot').getBoundingClientRect(), pr = document.createElement('div'); pr.style.paddingBottom = 'env(safe-area-inset-bottom,0px)'; document.body.append(pr); const e = getComputedStyle(pr).paddingBottom; pr.remove();
+      return { env: e, nav: Math.round(T.height), shown: !U.hidden && u.height > 0, room: U.dataset.room, gap: u.height ? Math.round(T.top - u.bottom) : null, foot: Math.round(T.top - F.bottom), sx: document.documentElement.scrollWidth > innerWidth }; });
+    ok(g.env === '34px' && g.nav >= 88 && g.shown && g.gap >= 8 && g.foot >= 0 && !g.sx, '100.4, QA: the home indicator\'s 34 px inset (' + w + ' x ' + h + ', ' + Math.round(sc * 16) + ' px text' + (cloud ? ', sign-in configured' : '') + ', the tab bar ' + g.nav + ' px): the crew shows, ' + g.gap + ' px clear of the tab bar', g);
     await x.close(); }
   // no room: a taller tab bar leaves it out; back to its size, it is back. Judged on layout changes, never on a scroll
   const x = await openH(), p = x.p; await until(async () => (await crewOf(p)).art === 5);

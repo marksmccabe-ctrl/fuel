@@ -117,6 +117,14 @@ const M = [
   ['r3-namesredo', 'motion,sync', s => rep(s, "const ids=crewOf(crewDay()), k=ids.join(','), names=settings.crewNames===true;", "const names=settings.crewNames===true, ids=crewOf(crewDay()), k=ids.join(',')+(names ? '+n' : '');")], /* a names change remounts the five: they move again */
   ['r3-priv320', 'room', s => css(s, '@media (max-width:340px){ #view-plan>.fredfoot>.privlink{display:none!important} }')], /* Privacy gone at 320 px */
   ['r3-privcover', 'room,sync', s => css(s, '#view-plan>.fredfoot:has(>.privlink:not([hidden]))+#planCrew{margin-top:-44px;position:relative;z-index:50}')], /* the crew over Privacy where sign-in is configured */
+  // review round 4: the app problems as the branch had them, and the units gap in the test
+  ['rv4-land', 'land', s => rep(rep(rep(s, "hides the ride's */ skySync(); /* q100 */ planBarRender();", "hides the ride's */ planBarRender();"), 'el.hidden=false; skySync(); /* q100 */ dayFitRows();', 'el.hidden=false; dayFitRows();'), 'as in render */ skySync(); /* q100 */ updateSummaries();', 'as in render */ updateSummaries();')], /* the box hidden only by the observer, after the results' scroll: WebKit lands 118 px past their top */
+  ['rv4-landride', 'land', s => rep(s, "hides the ride's */ skySync(); /* q100 */ planBarRender();", "hides the ride's */ planBarRender();")], /* ... render's alone (the ride, Plan for Clothing) */
+  ['rv4-landrun', 'land', s => rep(s, 'el.hidden=false; skySync(); /* q100 */ dayFitRows();', 'el.hidden=false; dayFitRows();')], /* ... runCrunchResult's alone (the run) */
+  ['rv4-landwear', 'land', s => rep(s, 'as in render */ skySync(); /* q100 */ updateSummaries();', 'as in render */ updateSummaries();')], /* ... renderClothingOnly's alone (the Clothing-only results) */
+  ['rv4-inset', 'room', s => rep(s, 'gap:8px;margin:10px 0 env(safe-area-inset-bottom,0px);padding:0;list-style:none}', 'gap:8px;margin:10px 0 0;padding:0;list-style:none}')], /* no room for the home indicator's inset: the crew always left out on a Face ID iPhone */
+  ['rv4-metric', 'looks', s => rep(s, 'deg=w ? tempDisp(tp!=null ? tp : w.air) : null', 'deg=w ? Math.round(tp!=null ? tp : w.air) : null')], /* the box in F whatever the rider's units */
+  ['rv4-unitsstale', 'looks', s => rep(s, 'if(P._l!==line){ P._l=line; P.innerHTML=line; }', 'if(P._w!==w){ P._w=w; P._l=line; P.innerHTML=line; }')], /* the line written only for a new forecast: a units change (or a new start time) keeps the old number */
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mut100.log'); fs.mkdirSync(path.dirname(out), { recursive: true });
 for (const [name, only, f] of M) {
