@@ -12210,12 +12210,12 @@ function skyBoxRender(){ const W=$('planSky'); if(!W) return; const out=skyShown
   const line=[t && esc(t), PW.map((s,k)=>`<span class="pvs-p">${s}${num && k===PW.length-1 ? '\u00a0·' : ''}</span>`).join(' ')].filter(Boolean).join('\u00a0· ')+(num ? (PW.length ? ' ' : t ? '\u00a0· ' : '')+num : ''); /* (each word of the place one piece: a word too long for the room beside fred goes under him whole, a place of several words fills that room word by word; each dot held to the word before it, the place's last one inside its piece, so no row starts with a dot) */
   let g=W.querySelector(':scope>.rwx-g'); if(!g){ g=document.createElement('div'); g.className='rwx-g'; g.innerHTML='<p class="pvs-l" id="planSkyL"></p>'; W.append(g); }
   if(sk) g.dataset.sky=sk; else delete g.dataset.sky; g.dataset.fred=fk; W.dataset.wx=w ? 'live' : 'none';
-  const P=g.firstElementChild; if(P.innerHTML!==line) P.innerHTML=line;
+  const P=g.firstElementChild; if(P._l!==line){ P._l=line; P.innerHTML=line; } /* against the last string written: innerHTML reads back its no-break spaces as &nbsp; (and esc's &#39; as '), so a render that changes nothing would replace the line (a selection on it, a screen reader's place, lost) */
   wxDress(W, true); } /* in place: the same sky and look keep their layers and fred (no restart); another cross-fades as on the card */
 function skySoon(){ if(skySoon.t) return; skySoon.t=setTimeout(()=>{ skySoon.t=0; skyBoxFetch(); }, 0); }
 function skyBoxFetch(){ skyBoxRender(); const W=$('planSky'), T=skyBoxFetch.t||(skyBoxFetch.t={}); if(!W || W.hidden || skyBoxFetch.p) return;
   if(!$('view-plan').classList.contains('active') || $('planSheet').classList.contains('open') || document.visibilityState==='hidden' || navigator.onLine===false) return; /* Plan open and showing; offline: no lookup */
-  const R=wxReq(); if(!R || R.ahead>10 || (wxAccepted && wxKey===R.key && !wxOld()) || skyKept(R)) return; /* no ride, typical weather only, or Crunch's rule: a forecast under an hour old is kept (the box's own copy too) */
+  const R=wxReq(); if(!R || R.ahead>10 || (wxAccepted && wxKey===R.key && !wxOld() && wxLast && !wxLast.stale && !wxLast.typical) || skyKept(R)) return; /* no ride, typical weather only, or Crunch's rule: a live forecast under an hour old is kept (the box's own copy too); a saved one Crunch fell back on is no live one here either (skyLive), so the box asks once its 10 minutes allow */
   if(Date.now()-(T[R.key]||0)<SKY_RETRY) return; T[R.key]=Date.now();
   skyBoxFetch.p=fetchWeather(true).catch(()=>false).then(ok=>{ skyBoxFetch.p=null; if(ok===null) delete T[R.key]; skySoon(); }); } /* a try overtaken (null: the ride changed, a Crunch took over) is no failed one: no 10 minutes for it; then the ride as it is now (changed meanwhile: its own lookup) */
 /* ---------- q100 (item 100): the crew (#planCrew, after the Plan's footer, on the page): five friends a day, by the local date alone
@@ -14267,6 +14267,7 @@ function runApply(){ const run=sport()==='run', H=document.documentElement, onPl
   document.querySelectorAll('#intensity [data-int]').forEach(b=>{ const L=b.lastChild; const want=run ? RUN_EFF[b.dataset.int] : INT_NAME[b.dataset.int]; if(L && L.nodeType===3 && L.textContent!==want) L.textContent=want; });
   if(onPlan && $('hdrTitle')) $('hdrTitle').textContent = run ? 'Today’s run' : VIEW_TITLE.plan;
   const pv=$('pvPlanH'); if(pv) pv.textContent = run ? 'Plan a run' : 'Plan a ride';
+  const sk=$('planSky'); if(sk) sk.setAttribute('aria-label', run ? 'Run forecast' : 'Ride forecast'); /* q100: the sky box named for the session too (q47) */
   const w=run ? 'run' : 'ride', cn=document.querySelector('#nutH + .pv-cnote'); if(cn) cn.textContent=`tap to swap for this ${w}`; // q47: the session's own word
   planSetRender();
   if(window.__upc) upcRender(); durBtnRender();
@@ -14663,7 +14664,8 @@ function wxReq(){ const q=wxPlace(), date=$('wxDate').value;
 let wxBusy=null, wxLatest=null; /* q100: the lookup in flight ({key, p, quiet, fc}): a Crunch during the sky box's lookup of the same ride waits for it (no second request); wxLatest: the last one started */
 const WX_QUIET_MS=15e3, WX_WAIT_MS=4e3; /* q100: the box's lookup stops holding the box after 15 s (a hung network: the box may ask another ride; a late answer is still taken if no lookup started since and the ride is the same); a Crunch waits 4 s for one that has no forecast yet (hung), then looks up itself, and for one that has it (only weather.gov's WBGT out, 8 s at most) until it ends */
 async function fetchWeather(quiet){ const R=wxReq(); if(!R) return false; /* quiet: the sky box's lookup (item 100), no note under the form */
-  if(wxAccepted && wxKey===R.key && !wxOld()) return true; // q63: an hour-old forecast is looked up again
+  if(wxAccepted && wxKey===R.key && !wxOld() && !((quiet || (wxBusy && wxBusy.key===R.key)) && wxLast && (wxLast.stale || wxLast.typical))) return true; // q63: an hour-old forecast is looked up again
+  /* q100: a saved (or typical) copy in hand does not stop the box's lookup (it shows only a live one), and a Crunch during that lookup waits for it as for any other */
   if(wxBusy && wxBusy.key===R.key){ const b=wxBusy, ok=await (quiet ? b.p : Promise.race([b.p, new Promise(r=>setTimeout(()=>{ if(!b.fc) r('late'); }, WX_WAIT_MS))])).catch(()=>false); if(ok!=='late' && ((ok && wxKey===R.key) || quiet)) return ok; } /* (one that failed or hangs: a Crunch looks up itself, and says so) */
   const b=wxBusy=wxLatest={key:R.key, quiet}; b.p=wxLookup(R, quiet, b); try{ return await (quiet ? Promise.race([b.p, new Promise(r=>setTimeout(r, WX_QUIET_MS, false))]) : b.p); } finally{ if(wxBusy===b) wxBusy=null; } }
 async function wxLookup(R, quiet, own){ const {q, date, start, i, pick, rest, key}=R, out=quiet ? document.createElement('div') : $('wxOut'); /* (quiet: its notes go nowhere) */
