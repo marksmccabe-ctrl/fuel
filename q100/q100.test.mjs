@@ -2,47 +2,60 @@
 // Every numbered point, QA line and decision (DECISIONS.md "Item 100", Build):
 //   cache    sw.js CACHE = APP_BUILD, v124 or later; fred world v9 or later
 //   place    100.1: the sky box (#planSky) sits between the ride ticket and Settings (in the page and on the screen), a plain Plan box: white
-//            (the panel), a 1.5 px outline, the panel radius (var(--r-panel)), no tint; a minimum height, never a fixed one (no height in
+//            (the panel), a 1.5 px outline in the Settings box's colour, the panel radius (var(--r-panel)), no tint; a minimum height, never a fixed one (no height in
 //            any rule for it; it grows past the minimum with larger text); its sky is item 87's masked .rwx-scene layer (a mask, the sky's
 //            layer by wxSkySet) and the bundle's own forecast sky is never used (no .fw-wx, FW has no wxSky)
 //   looks    100.1-2: for a sunny, wet, snowy and freezing forecast and a clear night: the box's sky is the forecast's (data-sky, its
 //            layer) and fred is dressed as item 98 dresses him (the key wx:<look>, the drawing FW.bird of FW.WX_WEAR[look], ids aside; the
-//            night still); the one line reads time · place · temperature ("Thu 8:00 AM · Carmel · 61°"), no other words, and its number
-//            is the weather card's after Crunch
+//            night still); the one line reads time · place · temperature ("Thu 8:00 AM · Carmel · 61°"), no other words (the box's whole
+//            text is the line), and its number is the weather card's after Crunch
 //   nofc     100.2, QA: no forecast (the lookup answered by nothing), no place the lookup can find, offline (no request at all), and a
-//            saved forecast from the cache (a failing network): fred in his cap (wx:clouds, FW.bird with no wear), no sky, no number
+//            saved forecast from the cache (a failing network), and a ride 11 or more days out (typical weather only: no lookup from the box):
+//            fred in his cap (wx:clouds, FW.bird with no wear), no sky, no number
 //   fetch    100.2: the forecast is looked up when Plan opens (on load: one lookup), through Crunch's own (the same key: a Crunch then makes
 //            no request); tab switches and the app back in front make no more; an hour-old one is looked up again (once); a failing
 //            network: one try, none again from the Plan for 10 minutes, then one; a Crunch during the box's lookup waits for it (one
-//            request of each kind)
+//            request of each kind); a Crunch during the box's failing lookup tries again itself and shows its note; no lookup while the Plan
+//            sheet is open (start times changed three times), one after Done
+//   keep     100.2 (check round 1): the box keeps a live forecast it has: a day changed and back, Crunch then Save to Journal, the computer
+//            layout's + New ride: live, its sky and number, no new lookup; offline after a live forecast: the cap; online again: the sky back
+//   race     100.2 (check round 1): the box's slow lookup of the old ride (answered or failing) after the new ride was Crunched leaves the
+//            new ride's forecast (wxKey, wxLast, the card after a redraw); its hung lookup does not hold Crunch once the network is back
+//            (results within 8 s; main 0.2 s); the ride changed while its lookup is out: the new ride's forecast with nothing else happening,
+//            and back to the first ride: that ride is asked again (an overtaken try is not a failed one)
 //   once     100.3, QA: after Crunch the box is out and only one fred is on the page, in every frame of the Crunch; the run's results too;
 //            back (the results gone) the box shows again, one fred
 //   desk     100.3: the computer layout: the box under the ticket in the Plan-a-ride column; out when Results is shown beside it; the crew
 //            is not on the computer layout
 //   crew     100.4: five friends after the footer (the next thing after it), on the page (no band): today's five by the local date
 //            (crewOf(crewDay) of the date, checked against the rule worked out here), the same at 8 am and 11:30 pm and on a second load,
-//            another five the next day; over 400 days never both Robs (9 and 17) and every friend 5 days in every 19; one body size (each
+//            another five the next day, and a new day while the app stays open brings its five when the app is back in front; over 400 days
+//            never both Robs (9 and 17) and every friend 5 days in every 19; one body size (each
 //            friend drawn at its FW.box width at the body's scale: 10, 12 and 17 are wider); each a fwMount spot with its own id prefix
 //            and no id twice on the page
 //   motion   round rule a: with the gate open each friend moves when first seen (fwm-go), offset by --fw-d with fw-vm0 (each friend at
 //            most its own loops: a bob, and a blink for 1, 2 and 13), at most 30 running fred world animations on the screen with fred in
-//            his busiest look (freeze) and the five; all still by 9.5 s; still under Reduce Motion and with Animate the world off
+//            his busiest look (freeze) and the five; all still by 9.5 s, and still after Journal and back, a resize and the app back in front
+//            (the same drawings kept); still under Reduce Motion and with Animate the world off
 //   room     100.4, QA: at the end of the scroll the crew sits at least 8 px clear of the tab bar (320, 375, 390, 430 px; 100, 150, 200%
-//            text) and the footer is clear of it; left out when there is no room (a taller tab bar), back when there is; judged on layout
-//            changes, never on a scroll
-//   theme    100.6: the run's graphite: the box follows the run (the panel #34343C, the sky mixed in, light words); the crew left out
+//            text) and the footer is clear of it, shown and not covered (its science link the element at its own centre); left out when there
+//            is no room (a taller tab bar), back when there is; at the edge: 4 px of room: left out, 9 px: shown, 8 or more clear; judged on
+//            layout changes, never on a scroll
+//   theme    100.6: the run's graphite: the box follows the run (the panel #34343C, its sky's first stop 26% of the sky in it, light words); the crew left out
 //            there (provisional decision), back on the ride
 //   switch   100.5: Settings › fred world has "Show the crew" (on) and "Show their names" (off), 44 px rows; neither is stored or in
 //            DEFAULT_SETTINGS until tapped; a tap stores settings.crewShow / crewNames and the crew follows (off: no art at all); a
 //            reload keeps them
 //   names    100.5, QA: names on: the first name under each friend (CREW_NAMES order, the five of the day), real text in the accessibility
-//            tree, never cut or overlapping (320 / 390 / 430 px, 100 / 150 / 200% text); names off: no name in the strip, the page's text
+//            tree, never cut, broken over two lines or overlapping (320 / 390 / 430 px, 100 / 150 / 200% text); names off: no name in the strip, the page's text
 //            or the accessibility tree
 //   sync     QA: two devices (the q91 Firebase stand-in): A turns the names on, B gets them (one settingsAt stamp each, crewNames); B turns
-//            the crew off, A's crew goes
-//   backup   a backup carries the switches and a restore brings them; one without them gives the defaults
-//   media    print: no crew, no sky, no fred (the box's words stay); forced colours: the art out, the box's edge kept
-//   fit      QA: 320 and 390 px at 150% and 200% text: the line inside the box and clear of fred, fred inside the box, no sideways scroll
+//            the crew off, A's crew goes; the Plan footer's Privacy link shows where sign-in is configured
+//   backup   a backup carries the switches and a restore brings them; one without them keeps this device's (names on stay on, the crew
+//            off stays off: as the rider, birthday and gender; check round 1)
+//   media    print: no crew, no sky, no fred (the box's words stay, without the feather or fred's room); forced colours: the art out, the box's edge kept
+//   fit      QA: 320 and 390 px at 150% and 200% text: the line inside the box and its rows beside fred clear of him (the rows under him
+//            take the box's width), fred inside the box, no sideways scroll; long places (Indianapolis, Mechanicsburg): no word over two rows
 //   main     (with [main null.html]) main has no box and no crew
 // Q100_ONLY=section,section runs some sections.
 import fs from 'node:fs';
@@ -65,7 +78,7 @@ const browser = await chromium.launch();
 // the hooked copy: every lookup the page makes (geocode, forecast, NWS) is logged from the main script's first line, and some of the app's
 // own state is handed out (as q97-q99 do)
 const HOOK = "\n(()=>{ const f=window.fetch; window.__q100req=[]; window.fetch=function(u, ...a){ const s=String(u && u.url || u); if(/open-meteo|weather\\.gov|zippopotam/.test(s)) window.__q100req.push(s.split('?')[0]); return f.call(this, u, ...a); }; })();\n"
-  + "Object.defineProperty(window,'__q100',{configurable:true,get(){ return {FWM, skyBoxFetch, skyBoxRender, crewOf, crewDay, CREW_NAMES, wxReq, backupData, DEFAULT_SETTINGS, KEYS, get settings(){ return settings; }, get wxLast(){ return wxLast; }}; }});\n";
+  + "Object.defineProperty(window,'__q100',{configurable:true,get(){ return {FWM, skyBoxFetch, skyBoxRender, crewOf, crewDay, CREW_NAMES, wxReq, backupData, DEFAULT_SETTINGS, KEYS, get settings(){ return settings; }, get wxLast(){ return wxLast; }, get wxKey(){ return wxKey; }}; }});\n";
 function hooked(page, name, hook = HOOK) { const src = fs.readFileSync(page, 'utf8'), k = src.indexOf("\n'use strict';\n"); if (k < 0) throw new Error("no 'use strict' line in " + page);
   const f = path.join(path.dirname(page), name), at = k + "\n'use strict';".length; fs.writeFileSync(f, src.slice(0, at) + hook + src.slice(at)); return f; }
 const HOOKED = hooked(PAGE, 'q100-hook.html'), MADE = [HOOKED];
@@ -83,7 +96,8 @@ const boxOf = p => p.evaluate(([N]) => { const W = document.getElementById('plan
   const nm = s => String(s).replace(/\b(fw-[a-z]+)\d+/g, '$1#').replace(/\bid="[^"]*"/g, 'id').replace(/url\(#[^)]*\)/g, 'url(#)').replace(/href="#[^"]*"/g, 'href'), look = g && g.dataset.fred;
   const L = document.getElementById('planSkyL'), layer = W && W.querySelector(':scope>.rwx-scene>.rwx-layer:not(.rwx-out)');
   return { on: !!W && !W.hidden && getComputedStyle(W).display !== 'none', wx: W && W.dataset.wx, sky: W && W.dataset.sky || null, gsky: g && g.dataset.sky || null, look, key: r && r.k, still: r && r.s,
-    same: !!f && !!look && nm(f.innerHTML) === nm(Object.assign(document.createElement('div'), { innerHTML: FW.bird({ wear: FW.WX_WEAR[look] }) }).innerHTML), layer: layer ? layer.dataset.k : null, line: L ? L.textContent : null, num: L && L.querySelector('.pvs-t') ? L.querySelector('.pvs-t').textContent : null }; }, [0]);
+    same: !!f && !!look && nm(f.innerHTML) === nm(Object.assign(document.createElement('div'), { innerHTML: FW.bird({ wear: FW.WX_WEAR[look] }) }).innerHTML), layer: layer ? layer.dataset.k : null, line: L ? L.textContent : null, num: L && L.querySelector('.pvs-t') ? L.querySelector('.pvs-t').textContent : null,
+    whole: !!W && !!L && W.innerText.replace(/\s+/g, ' ').trim().toLowerCase() === L.textContent.replace(/\s+/g, ' ').trim().toLowerCase() /* (no other words in the box) */ }; }, [0]);
 const ready = (p, wx, look) => until(() => p.evaluate(([wx, look]) => { const W = document.getElementById('planSky'); return !!W && W.dataset.wx === wx && (!look || (W.querySelector(':scope>.rwx-g') || {}).dataset.fred === look) && !!W.querySelector(':scope>.rwx-fred:not(.rwx-out) svg'); }, [wx, look]), 20000);
 const reqs = p => p.evaluate(() => window.__q100req.slice());
 const kinds = L => ({ geo: L.filter(u => /geocoding/.test(u)).length, fc: L.filter(u => /api\.open-meteo\.com\/v1\/forecast|archive-api/.test(u)).length, all: L.length });
@@ -93,6 +107,11 @@ const crewOf = p => p.evaluate(() => { const U = document.getElementById('planCr
 // the rule, worked out here: the local date as a day number, five friends from 5 x day, round the 19
 const NAMES = ['Ryan', 'Dustin', 'Chelsea', 'Bobby', 'Anne', 'Heather', 'Luke', 'Mark', 'Maria', 'Rob', 'Marc', 'Katie', 'Bentley', 'John', 'Steve', 'Julia', 'Chiara', 'Rob', 'Paul'];
 const fiveOf = (y, m, d) => { const day = Date.UTC(y, m - 1, d) / 864e5, s = ((day * 5) % 19 + 19) % 19; return [0, 1, 2, 3, 4].map(k => (s + k) % 19); };
+const sheet = async (p, f) => { await p.click('#locRow'); await until(() => p.evaluate(() => document.getElementById('planSheet').classList.contains('open'))); await f(); await p.click('#psAct'); await until(() => p.evaluate(() => !document.getElementById('planSheet').classList.contains('open'))); };
+const setField = async (p, sel, v) => { await p.fill(sel, v); await p.dispatchEvent(sel, 'change'); };
+const setPlace = async (p, place) => { await p.click('#locRow'); await until(() => p.evaluate(() => document.getElementById('planSheet').classList.contains('open'))); await setField(p, '#wxLoc', place); await sleep(300); await p.keyboard.press('Escape').catch(() => {}); /* (the suggestions shut) */
+  if (await p.evaluate(() => document.getElementById('planSheet').classList.contains('open'))) await p.click('#psAct'); await until(() => p.evaluate(() => !document.getElementById('planSheet').classList.contains('open'))); };
+const shown = p => until(() => p.evaluate(() => getComputedStyle(document.getElementById('results')).display !== 'none' && !document.getElementById('calcBtn').disabled), 20000);
 const endScroll = p => p.evaluate(() => new Promise(r => { scrollTo(0, document.scrollingElement.scrollHeight); requestAnimationFrame(() => requestAnimationFrame(r)); }));
 
 const sections = [];
@@ -111,11 +130,11 @@ section('place', async () => {
   const g = await p.evaluate(() => { const W = document.getElementById('planSky'), T = document.getElementById('rideSec'), S = document.getElementById('planSetBox'), cs = getComputedStyle(W), r = W.getBoundingClientRect();
     const fol = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING), sc = W.querySelector(':scope>.rwx-scene'), scs = sc && getComputedStyle(sc);
     const own = [...document.styleSheets].flatMap(s => { try { return [...s.cssRules]; } catch (e) { return []; } }).flatMap(function f(r) { return [...(r.selectorText ? [r] : []), ...[...(r.cssRules || [])].flatMap(f)]; }) /* (a style rule has cssRules too: nesting) */.filter(r => r.selectorText && /#planSky\b/.test(r.selectorText) && !/#planSky[ >.:[]/.test(r.selectorText.replace(/#planSky\[hidden\]/, '')));
-    return { order: fol(T, W) && fol(W, S), screen: T.getBoundingClientRect().bottom <= r.top + 1 && r.bottom <= S.getBoundingClientRect().top + 1, bg: cs.backgroundColor, bw: cs.borderTopWidth, bs: cs.borderTopStyle, bc: cs.borderTopColor,
+    return { order: fol(T, W) && fol(W, S), screen: T.getBoundingClientRect().bottom <= r.top + 1 && r.bottom <= S.getBoundingClientRect().top + 1, bg: cs.backgroundColor, bw: cs.borderTopWidth, bs: cs.borderTopStyle, bc: cs.borderTopColor, setbc: getComputedStyle(S).borderTopColor,
       rad: cs.borderTopLeftRadius, setbw: getComputedStyle(S).borderTopWidth, ol: getComputedStyle(document.documentElement).getPropertyValue('--ol').trim(), decl: own.map(r => (/border:([^;]*)/.exec(r.style.cssText) || [])[1]).filter(Boolean), rp: getComputedStyle(document.documentElement).getPropertyValue('--r-panel').trim(), minh: cs.minHeight, h: r.height, heightRule: own.map(r => r.style.height).filter(Boolean), inline: W.getAttribute('style'),
       mask: scs && (scs.maskImage || scs.webkitMaskImage), scene: !!sc, fwwx: document.querySelectorAll('.fw-wx').length, wxSky: typeof FW.wxSky }; });
   ok(g.order && g.screen, '100.1: the box sits between the ride ticket and Settings (in the page and on the screen)', g);
-  ok(g.bg === 'rgb(255, 255, 255)' && g.ol === '1.5px' && g.decl.some(v => /var\(--ol\)/.test(v)) && g.bw === g.setbw && g.bs === 'solid' && g.rad === g.rp && g.rp === '20px', '100.1: a plain Plan box: white, a 1.5 px outline (var(--ol), 1.5px: drawn as the Settings box\'s, ' + g.bw + '), the panel radius (var(--r-panel))', g);
+  ok(g.bg === 'rgb(255, 255, 255)' && g.ol === '1.5px' && g.decl.some(v => /var\(--ol\)/.test(v)) && g.bw === g.setbw && g.bs === 'solid' && g.bc === g.setbc && g.rad === g.rp && g.rp === '20px', '100.1: a plain Plan box: white, a 1.5 px outline (var(--ol), 1.5px: drawn as the Settings box\'s, ' + g.bw + ', in its colour ' + g.setbc + '), the panel radius (var(--r-panel))', g);
   ok(parseFloat(g.minh) >= 100 && !g.heightRule.length && !g.inline, '100.1, QA: a minimum height, never a fixed one (no height in its rules, none inline)', g);
   ok(g.scene && /gradient/.test(g.mask || '') && !g.fwwx && g.wxSky === 'undefined', '100.1: its sky is item 87\'s masked .rwx-scene layer; the bundle\'s forecast sky is not used (no .fw-wx; FW has no wxSky)', g);
   await x.close();
@@ -134,14 +153,14 @@ section('looks', async () => {
     const line = k === 'night' ? /^Thu 8:00 PM · Carmel · \d+°$/ : LINE;
     ok(B.on && B.wx === 'live' && (k === 'night' ? !B.sky && !B.layer : B.sky === k && B.gsky === k && B.layer === k) && B.look === k && B.key === 'wx:' + k && B.same && (k === 'night' ? B.still === true : B.still === false),
       '100.1-2: ' + k + ': the box\'s sky is the forecast\'s (' + (k === 'night' ? 'none on a clear night' : k) + ') and fred is dressed for it as on the weather card (wx:' + k + ', FW.bird of FW.WX_WEAR.' + k + (k === 'night' ? ', still' : '') + ')', B);
-    ok(line.test(B.line || ''), '100.1: ' + k + ': one line, time · place · temperature ("' + B.line + '")', B.line);
+    ok(line.test(B.line || '') && B.whole, '100.1: ' + k + ': one line, time · place · temperature ("' + B.line + '"), the box\'s only words', B);
     if (k === 'sun') { await crunch(p); const t = await p.evaluate(() => { const e = document.querySelector('#rWeather .rwx-temp'); return e && e.textContent.trim(); });
       ok(!!t && t === B.num, '100.1: the line\'s number is the weather card\'s (the forecast at the start: ' + B.num + ' and ' + t + ')', { box: B.num, card: t }); }
     await x.close(); }
 });
 
 section('nofc', async () => {
-  const cap = (B, what) => ok(B.on && B.wx === 'none' && !B.sky && !B.gsky && !B.layer && B.look === 'clouds' && B.key === 'wx:clouds' && B.same && LINE0.test(B.line || '') && !B.num && !/\d+°/.test(B.line || ''),
+  const cap = (B, what, line = LINE0) => ok(B.on && B.wx === 'none' && !B.sky && !B.gsky && !B.layer && B.look === 'clouds' && B.key === 'wx:clouds' && B.same && line.test(B.line || '') && B.whole && !B.num && !/\d+°/.test(B.line || ''),
     '100.2, QA: ' + what + ': fred in his cap (FW.bird with no wear: wx:clouds), no sky, no number ("' + B.line + '")', B);
   { const x = await openH({ forecast: false }); await ready(x.p, 'none', 'clouds'); cap(await boxOf(x.p), 'no forecast'); await x.close(); }
   { const x = await openH({ route: (r, u) => u.startsWith('https://geocoding-api.open-meteo.com/v1/search') ? r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{"results":[]}' }) : null });
@@ -155,6 +174,11 @@ section('nofc', async () => {
     await ready(x.p, 'live', null); mode = 'fail'; await reload(x.p); await until(async () => (await reqs(x.p)).length > 0, 8000); await sleep(1000); await ready(x.p, 'none', 'clouds');
     const st = await x.p.evaluate(() => !!(window.__q100.wxLast && window.__q100.wxLast.stale));
     ok(st, 'nofc: the failing lookup fell back on the forecast saved earlier (fetchWeather\'s cache: wxLast.stale)', st); cap(await boxOf(x.p), 'a failing network (a saved forecast from the cache)'); await x.close(); }
+  // a ride 11 or more days out: typical weather only, which the box does not show as a forecast (and does not look up)
+  { const x = await openH(), p = x.p; await ready(p, 'live', null); await sleep(400); const a = kinds(await reqs(p));
+    await sheet(p, () => setField(p, '#wxDate', '2026-11-13')); await sleep(1500); await ready(p, 'none', 'clouds'); const b = kinds(await reqs(p));
+    ok(b.all === a.all, '100.2: a ride 15 days out (typical weather only): the box asks for nothing (no forecast, no archive)', { a, b });
+    cap(await boxOf(p), 'a ride 15 days out (typical weather only)', /^Fri 8:00\sAM · Carmel$/); await x.close(); }
 });
 
 section('fetch', async () => {
@@ -177,10 +201,66 @@ section('fetch', async () => {
     await p.evaluate(() => { const T = window.__q100.skyBoxFetch.t || {}; Object.keys(T).forEach(k => { T[k] -= 10 * 60e3 + 1000; }); }); await tab(p, 'journal'); await tab(p, 'plan'); await sleep(1200); const c = kinds(await reqs(p));
     ok(a.all >= 1 && b.all === a.all && c.all > b.all && c.geo === a.geo + 1, '100.2: a failing network: one try when Plan opens, none on 8 tab switches and the app back in front, one again after 10 minutes', { a, b, c }); await x.close(); }
   // a Crunch while the box's lookup is still out: it waits for it (one place search, one forecast)
-  { const slow = (r, u) => /open-meteo/.test(u) ? new Promise(res => setTimeout(() => res(WX(r, u)), 1500)) : null;
+  { const slow = (r, u) => /open-meteo/.test(u) ? new Promise(res => setTimeout(() => res(WX(r, u)), 1200)) : null; /* (two requests in turn: under the 4 s a Crunch waits) */
     const x = await openH({ forecast: false, route: slow, settle: 100 }), p = x.p; await until(async () => (await reqs(p)).length > 0, 5000);
     await p.click('#calcBtn'); await until(() => p.evaluate(() => getComputedStyle(document.getElementById('results')).display !== 'none'), 20000); await sleep(500);
     const a = kinds(await reqs(p)); ok(a.geo === 1 && a.fc === 1, '100.2: a Crunch during the box\'s lookup waits for it: one place search and one forecast in all', a); await x.close(); }
+  // a Crunch during the box's failing lookup: Crunch tries again itself and says so (check round 1)
+  { const bad = (r, u) => /open-meteo/.test(u) ? new Promise(res => setTimeout(() => res(r.fulfill({ status: 500, body: 'down' })), 1500)) : null;
+    const x = await openH({ forecast: false, route: bad, settle: 100 }), p = x.p; await until(async () => (await reqs(p)).length > 0, 5000); await p.click('#calcBtn'); await shown(p); await sleep(300);
+    const a = kinds(await reqs(p)), note = await p.evaluate(() => { const o = document.getElementById('wxOut'); return getComputedStyle(o).display !== 'none' ? o.textContent : ''; });
+    ok(a.geo === 2 && /Couldn't get the forecast/.test(note), '100.2: a Crunch during the box\'s failing lookup tries again itself (a second place search) and shows its note', { a, note }); await x.close(); }
+  // no lookup while the Plan sheet is open (each edit would be one); one after Done (check round 1)
+  { const x = await openH(), p = x.p; await ready(p, 'live', null); await sleep(400); const a = kinds(await reqs(p));
+    await p.click('#locRow'); await until(() => p.evaluate(() => document.getElementById('planSheet').classList.contains('open')));
+    for (const t of ['09:00', '10:00', '11:00']) { await setField(p, '#startTime', t); await sleep(500); } const b = kinds(await reqs(p));
+    await p.click('#psAct'); await until(() => p.evaluate(() => !document.getElementById('planSheet').classList.contains('open'))); await sleep(1500); const c = kinds(await reqs(p));
+    ok(b.all === a.all && c.geo === a.geo + 1 && c.fc === a.fc + 1, '100.2: the Plan sheet open, three start times: no lookup; Done: one (a place search and a forecast)', { a, b, c }); await x.close(); }
+});
+
+section('keep', async () => {
+  // a day changed and back: the first day's forecast again (the box's own copy, under an hour old), no new lookup
+  { const x = await openH({ query: '?sky=sun' }), p = x.p; await ready(p, 'live', 'sun'); await sleep(400);
+    await sheet(p, () => setField(p, '#wxDate', '2026-10-31')); await until(async () => { const B = await boxOf(p); return B.wx === 'live' && /^Sat /.test(B.line || ''); }, 10000); await sleep(400); const b = kinds(await reqs(p));
+    await sheet(p, () => setField(p, '#wxDate', '2026-10-29')); await sleep(1500); const B = await boxOf(p), c = kinds(await reqs(p));
+    ok(B.on && B.wx === 'live' && B.look === 'sun' && B.sky === 'sun' && LINE.test(B.line || '') && c.all === b.all, '100.2: a day changed and back: the box shows the first day\'s forecast again (live, its sky and number), no new lookup', { B, b, c });
+    // Crunch, then Save to Journal (planReset): the box is back with the forecast
+    await crunch(p); const n = kinds(await reqs(p)); await p.click('#journalBtn'); await sleep(1500); await tab(p, 'journal'); await tab(p, 'plan'); await sleep(800); const S = await boxOf(p), m = kinds(await reqs(p));
+    ok(S.on && S.wx === 'live' && S.look === 'sun' && S.sky === 'sun' && LINE.test(S.line || '') && m.all === n.all, '100.2: Crunch, then Save to Journal: the box is back with the forecast (live, its sky and number), no new lookup', { S, n, m });
+    // offline after a live forecast: the cap (100.2); online again: the sky and number back
+    await x.ctx.setOffline(true); await p.evaluate(() => dispatchEvent(new Event('offline'))); await ready(p, 'none', 'clouds'); const O = await boxOf(p), o = kinds(await reqs(p));
+    ok(O.on && !O.sky && !O.num && LINE0.test(O.line || '') && o.all === m.all, '100.2: offline after a live forecast this session: fred in his cap, no sky, no number, no request', { O, o });
+    await x.ctx.setOffline(false); await p.evaluate(() => dispatchEvent(new Event('online'))); await ready(p, 'live', 'sun'); const N = await boxOf(p);
+    ok(N.sky === 'sun' && LINE.test(N.line || ''), '100.2: back online: the sky and number again', N); await x.close(); }
+  // the computer layout: + New ride
+  { const x = await openH({ query: '?sky=sun', width: 1280, height: 800 }), p = x.p; await ready(p, 'live', 'sun'); await crunch(p); const n = kinds(await reqs(p));
+    await p.click('button[data-dk=newride]:visible'); await sleep(1500); const S = await boxOf(p), m = kinds(await reqs(p));
+    ok(S.on && S.wx === 'live' && S.sky === 'sun' && LINE.test(S.line || '') && m.all === n.all, '100.2: the computer layout, Crunch then + New ride: the box is back with the forecast, no new lookup', { S, n, m }); await x.close(); }
+});
+
+section('race', async () => {
+  // the box's lookup of the 8:00 ride held 5 s, answered or failing; meanwhile 9:00 is set and Crunched; then a redraw with no lookup
+  for (const how of ['ok', 'fail']) {
+    let n = 0; const route = (r, u) => /api\.open-meteo\.com\/v1\/forecast/.test(u) ? (n++ === 0 ? new Promise(res => setTimeout(() => res(how === 'ok' ? WX(r, u) : r.fulfill({ status: 500, body: 'down' })), 5000)) : WX(r, u)) : null;
+    const x = await openH({ route, settle: 200 }), p = x.p; await until(async () => kinds(await reqs(p)).fc >= 1, 8000);
+    await sheet(p, () => setField(p, '#startTime', '09:00')); await crunch(p);
+    const card = () => p.evaluate(() => document.getElementById('rWeather').textContent.replace(/\s+/g, ' ').trim()), c0 = await card(); await sleep(6000);
+    await p.evaluate(() => document.getElementById('prowBtn-heatadj').click()); await sleep(800); /* (recrunchQuiet: the card drawn again from the shared forecast) */
+    const s = await p.evaluate(() => { const Q = window.__q100; return { key: Q.wxKey, cur: Q.wxReq().key, start: Q.wxLast && Q.wxLast.startMin }; }), c1 = await card();
+    ok(s.key === s.cur && s.start === 540 && c1 === c0, '100.2: the box\'s late lookup of the old ride (' + how + ') leaves the Crunched ride\'s forecast (wxKey, wxLast, the card after a redraw)', { s, c0: c0.slice(0, 90), c1: c1.slice(0, 90) });
+    await x.close(); }
+  // the network hangs while the box asks, and is back before Crunch: results promptly (main: 0.2 s)
+  { let answer = false; const held = []; const route = (r, u) => /open-meteo/.test(u) ? (answer ? WX(r, u) : new Promise(res => held.push(() => res(r.abort())))) : null;
+    const x = await openH({ route, settle: 200 }), p = x.p; await sleep(2500); answer = true; const t0 = Date.now(); await p.click('#calcBtn'); const done = await shown(p), ms = Date.now() - t0;
+    ok(!!done && ms < 8000, '100.2: the box\'s lookup hung, the network back: Crunch shows results within 8 s (' + ms + ' ms: it waits at most 4 s on the box\'s lookup)', { ms, held: held.length });
+    held.forEach(f => f()); await x.close(); }
+  // the ride changed while the box's lookup is out (held 4 s): the new ride's forecast, nothing else happening; back to 8:00: asked again
+  { let n = 0; const route = (r, u) => /api\.open-meteo\.com\/v1\/forecast/.test(u) ? (n++ === 0 ? new Promise(res => setTimeout(() => res(WX(r, u)), 4000)) : WX(r, u)) : null;
+    const x = await openH({ route, settle: 200 }), p = x.p; await until(async () => kinds(await reqs(p)).fc >= 1, 8000);
+    await sheet(p, () => setField(p, '#startTime', '09:00')); const B = await until(async () => { const b = await boxOf(p); return b.wx === 'live' && /^Thu 9:00\sAM · Carmel · \d+°$/.test(b.line || '') && b; }, 12000);
+    ok(!!B, '100.2: the ride changed while the box\'s lookup was out: the box gets the new ride\'s forecast with nothing else happening', B || await boxOf(p));
+    await sheet(p, () => setField(p, '#startTime', '08:00')); const C = await until(async () => { const b = await boxOf(p); return b.wx === 'live' && LINE.test(b.line || '') && b; }, 8000);
+    ok(!!C, '100.2: back to the first ride (its try overtaken, not failed): it is asked again and shown', C || await boxOf(p)); await x.close(); }
 });
 
 section('once', async () => {
@@ -233,6 +313,11 @@ section('crew', async () => {
   for (const [now, y, m, d] of [['2026-10-29T08:00:00-07:00', 2026, 10, 29], ['2026-10-29T23:30:00-07:00', 2026, 10, 29], ['2026-10-30T08:00:00-07:00', 2026, 10, 30]]) {
     const z = await openH({ now }); await until(async () => (await crewOf(z.p)).art === 5); const k = await crewOf(z.p);
     ok(J(k.ids) === J(fiveOf(y, m, d)), 'crew: at ' + now + ' (local) the five of that date (' + fiveOf(y, m, d).join(', ') + ')' + (d === 30 ? ': another five the next day' : ': the same all day'), k.ids); await z.close(); }
+  // a new day while the app stays open: back in front, the next day's five (no reload, no tab tap; check round 1)
+  { const z = await openH(), p = z.p; await until(async () => (await crewOf(p)).art === 5);
+    await p.evaluate(() => { const D = Date; globalThis.Date = class extends D { constructor(...a) { super(...(a.length ? a : [D.now() + 864e5])); } static now() { return D.now() + 864e5; } }; document.dispatchEvent(new Event('visibilitychange')); });
+    const k = await until(async () => { const c = await crewOf(p); return J(c.ids) === J(fiveOf(2026, 10, 30)) && c.art === 5 && c; }, 5000);
+    ok(!!k, 'crew: a new day while the app stays open: back in front, the next day\'s five (' + fiveOf(2026, 10, 30).join(', ') + ')', k || await crewOf(p)); await z.close(); }
 });
 
 section('motion', async () => {
@@ -249,6 +334,13 @@ section('motion', async () => {
   ok(new Set(Object.values(R.delays)).size >= 3, 'motion: the friends do not bob in step (--fw-d offsets: their bob phases differ)', R.delays);
   ok(R.max <= 30 && B.look === 'freeze', 'budget: at most 30 running fred world animations on the screen, fred in his busiest look (freeze) and the five friends (' + R.max + ')', R.max);
   ok(R.end.running === 0 && R.end.go === 0, 'round rule a: all still by 9.5 s (no running fred world animation, no .fwm-go)', R.end);
+  // they move again only when what they show changes: Journal and back, a resize, the app back in front: still, the same drawings (check round 1)
+  const SPOTS = '#planCrew .crew-a>svg, #planSky>.rwx-fred:not(.rwx-out)>svg';
+  await p.evaluate(S => { window.__q100svg = [...document.querySelectorAll(S)]; }, SPOTS);
+  await tab(p, 'journal'); await tab(p, 'plan'); await p.evaluate(() => { dispatchEvent(new Event('resize')); document.dispatchEvent(new Event('visibilitychange')); });
+  const A = await p.evaluate(S => new Promise(res => { let go = 0, run = 0; const t0 = performance.now(); const look = () => { go = Math.max(go, document.querySelectorAll('.fwm-go').length); run = Math.max(run, document.getAnimations().filter(a => a.playState === 'running' && /^fw-/.test(a.animationName || '')).length);
+    if (performance.now() - t0 < 1500) setTimeout(look, 50); else { const now = [...document.querySelectorAll(S)]; res({ go, run, n: now.length, same: now.length === window.__q100svg.length && now.length === 6 && now.every((s, i) => s === window.__q100svg[i]) }); } }; look(); }), SPOTS);
+  ok(A.go === 0 && A.run === 0 && A.same, 'round rule a: back on Plan (Journal and back), a resize and the app back in front: nothing moves again, each spot keeps its drawing (the same svg nodes: fred and the five)', A);
   await x.close();
   for (const [what, o] of [['Reduce Motion', { motion: false }], ['Animate the world off', { motion: true, settings: { worldMotion: false } }]]) {
     const y = await openH(Object.assign({ query: '?sky=sun', width: 430, height: 932, settle: 50 }, o)); const s = await y.p.evaluate(() => new Promise(res => { let go = 0, run = 0, n = 0; const t0 = performance.now();
@@ -260,7 +352,10 @@ section('room', async () => {
   for (const [w, h] of [[320, 568], [375, 667], [390, 844], [430, 932]]) for (const sc of [1, 1.5, 2]) {
     const x = await openH({ width: w, height: h, scale: sc, settings: { crewNames: true } }), p = x.p; await until(async () => (await crewOf(p)).art === 5); await endScroll(p);
     const g = await p.evaluate(() => { const U = document.getElementById('planCrew').getBoundingClientRect(), T = document.querySelector('nav.tabs').getBoundingClientRect(), F = document.querySelector('#view-plan>.fredfoot').getBoundingClientRect();
-      return { shown: !document.getElementById('planCrew').hidden && U.height > 0, gap: Math.round(T.top - U.bottom), foot: Math.round(T.top - F.bottom), sx: document.documentElement.scrollWidth > innerWidth }; });
+      const sb = document.querySelector('#view-plan>.fredfoot>.footlink'); let sr = sb.getBoundingClientRect(); if (sr.top < 0 || sr.bottom > innerHeight) { sb.scrollIntoView({ block: 'center' }); sr = sb.getBoundingClientRect(); }
+      const at = sr.width && sr.height ? document.elementFromPoint(sr.left + sr.width / 2, sr.top + sr.height / 2) : null, seen = getComputedStyle(sb).display !== 'none' && sr.width > 0 && sr.height > 0 && !!at && sb.contains(at); scrollTo(0, document.scrollingElement.scrollHeight);
+      return { shown: !document.getElementById('planCrew').hidden && U.height > 0, gap: Math.round(T.top - U.bottom), foot: Math.round(T.top - F.bottom), seen, sx: document.documentElement.scrollWidth > innerWidth }; });
+    ok(g.seen, 'QA: ' + w + ' x ' + h + ', ' + sc * 100 + '% text: the "Planning tool, not medical advice" footer stays, shown and not covered (its link is the element at its own centre)', g);
     ok(g.shown ? g.gap >= 8 && g.foot >= 0 && !g.sx : true, '100.4, QA: ' + w + ' x ' + h + ', ' + sc * 100 + '% text: at the end of the scroll the crew sits ' + g.gap + ' px clear of the tab bar (8 or more), the footer clear of it, no sideways scroll', g);
     ok(g.shown, 'room: ' + w + ' x ' + h + ', ' + sc * 100 + '% text: the crew shows (there is room)', g);
     await x.close(); }
@@ -276,13 +371,23 @@ section('room', async () => {
   ok(fs0 === 0 && a.fit > 0, 'room: judged on layout changes, never on a scroll (no measure in ' + 'a scroll to the end and back; one when the tab bar changed)', { scroll: fs0, after: a.fit });
   ok(a.hidden && a.disp === 'none' && +a.room < 8 && !b.hidden && +b.room >= 8, '100.4: no room (a tab bar 70 px taller, as larger text could make it): the crew is left out; room again: it is back', { a, b });
   await x.close();
+  // at the edge (check round 1): the tab bar grown until 4 px of room are left: left out; 9 px: shown, at least 8 px clear
+  for (const [want, on] of [[4, false], [9, true]]) {
+    const y = await openH({ width: 390, height: 844 }), q = y.p; await until(async () => (await crewOf(q)).art === 5); await endScroll(q);
+    let g = null; for (let k = 0; k < 4; k++) { const r = +(await crewOf(q)).room; if (r === want) break; await q.evaluate(d => { const T = document.querySelector('nav.tabs'), h = T.getBoundingClientRect().height + d; let s = document.getElementById('q100edge'); if (!s) { s = document.createElement('style'); s.id = 'q100edge'; document.head.append(s); } s.textContent = 'nav.tabs{box-sizing:border-box!important;min-height:' + h + 'px!important}'; }, r - want); await sleep(400); await endScroll(q); }
+    g = await q.evaluate(() => { const U = document.getElementById('planCrew'), r = U.getBoundingClientRect(), T = document.querySelector('nav.tabs').getBoundingClientRect(); return { hidden: U.hidden, room: +U.dataset.room, gap: r.height ? +(T.top - r.bottom).toFixed(1) : null }; });
+    ok(g.room === want && (on ? !g.hidden && g.gap >= 8 : g.hidden), '100.4: at the edge: ' + want + ' px of room at the end of the scroll: ' + (on ? 'shown, ' + g.gap + ' px clear of the tab bar' : 'left out'), g);
+    await y.close(); }
 });
 
 section('theme', async () => {
   const x = await openH({ query: '?sky=rain' }), p = x.p; await ready(p, 'live', 'rain');
   await p.click('#sportBtn'); await p.click('#sportMenu [data-sport=run]'); await until(() => p.evaluate(() => document.documentElement.classList.contains('run-theme'))); await ready(p, 'live', 'rain'); await sleep(300);
-  const g = await p.evaluate(() => { const W = document.getElementById('planSky'), bg = W.querySelector('.rwx-bg'), L = document.getElementById('planSkyL'); return { bg: getComputedStyle(W).backgroundColor, sky: bg && getComputedStyle(bg).backgroundImage, ink: getComputedStyle(L).color, crew: getComputedStyle(document.getElementById('planCrew')).display }; });
-  ok(g.bg === 'rgb(52, 52, 60)' && /color-mix|rgb\(/.test(g.sky || '') && g.ink === 'rgb(242, 242, 247)', '100.6: the run\'s graphite: the box takes the run\'s panel (#34343C), its sky mixed into it, the light words', g);
+  const g = await p.evaluate(() => { const W = document.getElementById('planSky'), bg = W.querySelector('.rwx-bg'), L = document.getElementById('planSkyL'), t = document.createElement('i'); t.style.color = 'var(--wx-c)'; bg.append(t); const c = getComputedStyle(t).color; t.remove();
+    const sky = bg && getComputedStyle(bg).backgroundImage, m = /linear-gradient\((?:[^,(]*,\s*)?(color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)\)|rgba?\((\d+), (\d+), (\d+))/.exec(sky || ''), first = m ? (m[2] ? [m[2], m[3], m[4]].map(v => +v * 255) : [m[5], m[6], m[7]].map(Number)) : null;
+    const wc = (c.match(/\d+(\.\d+)?/g) || []).slice(0, 3).map(Number), want = wc.map((v, i) => v * .26 + [52, 52, 60][i] * .74);
+    return { bg: getComputedStyle(W).backgroundColor, sky, first, wc, want, off: first && want.length === 3 ? Math.max(...first.map((v, i) => Math.abs(v - want[i]))) : null, ink: getComputedStyle(L).color, crew: getComputedStyle(document.getElementById('planCrew')).display }; });
+  ok(g.bg === 'rgb(52, 52, 60)' && g.off != null && g.off <= 4 && g.ink === 'rgb(242, 242, 247)', '100.6: the run\'s graphite: the box takes the run\'s panel (#34343C), its sky\'s first stop 26% of the sky in it (within ' + g.off + ' of ' + (g.want || []).map(Math.round).join(', ') + '), the light words', g);
   ok(g.crew === 'none', '100.6 (provisional): the crew is left out on the run\'s graphite', g);
   await p.click('#sportBtn'); await p.click('#sportMenu [data-sport=ride]'); await until(() => p.evaluate(() => !document.documentElement.classList.contains('run-theme'))); await sleep(300);
   ok((await crewOf(p)).on, 'theme: back on the ride the crew shows again', await crewOf(p));
@@ -313,11 +418,12 @@ section('names', async () => {
     await x.close(); }
   for (const [w, h] of [[320, 568], [390, 844], [430, 932]]) for (const sc of [1, 1.5, 2]) {
     const x = await openH({ width: w, height: h, scale: sc, settings: { crewNames: true } }), p = x.p; await until(async () => (await crewOf(p)).art === 5);
-    const c = await crewOf(p), g = await p.evaluate(() => { const L = [...document.querySelectorAll('#planCrew .crew-f')].map(li => { const n = li.querySelector('.crew-n'), a = li.querySelector('.crew-a'); return { n: n && n.getBoundingClientRect().toJSON(), a: a.getBoundingClientRect().toJSON(), cut: n ? n.scrollWidth > n.clientWidth + 1 || n.scrollHeight > n.clientHeight + 1 : true, under: n ? n.getBoundingClientRect().top >= a.getBoundingClientRect().bottom - 1 : false }; });
+    const c = await crewOf(p), g = await p.evaluate(() => { const L = [...document.querySelectorAll('#planCrew .crew-f')].map(li => { const n = li.querySelector('.crew-n'), a = li.querySelector('.crew-a'); const rg = n && document.createRange(); if (rg) rg.selectNodeContents(n); const lines = rg ? new Set([...rg.getClientRects()].filter(q => q.width > .5).map(q => Math.round(q.top))).size : 0;
+        return { lines, n: n && n.getBoundingClientRect().toJSON(), a: a.getBoundingClientRect().toJSON(), cut: n ? n.scrollWidth > n.clientWidth + 1 || n.scrollHeight > n.clientHeight + 1 : true, under: n ? n.getBoundingClientRect().top >= a.getBoundingClientRect().bottom - 1 : false }; });
       const hit = (r, q) => r.left < q.right - .5 && q.left < r.right - .5 && r.top < q.bottom - .5 && q.top < r.bottom - .5; let over = 0;
       L.forEach((x, i) => L.forEach((y, j) => { if (i !== j && (hit(x.n, y.n) || hit(x.n, y.a))) over++; }));
-      return { cut: L.filter(x => x.cut).length, under: L.every(x => x.under), over, out: L.filter(x => x.n.left < -0.5 || x.n.right > innerWidth + .5).length }; });
-    ok(J(c.names) === J(want) && !g.cut && g.under && !g.over && !g.out, '100.5, QA: names on, ' + w + ' px, ' + sc * 100 + '% text: the first name under each friend (' + want.join(', ') + '), none cut, none over another or past the screen', { names: c.names, g });
+      return { broken: L.filter(x => x.lines !== 1).length, cut: L.filter(x => x.cut).length, under: L.every(x => x.under), over, out: L.filter(x => x.n.left < -0.5 || x.n.right > innerWidth + .5).length }; });
+    ok(J(c.names) === J(want) && !g.cut && !g.broken && g.under && !g.over && !g.out, '100.5, QA: names on, ' + w + ' px, ' + sc * 100 + '% text: the first name under each friend (' + want.join(', ') + '), none cut or broken over two lines, none over another or past the screen', { names: c.names, g });
     if (w === 390 && sc === 1) { const snap = await p.locator('#planCrew').ariaSnapshot(); ok(want.every(n => snap.includes(n)) && /list/.test(snap), 'names: on, they are real text in the accessibility tree (a list of the names; the art aria-hidden)', snap.slice(0, 300)); }
     await x.close(); }
 });
@@ -331,6 +437,8 @@ section('sync', async () => {
   const A = await synced('A'), B = await synced('B');
   for (const x of [A, B]) await until(() => x.p.evaluate(() => { const o = JSON.parse(localStorage.getItem('bluebird.synccursor.v1') || 'null'); return !!(o && o.full); }), 20000);
   await until(() => doc().settings, 15000);
+  const priv = await A.p.evaluate(() => { const b = document.querySelector('#view-plan>.fredfoot>.privlink'), r = b && b.getBoundingClientRect(); return !!b && !b.hidden && getComputedStyle(b).display !== 'none' && r.width > 0 && r.height > 0; });
+  ok(priv, 'QA: where sign-in is configured, the Plan footer\'s Privacy link shows (the footer the crew follows)', priv);
   const nudge = async (cond, ms = 45000) => { const t = Date.now(); while (Date.now() - t < ms) { for (const x of [A, B]) await x.p.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(1500); const v = await cond().catch(() => null); if (v) return v; } return null; };
   await toSettings(A.p); await A.p.click('#prowBtn-crewnames'); await settle(A.p, 200);
   const up = await until(() => (doc().settings || {}).crewNames === true, 20000), at = doc().settingsAt || {};
@@ -360,29 +468,36 @@ section('backup', async () => {
   const y = await openH(), p = y.p; await restore(p, ex); await sleep(400); const r1 = await crewOf(p); /* (before the Plan tab: the restore itself redraws the crew) */
   ok(r1.names.length === 5, 'backup: restored on a fresh page, the names show (the restore redraws the crew)', r1); await tab(p, 'plan');
   const old = JSON.parse(JSON.stringify(ex)); delete old.settings.crewNames; delete old.settings.crewShow; await restore(p, old); await tab(p, 'plan'); await sleep(300);
-  const c = await crewOf(p), st = await p.evaluate(() => window.__q100.settings);
-  ok(c.on && !c.names.length && !('crewNames' in st) && !('crewShow' in st), 'backup: a backup without them gives the defaults (the crew on, no names), as worldMotion', { c, st: [st.crewShow, st.crewNames] });
+  const c = await crewOf(p), st = await p.evaluate(() => window.__q100.settings), ls = await p.evaluate(() => JSON.parse(localStorage.getItem('bluebird.settings.v2')));
+  ok(c.on && c.names.length === 5 && st.crewNames === true && ls.crewNames === true && !('crewShow' in st), 'backup: a backup without them keeps this device\'s (names on stay on, stored; as the rider, birthday and gender)', { c, st: [st.crewShow, st.crewNames], ls: ls.crewNames });
   await y.close();
+  const z = await openH({ settings: { crewShow: false } }), q = z.p; await restore(q, old); await tab(q, 'plan'); await sleep(300); const d = await crewOf(q), sz = await q.evaluate(() => window.__q100.settings);
+  ok(!d.on && d.art === 0 && sz.crewShow === false, 'backup: one without them on a device with the crew off: it stays off', { d, crewShow: sz.crewShow });
+  await z.close();
 });
 
 section('media', async () => {
   const x = await openH({ query: '?sky=sun', settings: { crewNames: true }, dpr: 2 }), p = x.p; await ready(p, 'live', 'sun'); await until(async () => (await crewOf(p)).art === 5);
   const look = () => p.evaluate(() => { const W = document.getElementById('planSky'), d = s => { const e = document.querySelector(s); return e ? getComputedStyle(e).display : 'gone'; };
-    return { box: d('#planSky'), edge: getComputedStyle(W).borderTopWidth + ' ' + getComputedStyle(W).borderTopStyle, fred: d('#planSky>.rwx-fred'), svg: d('#planSky>.rwx-fred>svg'), scene: d('#planSky>.rwx-scene'), crew: d('#planCrew'), art: d('#planCrew .crew-a'), line: d('#planSkyL') }; });
+    const L = document.getElementById('planSkyL');
+    return { shadow: getComputedStyle(L).textShadow, room: getComputedStyle(L, '::before').display + ' ' + getComputedStyle(L, '::before').width + ' ' + getComputedStyle(L).paddingRight, box: d('#planSky'), edge: getComputedStyle(W).borderTopWidth + ' ' + getComputedStyle(W).borderTopStyle, fred: d('#planSky>.rwx-fred'), svg: d('#planSky>.rwx-fred>svg'), scene: d('#planSky>.rwx-scene'), crew: d('#planCrew'), art: d('#planCrew .crew-a'), line: d('#planSkyL') }; });
   await p.emulateMedia({ media: 'print' }); const pr = await look(); await p.emulateMedia({ media: 'screen' });
   ok(pr.box !== 'none' && pr.line !== 'none' && pr.fred === 'none' && pr.scene === 'none' && pr.crew === 'none', 'QA print: no sky, no fred, no crew (the box\'s words stay)', pr);
+  ok(pr.shadow === 'none' && /^none /.test(pr.room) && / 0px$/.test(pr.room), 'print: the line without its feather (each ring would print as another copy of the words) and without fred\'s room', pr);
   for (const cs of ['light', 'dark']) { await p.emulateMedia({ forcedColors: 'active', colorScheme: cs }); const fc = await look();
     ok(fc.box !== 'none' && / solid$/.test(fc.edge) && parseFloat(fc.edge) >= 1 && (fc.fred === 'none' || fc.svg === 'none') && fc.scene === 'none' && fc.art === 'none', 'QA forced colours (' + cs + '): the art out (fred, the sky, the crew), the box\'s edge kept', fc); }
   await p.emulateMedia({ forcedColors: 'none' }); await x.close();
 });
 
 section('fit', async () => {
-  for (const [w, h] of [[320, 568], [390, 844]]) for (const sc of [1.5, 2]) {
+  for (const place of ['Carmel, IN', 'Indianapolis, IN', 'Mechanicsburg, PA']) for (const [w, h] of [[320, 568], [390, 844]]) for (const sc of [1.5, 2]) {
     const x = await openH({ query: '?sky=rain', width: w, height: h, scale: sc }), p = x.p; await ready(p, 'live', 'rain');
+    if (place !== 'Carmel, IN') { await setPlace(p, place); await until(async () => { const B = await boxOf(p); return B.wx === 'live' && B.line.includes(place.split(',')[0]); }, 15000); await sleep(300); }
     const g = await p.evaluate(() => { const W = document.getElementById('planSky'), Wr = W.getBoundingClientRect(), L = document.getElementById('planSkyL'), f = W.querySelector(':scope>.rwx-fred').getBoundingClientRect(), rg = document.createRange(); rg.selectNodeContents(L);
-      const T = [...rg.getClientRects()], right = Math.max(...T.map(r => r.right)), bodyL = f.left + f.width * .12;
-      return { inside: T.every(r => r.left >= Wr.left && r.right <= Wr.right && r.top >= Wr.top && r.bottom <= Wr.bottom), clear: right <= bodyL + .5, fred: f.bottom <= Wr.bottom && f.top >= Wr.top && f.right <= Wr.right, cut: L.scrollWidth > L.clientWidth + 1, sx: document.documentElement.scrollWidth > innerWidth, right: Math.round(right), bodyL: Math.round(bodyL) }; });
-    ok(g.inside && g.clear && g.fred && !g.cut && !g.sx, 'QA: ' + w + ' px, ' + sc * 100 + '% text: the line wraps inside the box, clear of fred; fred inside the box; nothing cut, no sideways scroll', g);
+      const T = [...rg.getClientRects()].filter(r => r.width > .5), bodyL = f.left + f.width * .12, beside = T.filter(r => (r.top + r.bottom) / 2 < f.bottom), right = Math.max(...beside.map(r => r.right)); /* (rows whose middle is above fred's foot: beside him; the rows under him take the box's width) */
+      const split = []; const tw = document.createTreeWalker(L, NodeFilter.SHOW_TEXT); let n; while ((n = tw.nextNode())) { const re = /\S+/g; let m; while ((m = re.exec(n.data))) { const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length); if (new Set([...r.getClientRects()].filter(q => q.width > .5).map(q => Math.round(q.top))).size > 1) split.push(m[0]); } }
+      return { line: L.textContent, inside: T.every(r => r.left >= Wr.left && r.right <= Wr.right && r.top >= Wr.top && r.bottom <= Wr.bottom), clear: right <= bodyL + .5, split, fred: f.bottom <= Wr.bottom && f.top >= Wr.top && f.right <= Wr.right, cut: L.scrollWidth > L.clientWidth + 1, sx: document.documentElement.scrollWidth > innerWidth, right: Math.round(right), bodyL: Math.round(bodyL) }; });
+    ok(g.inside && g.clear && g.fred && !g.cut && !g.sx && !g.split.length, 'QA: ' + place + ', ' + w + ' px, ' + sc * 100 + '% text: the line wraps inside the box, its rows beside fred clear of him, no word over two rows; fred inside the box; nothing cut, no sideways scroll', g);
     await x.close(); }
 });
 

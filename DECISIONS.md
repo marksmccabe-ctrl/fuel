@@ -2490,3 +2490,70 @@
     left out); docs/LEGAL.md "Crew likenesses" waits for each person's consent date and scope (probe100/legal-crew-draft.md): item 100
     cannot merge before it. Not checked: a real VoiceOver on the names list; a real phone's Dynamic Type (the kit's text sizes are a
     root font size).
+- Build check round 1 (the acceptance checkers on the build, b7b8f1b + f639375: 19 problems, 7 in the app (look 2, data 5), 12 in
+  q100 (tests lens); every one reproduced on fred100/null.html with the checkers' probes (probe100/check1-look, check1-data,
+  check1-tests); all real, all fixed; cache still v124, no bundle change).
+  - App (wt-q100 index.html):
+    - The box keeps a live forecast it has (medium, look): after Save to Journal, + New ride or a day changed and back, planReset or the
+      new key dropped the shared forecast and the box's own 10-minute block (stamped by its successful lookup) stopped it asking again:
+      the cap for a ride with a forecast. Now the box keeps its own copy of each live forecast it sees this session (SKY_KEPT, by ride
+      key; read while results are up too, so Crunch's own lookup is kept for after Save), shown while under an hour old (Crunch's
+      WX_MAX_AGE), and skyBoxFetch asks nothing while a copy is fresh. No request, no cap-then-sky flicker. The shared state (wxLast,
+      wxAccepted, wxKey, #tempF) is not touched from the copy, so Crunch after Save still looks up as main does.
+    - The box's late lookup no longer writes another ride's forecast (medium, data): fetchWeather gives each lookup a record
+      ({key, p, quiet}) and wxLookup's gone() drops a quiet lookup's answer (success, cache fallback and failure: returns null, writes
+      nothing) when the ride changed (wxReq's key) or the record is no longer wxBusy (a Crunch took over, or it gave up).
+    - A hung lookup holds nothing (medium, data): a Crunch waits on the box's lookup of the same ride at most WX_WAIT_MS 4 s, then looks
+      up itself (its record replaces the box's, so the box's late answer is dropped); the box's own lookup gives up after WX_QUIET_MS 15 s
+      (skyBoxFetch.p clears, that ride's try counts as failed: 10 minutes). On the checkers' hang probe Crunch shows results 4.1 s after the
+      tap (it was "Crunching..." past 15 s; main 0.16 s, which makes no lookup before Crunch). 4 s is above a normal lookup (the q100 wait
+      case is two 1.2 s answers in turn) and short enough not to read as stuck.
+    - The ride changed during the box's lookup (low, data): skyBoxFetch's settle calls skySoon (the ride as it is now: its own lookup if
+      due) instead of only drawing; an overtaken try (null) clears its 10-minute stamp, since it did not fail, so a ride the rider returns
+      to is asked again. The key check, the hour rule and the 10 minutes after a real failure keep it from looping.
+    - Offline is the cap (low, data): skyLive returns nothing while navigator.onLine is false, and the window's offline and online events
+      redraw the box (online: the sky back, a lookup if due). Spec 100.2 is followed as written; the forecast in hand stays in memory and
+      comes back with the network.
+    - The line's room only beside fred (low, look): the padding-right on #planSky .pvs-l became a right float of fred's size
+      (.pvs-l::before: width as the old padding, height fred's box from the box's top), so the rows under him use the box's width, and the
+      place is one inline-block piece (.pvs-p, at most the line's width), so a place too long for the room beside fred goes under him
+      whole ("INDIANAPOLIS", "MECHANICSBURG" at 320 px 150/200% and 390 px 200%). overflow-wrap:break-word alone was tried and still split
+      the word beside the float (Chrome breaks before it moves a line past a float); hyphens were not wanted ("INDIANAP-OLIS" beside him
+      is the same problem). Print hides the float (fred is not printed).
+    - An old backup without the crew switches keeps this device's (low, data): restoreAll keeps crewShow / crewNames when the file has no
+      key for them, as it keeps the rider, birthday and gender (the value does not change, so nothing is stamped or synced). The Build
+      note and q100 'backup' said "gives the defaults, as worldMotion": that was the build's reading, now changed. worldMotion itself is
+      left as item 97 made it (a backup without it gives the default); making it keep this device's too is a one-line follow-up for Mark
+      to decide, not done here.
+  - Kit (q100/q100.test.mjs, 155 checks, was 114): new sections keep (a day and back, Crunch then Save, + New ride on the computer
+    layout, offline after live then online) and race (the late lookup answered and failing, then recrunchQuiet: wxKey, wxLast and the
+    card stay the Crunched ride's; the hung lookup: results within 8 s; the ride changed during the lookup: its forecast with nothing
+    else; back to the first ride: asked again). Tightened: place (the outline in the Settings box's colour), looks and nofc (the box's
+    whole text is the line), nofc (a ride 15 days out: the cap and no request), fetch (a Crunch during a failing box lookup: a second place
+    search and the note; the Plan sheet open, three start times: no request, one lookup after Done; the wait case now two 1.2 s answers),
+    crew (a new day while the app stays open: the next day's five when it is back in front), motion (Journal and back, a resize and the
+    app back in front: nothing moves, the same six svg nodes), room (the footer's link shown and the element at its own centre at every
+    size; at the edge, 4 px of room: left out, 9 px: shown and at least 8 px clear), theme (the run sky's first stop within 4 of 26% of
+    the sky's --wx-c in #34343C), names (each name on one line), sync (the Plan footer's Privacy link shows where sign-in is configured),
+    backup (an old backup keeps names on and the crew off), media (print: no feather, no room), fit (Indianapolis and Mechanicsburg at
+    320 / 390 px, 150 / 200%: no word over two rows; rows beside fred clear of him, judged by each row's middle against fred's foot: the
+    big number's glyph box reaches 3 px above its line box). The HOOK also hands out wxKey.
+  - mut100.mjs gains 22 mutants (c1-*): the app problems as the build had them (keep, offline, race, hang, slowchange, overtaken, backup,
+    split), the checkers' 13 test mutants as they built them (room0, nofoot, typical, sheetopen, crunchnote, fredagain, crewredo,
+    namebreak, runsky, note, edge, printfeather, daystale) and printroom (print keeps fred's room); tight, stale, hourold and print
+    follow the changed source.
+  - Runs on fred100/null.html (q100-front 891b7e0, v124), main page fred/null.html (8c66750), Mac Studio, one at a time (probe100/r1:
+    runs.sh and runs2.sh, logs and summary.txt in r1/runs and r1/runs2):
+    - q100 (main second) `OK: item 100: Front page, the sky card and the crew (155 checks)` (208 s); on the build as the checkers had it
+      (probe100/check1-tests/base, f639375) `FAIL 15`: the day and back, Save, + New ride, back online, the late lookup ok and failing,
+      the hung lookup (20.1 s), the changed ride, both backups, print's room, four long-place fits.
+    - mut100, the 22 new and the 4 changed mutants: all FAIL (probe100/r1/w/mut100.log, per-mutant logs probe100/r1/mut100-<name>/);
+      the other 36 build unchanged from the new source (DRY) and guard sections that were only tightened.
+    - q99 (main second) `OK (8650 checks)` (990 s); q98 in parts `OK (253)`, `OK (49)`, `OK (21)`; q97 `OK (128 checks)`.
+    - motion on the 14 new screens `OK (27 checks)`; budgets on them and plan-before `OK (62 checks)`, host reference 1.16-1.42 ms;
+      smoke `OK (14 checks)`; contrast `OK (54 checks)`; layout 320 px and 390 px on the new screens `OK`; inventory `OK (7 checks)`;
+      npm test in wt-q100 1829 tests, 1782 pass, 0 fail, 47 todo. The probes: check1-data p-fetch (counts, offline, slowchange, race-ok,
+      race-fail, hang) all ok, hang 4.1 s (main 0.16 s); check1-look flip and aftersave (phone, desk) live with no new request;
+      probe100/r1/words.mjs (3 places x 4 widths x 3 text sizes) no word split, no row beside fred over him.
+  - Open as before: Mark on the v9 boots and on the crew on graphite (provisional), docs/LEGAL.md "Crew likenesses" (consent dates and
+    scope from Mark) before merge; and now whether worldMotion should also survive an old backup as the crew switches do.
