@@ -2168,8 +2168,9 @@
     the knee band at y 263 (else 266) with its ink line and highlight moved up. The thermal jersey's cuff is two butt-capped dashes on the
     arm path, under the hand and clipboard. Every other drawing, the avatars and the default rider are byte-identical to v8; no box,
     class, id or animation changed.
-  - ACCEPTED_V8, entry by entry (v8's least -> v9's least in its v8 width, pixels changed / own; C Chromium, W WebKit; v9 from
-    probe100/main/mpx.mjs, q99's pxMany method on bare lists, which read as the ride lists within a skin):
+  - ACCEPTED_V8, entry by entry (v8's least -> v9's least in its v8 width, pixels changed / own; C Chromium, W WebKit; v9 as q99 itself
+    prints it for the retired entries, probe100/main/runs/retired-v9.txt from q99-main.log, every reading on the ride and direct lists in
+    the width, and the same as probe100/main/mpx.mjs reads on bare lists):
     1. Boots over leg wear, no wool socks (point 1): C2x 192 / 18 -> 962 / 648; C3x 353 / 61 -> 1860 / 1568; W2x 194 / 18 -> 964 / 648;
        W3x 334 / 46 -> 1856 / 1568 (own counted in #B0343A). Dropped.
     2. Leg wear above boots, no wool socks (point 2): C2x legs and light tights 70 / 26 -> 168 / 116, heavy tights 74 / 28 -> 180 / 116;
@@ -2188,6 +2189,14 @@
     checks)`; entries 1-5 print "never under SHOW" for every item on every screen of their widths (accnotes.py) and "now shows" on each
     (1: 224 readings on each of the four screens; 2: 121, 91, 121, 91; 3: 156 and 164; 4: 188 on each; 5: 461 and 461), and each width
     check passes (every cell judged). Then entries 1-5 were removed (n 6 keeps its number).
+  - FORMER_V8 (found by the mutant rerun, fixed; nothing loosened): with entries 1-5 gone, their cases on the other screens were measured
+    only when Chromium 2x read them within half again of SHOW, and on v9 they read far above it, so the cells accElsewhere had kept measuring
+    on Chromium 3x and WebKit fell out: mut99's v8c2-wksock (Safari alone drawing the wool socks over leg wear above shoe covers as nothing)
+    `OK (8277 checks)` against the q99 with the entries dropped. q99 now keeps the retired entries as FORMER_V8 (each as it was, least
+    printed beside v9's, never a floor): every reading of a retired entry's case whose item and skin are in its width on another screen is
+    measured there (as accElsewhere did) and judged against SHOW, and one check per entry that every cell of its v8 width is still judged
+    ("ACCEPTED_V8 n (..., retired with v9): every screen, item and skin of its v8 width is still judged, against SHOW"); each prints its v9
+    least per screen and item beside v8's (the table above). It only adds measurements and checks to the strip section.
   - q99 (kit): BUILDS v9 only (v8 went with v9, as v7 with v8); the cache check asks v9 (17:38) or later and v9's sha1s; OWN.boots
     #B0343A (v9 draws #3A2F2A nowhere: the BUILDS-only q99 on v9 failed 379 boots lines, 0-12 own, fwcheck7/app/logs/q99-strip.log); the
     by-design rules unchanged, as v9 measures them (the wool socks' own colour stays 0-12 under covers with knee warmers or leg wear; the
@@ -2218,15 +2227,26 @@
     checks)`, v9a5-legtop `OK (8357 checks)`, so each is caught only because its entry is gone; v9-boots38 `FAIL 379` there too (OWN is
     v9's in that copy; the old OWN, #3A2F2A, failed the real v9 with the same 379). "A page drawing nothing for wool socks under knee
     warmers" is v8c2-kneesock (no cover; under a cover they are by design).
-  - Proof, one at a time on fred100/null.html (probe100/main/runs.sh, logs in probe100/main/runs/, summary.txt; Mac Studio, load 3-7
-    from other work): q99 with main's page second `OK: item 99: Your rider, and the rider on the Closet card (8561 checks)` (905 s;
-    8647 with entries 1-5, which the drop removes); q97 (main second, Q97_REPO wt-q100) `OK (128 checks)` (127 + the new version check;
+  - Proof, one at a time on fred100/null.html (probe100/main/runs.sh, logs in probe100/main/runs/, summary-1.txt and summary.txt; Mac
+    Studio, load 3-7 from other work): q99 (the final, with FORMER_V8) with main's page second `OK: item 99: Your rider, and the rider on
+    the Closet card (8647 checks)` (q99-main.log; the band's widest gap 79%, WebKit 2x light tights on tan skin, 248 -> 196; before
+    FORMER_V8 `OK (8561 checks)`, q99-main-1.log, 905 s); q97 (main second, Q97_REPO wt-q100) `OK (128 checks)` (127 + the new version check;
     its handoff byte check ran and passed); q98 in its parts (main second) `OK (253 checks)`, `OK (49)`, `OK (21)`; motion on the 16
     rider screens `OK ... (27 checks)`; smoke `OK (14 checks)`; inventory `OK: inventory nothing removed (7 checks)`; contrast `OK:
     contrast AA on 16 screens ... (58 checks)`; layout (LAYOUT_ONLY=rider) 320 px 13 screens (39 opened) and 390 px 16 (48), `OK`, no new
     failures; budgets `OK: fred world budgets: 16 screens (15 with fred world art) ... (host reference 1.6-1.6 ms, quiet at most 1.8) ...
     (62 checks)`, no host busy line outside its self-tests; npm test in wt-q100 1824 tests, 1777 pass, 0 fail, 47 todo.
-  - Mutants: all 155 of q99/mut99.mjs (152 - v8a1-floor - v8a5-floor + the five v9 ones) on fred100 against this q99, detached (probe100/w/mutants.log, per-mutant logs probe100/mut-<name>/q99.log): running at this commit; the result is logged below when they end.
+  - Mutants: all 155 of q99/mut99.mjs (152 - v8a1-floor - v8a5-floor + the five v9 ones) on fred100, detached and one at a time
+    (probe100/w/mutants.log, per-mutant logs probe100/mut-<name>/q99.log; 31457 s): against the q99 with entries 1-5 dropped, 154 `FAIL`
+    with lines of their own (the page is green, so every FAIL line is the mutant's; the fewest one line, as before: nofilter, privacy,
+    store-open, print, hint and the c1-, r2-, r4- to r7- sheet and fit ones), and one passed: v8c2-wksock `OK (8277 checks)` (FORMER_V8
+    above). After FORMER_V8, the strip mutants whose case lies in a retired width, the new ones and the dump one again (6514 s): v8c2-wksock
+    `FAIL 5` (WebKit 2x and 3x, both lists, and the band check), v8a1-out 31, v8a2-out 10, v8a2-floor 105, v8a3-out 21, v8a3-floor 162,
+    v8a4-out 67, v8a4-floor 207, v8a5-out 69, v9-boots38 379, v9a1-thin 245, v9a2-basesock 308, v9a4-kneeband 206, v9a5-legtop 4 (the 3x
+    lines), v8a-dump 106. FORMER_V8 only adds measurements and checks to the strip section, so the other 140 (each already FAIL on the
+    first pass, or not running the strip) cannot pass through it: not run a third time. The v8 mutants of the other entries as on the first
+    pass: v8a6-out 8, v8a6-floor 118, v8a6-fingercuff 26, v8c2-bootsnosock 484, v8c2-kneesock 188 (the page drawing nothing for wool
+    socks under knee warmers).
   - The app code for item 99 is unchanged (no check needed a change); cache stays v123 until item 100's build step bumps it to v124.
   - For the design chat (none blocks this step; from the independent check, verify-bundle7.json): (1) the v9 boots #B0343A are a brick
     red within 48 a channel of the app's warning red --red #C4162A (20 / 30 / 16), and QUEUE's round rules say "Red is warnings only":
