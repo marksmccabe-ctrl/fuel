@@ -5773,7 +5773,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 #planSky .pvs-p{display:inline-block;max-width:100%}
 #planSky .pvs-l::before{content:'';float:right;width:calc(var(--wxf) * 1.21 - 10px);height:calc(var(--wxf) * 1.14 - 14px)} /* fred's room beside him only (his box's height from the top): the rows under him take the box's width, and a word too long for the room beside him goes under him whole rather than break ("INDIANAPO / LIS" at 320 px, 200% text) */
 #planSky .pvs-t{font:700 1.25rem/1 var(--font);letter-spacing:0;color:var(--text);white-space:nowrap}
-.crew{container-type:inline-size;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.crew{container-type:inline-size;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:8px;margin:10px 0 env(safe-area-inset-bottom,0px);padding:0;list-style:none} /* below it the home indicator's inset (34 px on a Face ID iPhone, the installed app): the tab bar grows by it (its padding), html's own inset padding is inside its 100% height and adds no scroll room, so without this the crew had 5 px at the end of the scroll and was always left out; only while it shows (hidden: display none, the page as main's) */
 .crew[hidden]{display:none}
 .crew-f{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;max-width:100%;margin:0;padding:0}
 .crew-a{position:relative;width:min(calc((100vw - 65px) * var(--bw,1) / var(--sw,5)), calc(76px * var(--bw,1)));width:min(calc((100cqw - 33px) * var(--bw,1) / var(--sw,5)), calc(76px * var(--bw,1)));aspect-ratio:var(--bw,1) / var(--ch,1.5);line-height:0}
@@ -12212,6 +12212,7 @@ function skyBoxRender(){ const W=$('planSky'); if(!W) return; const out=skyShown
   if(sk) g.dataset.sky=sk; else delete g.dataset.sky; g.dataset.fred=fk; W.dataset.wx=w ? 'live' : 'none';
   const P=g.firstElementChild; if(P._l!==line){ P._l=line; P.innerHTML=line; } /* against the last string written: innerHTML reads back its no-break spaces as &nbsp; (and esc's &#39; as '), so a render that changes nothing would replace the line (a selection on it, a screen reader's place, lost) */
   wxDress(W, true); } /* in place: the same sky and look keep their layers and fred (no restart); another cross-fades as on the card */
+function skySync(){ const W=$('planSky'), o=skyShown(); if(W && W.hidden!==o) W.hidden=o; } /* the box out the moment results show (render, runCrunchResult, renderClothingOnly), before their scroll is measured: the observer's word comes after it, and WebKit has no scroll anchoring to put the results back under the header when the box above them goes */
 function skySoon(){ if(skySoon.t) return; skySoon.t=setTimeout(()=>{ skySoon.t=0; skyBoxFetch(); }, 0); }
 function skyBoxFetch(){ skyBoxRender(); const W=$('planSky'), T=skyBoxFetch.t||(skyBoxFetch.t={}); if(!W || W.hidden || skyBoxFetch.p) return;
   if(!$('view-plan').classList.contains('active') || $('planSheet').classList.contains('open') || document.visibilityState==='hidden' || navigator.onLine===false) return; /* Plan open and showing; offline: no lookup */
@@ -12252,7 +12253,7 @@ function crewFit(){ const U=$('planCrew'); if(!U || !U.dataset.k || settings.cre
 function crewSoon(){ if(crewSoon.t) return; crewSoon.t=setTimeout(()=>{ crewSoon.t=0; crewRender(); }, 0); } /* (after the code that changed settings: a sync, a restore, the boot pass) */
 /* the box out while results are shown (before a frame shows both freds: a MutationObserver's word comes before the next frame), back
    when they go; the crew judged again whenever the layout under it changes (sizes only: a scroll changes none) */
-{ const mo=new MutationObserver(()=>{ const W=$('planSky'), o=skyShown(); if(W.hidden!==o) W.hidden=o; skySoon(); }); mo.observe($('results'), {attributes:true, attributeFilter:['style']}); mo.observe($('runResults'), {attributes:true, attributeFilter:['hidden']}); mo.observe($('view-plan'), {attributes:true, attributeFilter:['data-ride']}); }
+{ const mo=new MutationObserver(()=>{ skySync(); skySoon(); }); mo.observe($('results'), {attributes:true, attributeFilter:['style']}); mo.observe($('runResults'), {attributes:true, attributeFilter:['hidden']}); mo.observe($('view-plan'), {attributes:true, attributeFilter:['data-ride']}); }
 if('ResizeObserver' in window){ const ro=new ResizeObserver(roDefer(crewFit)); ['view-plan','planBar','planSaved'].forEach(id=>ro.observe($(id))); ro.observe(document.querySelector('nav.tabs')); }
 addEventListener('resize', ()=>{ crewFit(); skySoon(); }); /* (a phone turned or a window resized: the computer layout comes or goes) */
 document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible'){ skySoon(); crewSoon(); } }); /* the app back in front: a lookup if due, a new day's crew */
@@ -12343,7 +12344,7 @@ function renderClothingOnly(mode){
   const i=readInputs(); if(planMode()!=='clothing' || !(i.durMin>0)) return false;
   lastResult=null; persistInputs(); planWearI=i; planBarOff=false;
   const R=$('results'); R.dataset.wearOnly='1'; staggerEnd(); // r1015 (item 86): boxes still waiting from the last Crunch land at once
-  renderWeather({i}, mode); renderWear(i); R.style.display='block'; if(!$('runResults').hidden) $('runResults').hidden=true; /* q98: never both sports' results, as in render */ updateSummaries(); planBarRender(); if(mode==='fresh' || mode==='open') staggerIn(R, {wx:mode==='fresh'}); // r1014 (item 85): the cards stagger in (no unused "pop" class); r1015 (item 86): each as it comes into view; q87: the weather gauges' entrance on a fresh Crunch
+  renderWeather({i}, mode); renderWear(i); R.style.display='block'; if(!$('runResults').hidden) $('runResults').hidden=true; /* q98: never both sports' results, as in render */ skySync(); /* q100 */ updateSummaries(); planBarRender(); if(mode==='fresh' || mode==='open') staggerIn(R, {wx:mode==='fresh'}); // r1014 (item 85): the cards stagger in (no unused "pop" class); r1015 (item 86): each as it comes into view; q87: the weather gauges' entrance on a fresh Crunch
   R.scrollIntoView({behavior:'auto',block:'start'});
   return true;
 }
@@ -14136,7 +14137,7 @@ function render(r, mode){ // r1014 (item 85): mode 'fresh' (a Crunch tap: the re
   $('rMath').innerHTML = mathSteps.map(([t,m,s],k)=>`<li><span class="ms-n">${k+1}</span><div><div class="ms-t">${t}</div><div class="ms-m">${m}</div>${s}</div></li>`).join('');
   // r1008 (item 67): the stages, the old steps behind "Show the full math" (r1010: its own Details row)
   { const ST=rideStages(r); $('rMathStages').innerHTML = ST ? mstHTML(ST) : ''; }
-  $('results').style.display='block'; if(!$('runResults').hidden) $('runResults').hidden=true; /* q98: never both sports' results (and two freds): the run's hidden, as runCrunchResult hides the ride's */ planBarRender(); hdrSubRender();
+  $('results').style.display='block'; if(!$('runResults').hidden) $('runResults').hidden=true; /* q98: never both sports' results (and two freds): the run's hidden, as runCrunchResult hides the ride's */ skySync(); /* q100 */ planBarRender(); hdrSubRender();
   if(mode==='fresh' || mode==='open') staggerIn($('results'), {bars:mode==='fresh', count:mode==='fresh' ? [...$('totGrid').querySelectorAll('tbody td b')] : null, wx:mode==='fresh'}); // r1014 (item 85), r1015 (item 86): each box plays as it comes into view; q87 (item 87): the weather gauges too, on a fresh Crunch
 }
 
@@ -14365,7 +14366,7 @@ function runCrunchResult(r, mode){ lastRun=r; staggerEnd(); $('results').style.d
   if(mode!=='fresh' && k>=0 && !el.hidden && old && old.parentElement===el && old.getClientRects().length){ /* q87 (item 87): any but a fresh Crunch keeps the shown weather box (its sky runs on) and changes its card in place; the boxes around it are new */
     [...el.childNodes].forEach(n=>{ if(n!==old) n.remove(); }); old.before(...N.slice(0, k)); old.after(...N.slice(k+1)); wxPut(old, nw.innerHTML, true); }
   else { const f=old && old.querySelector(':scope>.rwx-fred:not(.rwx-out)'); if(old) lvStop(old); el.replaceChildren(...N); if(nw){ if(f) nw.prepend(f); wxDress(nw, false); } } /* q98: fred carried into the new box (kept when his look is the same, as in the ride's box) */
-  el.hidden=false; dayFitRows(); wxFitRows(); if(mode==='fresh') staggerIn(el, {wx:true}); /* r1014 (item 85): a fresh Crunch staggers the run's boxes; q87: its weather gauges too */ if(!wxQuiet) el.scrollIntoView({behavior:'auto', block:'start'}); }
+  el.hidden=false; skySync(); /* q100 */ dayFitRows(); wxFitRows(); if(mode==='fresh') staggerIn(el, {wx:true}); /* r1014 (item 85): a fresh Crunch staggers the run's boxes; q87: its weather gauges too */ if(!wxQuiet) el.scrollIntoView({behavior:'auto', block:'start'}); }
 // q42: Settings › Cycling | Running (this device remembers the side; it opens on the current sport)
 const SETSP_KEY='bluebird.setSport.v1';
 function setSportView(){ let v=null; try{ v=localStorage.getItem(SETSP_KEY); }catch(e){} return v==='run' || v==='ride' ? v : sport(); }
