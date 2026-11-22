@@ -241,6 +241,8 @@ function pageAudit(cfg) {
   const FL = new Map();
   // a sticky box is stuck (floating) when it sits at its offset from the screen's edge: top:N at N px from the top, bottom:N at N px from
   // the bottom; elsewhere the page has scrolled it to where it would sit unstuck
+  // (only a sticky box the page itself scrolls: one inside a scroller, a sheet's title bar, sticks to that scroller's edge)
+  const onPage = x => { for (let a = x.parentElement; a && a !== de && a !== document.body; a = a.parentElement) { const c = cs(a); if (/auto|scroll|hidden|clip/.test(c.overflowX + ' ' + c.overflowY)) return false; } return true; };
   const stuck = x => { const c = cs(x), r = x.getBoundingClientRect(), t = parseFloat(c.top), b = parseFloat(c.bottom);
     return (!isNaN(t) && Math.abs(r.top - t) < 1) || (!isNaN(b) && Math.abs(innerHeight - r.bottom - b) < 1) || (isNaN(t) && isNaN(b)); };
   const floatOf = e => {
@@ -248,7 +250,7 @@ function pageAudit(cfg) {
     let f = null;
     for (let x = e; x && x !== de; x = x.parentElement) {
       const p = cs(x).position;
-      if (p === 'sticky' && !stuck(x)) continue; /* (item 100: a sticky bar not stuck now, scrolled with the page into its own place, is page: the Crunch bar at the end of a long Plan, under the header) */
+      if (p === 'sticky' && onPage(x) && !stuck(x)) continue; /* (item 100: a sticky bar not stuck now, scrolled with the page into its own place, is page: the Crunch bar at the end of a long Plan, under the header) */
       if (p === 'fixed' || p === 'sticky' || (p === 'absolute' && (/^(menu|listbox|dialog|alertdialog|tooltip)$/.test(x.getAttribute('role') || '') || x.hasAttribute('popover')))) { f = x; break; }
     }
     FL.set(e, f); return f;
