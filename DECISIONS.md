@@ -2557,3 +2557,78 @@
       probe100/r1/words.mjs (3 places x 4 widths x 3 text sizes) no word split, no row beside fred over him.
   - Open as before: Mark on the v9 boots and on the crew on graphite (provisional), docs/LEGAL.md "Crew likenesses" (consent dates and
     scope from Mark) before merge; and now whether worldMotion should also survive an old backup as the crew switches do.
+- Build check round 2 (the acceptance checkers on round 1, 891b7e0: 13 problems, 5 in the app (look 3, data 2), 8 in q100 (tests
+  lens); each reproduced first (the checkers' probes check2-data p2-cache stale/stalestuck and p2-slow box on 891b7e0, probe100/r2
+  repro-*.txt; check2-look's places and wordfix; their c2t mutants); all real, all fixed; cache still v124, no bundle change).
+  - App (wt-q100 index.html):
+    - A place of several words no longer drops under fred whole (medium, look): round 1's one piece per place (.pvs-p) left the rows
+      beside fred empty after "THU 8:00 AM ·" and the box taller (Salt Lake City 149 px at 320 px 150%, Colorado Springs 176 / 196 px,
+      Rancho Santa Margarita 138 px), and a row could start with the dot. Now each word of the place is its own piece (a word too long
+      for the room beside fred still goes under him whole: Indianapolis, Mechanicsburg) and each dot is held to the word before it: the
+      separators are a no-break space and the dot ("8:00 AM ·"), and the place's last dot sits inside its last word's piece, because
+      Chrome breaks after an inline-block whatever follows it (a no-break space after the piece still let "· 61°" start a row: probe100/r2
+      words2.mjs, 5 of 84 cases, before the dot went inside). The same boxes are now 117, 117, 146 and 116 px; 7 places x 4 widths x 3
+      text sizes: no row starting with a dot, no word split, nothing beside fred over him (r2/words2-new.txt).
+    - The crew has a size cap (low, look): a slot is min(its share of the column, 76 px a body), with the vw fallback capped the same,
+      so a tablet or a phone turned keeps a large phone's size (76 px, Rob 80.5 px, the crew 115 px tall at 768 x 1024, 1024 x 768 and
+      844 x 390; it was 129 px a friend, 196 px tall) and the row is centred (justify-content was already center). 76 px is about the
+      430 px phone's 72 px; fred in the box is 88 px.
+    - Print drops the box's minimum height (low, look): #planSky{min-height:0!important} beside the print rule that hides fred's room,
+      as item 98 does for the card: the box prints as its line and padding (52 px, was 114 px).
+    - The box's failed lookup writes nothing (medium, data): wxLookup's catch returns false for a quiet lookup (after the gone() check)
+      with no cache fallback and no nulling. Round 1 let it take the saved copy into the shared state (wxKey, wxAccepted, wxLast.stale):
+      with the network back, Crunch then made no request and showed "Saved forecast from 10 min ago", and the box (which never shows a
+      saved copy) kept the cap until that copy was an hour old. Crunch now looks up as main does and falls back on the cache itself; the
+      box's normal 10 minutes apply. With that, skyLive also needs the shared forecast to be under an hour old (!wxOld(), as its kept
+      copies are): a failed relookup of an hour-old forecast no longer replaces it, so without the rule the box would show it as live.
+    - Slow weather.gov (medium, data): nwsWBGT gives up after 8 s (an AbortController, as the place search's 8 s; its catch already
+      keeps the estimated WBGT), so Open-Meteo's speed sets a lookup's length, for Crunch too (main has no limit: a slow NDFD held
+      Crunch 18 s on the checkers' probe; it is now 8 s at most and the estimate, which main uses whenever NDFD fails). A Crunch waiting
+      on the box's lookup of the same ride now waits 4 s (WX_WAIT_MS) only for a lookup that has no forecast yet (hung: then it looks up
+      itself); once the box's lookup has its forecast (own.fc, set when Open-Meteo answers) Crunch waits for its end (weather.gov's 8 s at
+      most), so no second lookup. And a late answer is no longer dropped just because the box stopped waiting (WX_QUIET_MS 15 s still
+      frees the box to ask another ride): gone() asks whether another lookup started since (wxLatest, the last one started) or the ride
+      changed, not whether it is still wxBusy, and a quiet success draws the box (skySoon). On the checkers' p2-slow: the box live at
+      ~8 s with the estimate (was the cap for 10 minutes); Crunch tapped at 3 s with NDFD at 18 s: results 5.0 s after the tap with 3
+      requests (was 22.1 s, 6; main 18.2 s, 3); NDFD at 6 s, Crunch at 1 s: 5.0 s, 3 (was 10.2 s, 6; main 6.2 s, 3).
+  - Kit (q100/q100.test.mjs, 249 checks, was 155): looks (the line in the caps style, uppercase; painted over the sky: the running
+    animations held, each row of the line shot shown and hidden must differ; rain and snow: the box's sky runs item 87's loops, rwx-fall /
+    rwx-snow), nofc (the box's failing lookup takes nothing in, wxLast and wxKey empty; Crunch on the failing network falls back on the
+    saved copy itself, as main; the sport changed with that saved copy in hand under the same key: the cap; a forecast now over an hour
+    old whose relookup fails: the cap), fetch (#wxOut hidden during the box's lookup, after its failure and when Plan opens; weather.gov
+    at 18 s: the box live within 12 s with the estimate, one request of each kind; Crunch during the box's wait on weather.gov at 6 s and
+    18 s: one request of each kind, results under 7.5 / 8 s), keep (a saved forecast, the boot lookup failing, the network back: Crunch
+    makes a place search and a forecast request, no "Saved forecast"; no Crunch: 10 minutes on, the box live), race (#wxOut hidden during
+    the hung lookup; Crunch's own place search 3.8-5 s after the tap, by the HOOK's performance.now() stamps, results within 8 s still
+    the outer bound; the box's lookup hung for good and the start changed at ~2 s: live for 9:00 within 21 s with one place search and one
+    forecast; the box's forecast answering at 17 s, the ride the same: taken, no second lookup), room (768 x 1024, 1024 x 768, 844 x 390:
+    each friend at most 76 px a body, the crew no taller, the row centred, shown at 768), theme (on the run: ticket, box, then the Carry
+    box and Settings, in the page and on the screen; the line painted on graphite), names (the accessibility tree exactly `- list "The
+    crew":` and the five listitems; each .crew-a aria-hidden="true"), media (print: the box at most its line, padding and border + 2
+    px), fit (each of 3 widths x 2 text sizes opened once, six places: the three of round 1 and Salt Lake City, San Francisco, Rancho
+    Santa Margarita; no row beside fred left empty or short of a word that would fit there, no row starting with a dot). The HOOK also
+    stamps each request (window.__q100t).
+  - mut100.mjs gains 18 mutants (c2-*): the app problems as round 1 had them (words, dot, crewcap, printh, stale, nwsbound, wait4,
+    latedrop) and hourlive (the new hour rule), and the checkers' test mutants (zline, quietout, quietms, skystill, wait65, runorder,
+    label, caps) and ariaart (their probe showed no AX change; the attribute check catches it); equal, print, explain, stale, c1-typical,
+    c1-race and c1-hang follow the changed source.
+  - Not done: the contrast audit's own "is the text painted" step (the checkers' second suggestion for zline): with no shown/hidden
+    difference it judges the line boxes' pixels, so text drawn under a layer reads as fine there; making that a failure touches every
+    screen of the audit and wants its own run on main; q100's painted checks hold the box's line meanwhile.
+  - Runs on fred100/null.html (q100-front 0137d7a, v124), main page fred/null.html (8c66750), Mac Studio, one at a time (probe100/r2:
+    runs.sh, logs and summary.txt in r2/runs):
+    - q100 (main second) `OK: item 100: Front page, the sky card and the crew (249 checks)` (289 s); on round 1's build (r2/base,
+      891b7e0) `FAIL 26`: the box's failing lookup takes the saved copy, Crunch with weather.gov slow (6 s, 18 s), the box with weather.gov
+      at 18 s, the saved copy and the network back (Crunch and box), the late answer, the three big screens, print's height, and the
+      places of several words.
+    - mut100, all 80 (the 40 of the build, the 22 of round 1, the 18 new): all FAIL (2226 s; r2/w/mut100.log, per-mutant logs
+      r2/mut100-<name>/).
+    - q99 (main second) `OK (8650 checks)` (959 s); q98 in parts `OK (253)`, `OK (49)`, `OK (21)`; q97 `OK (128 checks)`.
+    - motion on the 14 new screens `OK (27 checks)`; budgets `OK (62 checks)`, host reference 1.14-1.72 ms, no host-busy line; smoke
+      `OK (14 checks)`; contrast `OK (54 checks)`; layout 320 px and 390 px on the new screens `OK`; inventory `OK (7 checks)`; npm test
+      in wt-q100 1829 tests, 1782 pass, 0 fail, 47 todo. The checkers' probes on the new page: p2-cache stale and stalestuck ok (Crunch
+      makes 1 geo + 1 forecast + 1 NWS request, no note; the box live at 11 minutes), p2-slow box ok (live by 14 s, the estimate),
+      crunch 5.0 s with 3 requests (both NDFD timings); r2/words2.mjs 84 of 84 ok.
+  - Open as before: Mark on the v9 boots and on the crew on graphite (provisional), docs/LEGAL.md "Crew likenesses" (consent dates and
+    scope from Mark) before merge, whether worldMotion should also survive an old backup; and now the weather.gov limit (8 s, then the
+    estimate) applies to Crunch too, a change from main Mark may want to know of.
