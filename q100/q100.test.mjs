@@ -22,17 +22,21 @@
 //            sheet is open (start times changed three times), one after Done; the box's lookups write no note under the form (#wxOut hidden
 //            during a lookup and after a failed one); weather.gov slow (check round 2): past 15 s the box still shows the forecast (live by
 //            12 s, the estimate); a Crunch while the box waits on it (6 s, 18 s) adopts the box's lookup (one request of each kind) and is done
-//            when that lookup is (weather.gov 8 s at most)
+//            when that lookup is (weather.gov 8 s at most); review round 3: the line kept in place (no write on a render that changes
+//            nothing, a selection on it kept); the 10 minutes held from both sides (none at 9 min 40 s); the box live 7.5-9.5 s after the
+//            weather.gov request (its 8 s limit, by the HOOK's stamps); a Crunch 3 s into weather.gov's wait done within 6.5 s, and one 7 s
+//            after the box's place search (weather.gov at 18 s) still takes the box's lookup (its 15 s outlasts weather.gov's 8 s)
 //   keep     100.2 (check round 1): the box keeps a live forecast it has: a day changed and back, Crunch then Save to Journal, the computer
 //            layout's + New ride: live, its sky and number, no new lookup; offline after a live forecast: the cap; online again: the sky back;
 //            (check round 2) a forecast saved earlier, the box's lookup at boot failing, the network back: Crunch looks up (a forecast request,
-//            no "Saved forecast" note), and the box shows its sky once its 10 minutes are over
+//            no "Saved forecast" note), and the box shows its sky once its 10 minutes are over; (review round 3) a saved forecast Crunch
+//            fell back on, the network back, the sport changed (the same key): none within the 10 minutes, then one lookup and the sky
 //   race     100.2 (check round 1): the box's slow lookup of the old ride (answered or failing) after the new ride was Crunched leaves the
 //            new ride's forecast (wxKey, wxLast, the card after a redraw); its hung lookup does not hold Crunch once the network is back
 //            (results within 8 s; main 0.2 s; Crunch's own place search 3.8-5 s after the tap: it waits 4 s on a lookup with no forecast yet);
 //            the ride changed while its lookup is out: the new ride's forecast with nothing else happening, and back to the first ride: that
 //            ride is asked again (an overtaken try is not a failed one); the box's lookup hung for good and the ride changed: after its 15 s
-//            the box asks for the new ride and shows it (one place search, one forecast)
+//            the box asks for the new ride and shows it (one place search, one forecast), 14-16.5 s after its first (review round 3)
 //   once     100.3, QA: after Crunch the box is out and only one fred is on the page, in every frame of the Crunch; the run's results too;
 //            back (the results gone) the box shows again, one fred
 //   desk     100.3: the computer layout: the box under the ticket in the Plan-a-ride column; out when Results is shown beside it; the crew
@@ -46,15 +50,18 @@
 //   motion   round rule a: with the gate open each friend moves when first seen (fwm-go), offset by --fw-d with fw-vm0 (each friend at
 //            most its own loops: a bob, and a blink for 1, 2 and 13), at most 30 running fred world animations on the screen with fred in
 //            his busiest look (freeze) and the five; all still by 9.5 s, and still after Journal and back, a resize and the app back in front
-//            (the same drawings kept); still under Reduce Motion and with Animate the world off
+//            (the same drawings kept), and after "Show their names" on and off (review round 3); still under Reduce Motion and with
+//            Animate the world off
 //   room     100.4, QA: at the end of the scroll the crew sits at least 8 px clear of the tab bar (320, 375, 390, 430 px; 100, 150, 200%
-//            text) and the footer is clear of it, shown and not covered (its science link the element at its own centre); left out when there
+//            text) and the footer is clear of it, shown and not covered (its science link the element at its own centre; review round 3:
+//            on the page with sign-in configured, so Privacy too, at every size; one Firebase-off size, no Privacy); left out when there
 //            is no room (a taller tab bar), back when there is; at the edge: 4 px of room: left out, 9 px: shown, 8 or more clear; judged on
 //            layout changes, never on a scroll; a tablet and a phone turned (768 x 1024, 1024 x 768, 844 x 390): each friend at most 76 px a
 //            body, the crew no taller than that, the row centred (check round 2)
 //   theme    100.6: the run's graphite: the box follows the run (the panel #34343C, its sky's first stop 26% of the sky in it, light words,
 //            painted over the sky), on the run between the ticket and the Carry box and Settings (in the page and on the screen); the crew
-//            left out there (provisional decision), back on the ride
+//            left out there (provisional decision), back on the ride; the box announced as "Run forecast" on the run, "Ride forecast" on
+//            the ride (review round 3)
 //   switch   100.5: Settings › fred world has "Show the crew" (on) and "Show their names" (off), 44 px rows; neither is stored or in
 //            DEFAULT_SETTINGS until tapped; a tap stores settings.crewShow / crewNames and the crew follows (off: no art at all); a
 //            reload keeps them
@@ -63,9 +70,11 @@
 //            exactly a list "The crew" of the five names, each drawing aria-hidden; names off: no name in the strip, the page's text or the
 //            accessibility tree
 //   sync     QA: two devices (the q91 Firebase stand-in): A turns the names on, B gets them (one settingsAt stamp each, crewNames); B turns
-//            the crew off, A's crew goes; the Plan footer's Privacy link shows where sign-in is configured
+//            the crew off, A's crew goes; the Plan footer's Privacy link shows where sign-in is configured, not covered; B's five keep their
+//            drawings when the names arrive (review round 3)
 //   backup   a backup carries the switches and a restore brings them; one without them keeps this device's (names on stay on, the crew
-//            off stays off: as the rider, birthday and gender; check round 1)
+//            off stays off: as the rider, birthday and gender; check round 1); a file with the crew off or the names off, restored on a
+//            device with them on, turns them off (review round 3)
 //   media    print: no crew, no sky, no fred (the box's words stay, without the feather or fred's room or height: the box the line's height
 //            and its padding); forced colours: the art out, the box's edge kept
 //   fit      QA: 320 and 390 px at 150% and 200% text: the line inside the box and its rows beside fred clear of him (the rows under him
@@ -232,7 +241,14 @@ section('fetch', async () => {
   { const x = await openH(), p = x.p; await ready(p, 'live', null); await sleep(500); const a = kinds(await reqs(p));
     ok(a.geo === 1 && a.fc === 1, '100.2: the forecast is looked up when Plan opens (one place search, one forecast)', a);
     { const o = await outQuiet(p); ok(o.quiet, '100.2, item 76: the box\'s lookup writes no note under the Plan form (#wxOut hidden)', o); }
-    for (let k = 0; k < 8; k++) { await tab(p, 'journal'); await tab(p, 'plan'); } await p.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(800);
+    /* (review round 3) the line kept in place: a render that changes nothing does not write it again (its guard once compared innerHTML,
+       which writes the no-break spaces as &nbsp;, so every render replaced it: a selection on it lost, its nodes rebuilt) */
+    await p.evaluate(() => { const L = document.getElementById('planSkyL'); window.__q100lm = 0; new MutationObserver(m => { window.__q100lm += m.length; }).observe(L, { childList: true, characterData: true, subtree: true }); });
+    for (let k = 0; k < 8; k++) { await tab(p, 'journal'); await tab(p, 'plan'); }
+    await p.evaluate(() => { const L = document.getElementById('planSkyL'), r = document.createRange(); r.selectNodeContents(L); getSelection().removeAllRanges(); getSelection().addRange(r); window.__q100sel = getSelection().toString();
+      document.dispatchEvent(new Event('visibilitychange')); dispatchEvent(new Event('online')); dispatchEvent(new Event('resize')); }); await sleep(800);
+    const lm = await p.evaluate(() => ({ writes: window.__q100lm, sel: getSelection().toString(), was: window.__q100sel }));
+    ok(lm.writes === 0 && lm.was.length > 10 && lm.sel === lm.was, '100.1: the line kept in place: 8 tab switches, the app back in front, online and a resize with the ride unchanged write it no more (' + lm.writes + ' writes), a selection on it kept ("' + lm.sel + '"; review round 3)', lm);
     const b = kinds(await reqs(p)); ok(b.all === a.all, '100.2: no request storm: 8 tab switches and the app back in front ask for nothing more', { a, b });
     await crunch(p); await sleep(300); const c = kinds(await reqs(p)); ok(c.all === a.all, '100.2: Crunch uses the box\'s forecast (the same fetchWeather key and cache: no request)', { a, c });
     await x.close(); }
@@ -246,8 +262,11 @@ section('fetch', async () => {
     await until(async () => (await reqs(p)).length > 0, 8000); await sleep(1000); const a = kinds(await reqs(p));
     { const o = await outQuiet(p); ok(o.quiet, '100.2, item 76: the box\'s failed lookup writes no note under the Plan form (#wxOut hidden, before any Crunch)', o); }
     for (let k = 0; k < 8; k++) { await tab(p, 'journal'); await tab(p, 'plan'); } await p.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(800); const b = kinds(await reqs(p));
-    await p.evaluate(() => { const T = window.__q100.skyBoxFetch.t || {}; Object.keys(T).forEach(k => { T[k] -= 10 * 60e3 + 1000; }); }); await tab(p, 'journal'); await tab(p, 'plan'); await sleep(1200); const c = kinds(await reqs(p));
-    ok(a.all >= 1 && b.all === a.all && c.all > b.all && c.geo === a.geo + 1, '100.2: a failing network: one try when Plan opens, none on 8 tab switches and the app back in front, one again after 10 minutes', { a, b, c }); await x.close(); }
+    /* the 10 minutes held from both sides (review round 3): the last try set back to 20 s short of them (absolute: the switches above took
+       seconds), nothing; just past them, one */
+    await p.evaluate(() => { const T = window.__q100.skyBoxFetch.t || {}; Object.keys(T).forEach(k => { T[k] = Date.now() - (10 * 60e3 - 20e3); }); }); await tab(p, 'journal'); await tab(p, 'plan'); await sleep(1200); const n = kinds(await reqs(p));
+    await p.evaluate(() => { const T = window.__q100.skyBoxFetch.t || {}; Object.keys(T).forEach(k => { T[k] = Date.now() - (10 * 60e3 + 1000); }); }); await tab(p, 'journal'); await tab(p, 'plan'); await sleep(1200); const c = kinds(await reqs(p));
+    ok(a.all >= 1 && b.all === a.all && n.all === a.all && c.all > b.all && c.geo === a.geo + 1, '100.2: a failing network: one try when Plan opens, none on 8 tab switches and the app back in front, none at 9 min 40 s, one again just past 10 minutes', { a, b, n, c }); await x.close(); }
   // a Crunch while the box's lookup is still out: it waits for it (one place search, one forecast)
   { const slow = (r, u) => /open-meteo/.test(u) ? new Promise(res => setTimeout(() => res(WX(r, u)), 1200)) : null; /* (two requests in turn: under the 4 s a Crunch waits) */
     const x = await openH({ forecast: false, route: slow, settle: 100 }), p = x.p; await until(async () => (await reqs(p)).length > 0, 5000);
@@ -266,14 +285,21 @@ section('fetch', async () => {
     await p.click('#psAct'); await until(() => p.evaluate(() => !document.getElementById('planSheet').classList.contains('open'))); await sleep(1500); const c = kinds(await reqs(p));
     ok(b.all === a.all && c.geo === a.geo + 1 && c.fc === a.fc + 1, '100.2: the Plan sheet open, three start times: no lookup; Done: one (a place search and a forecast)', { a, b, c }); await x.close(); }
   // weather.gov slow (check round 2): past the box's 15 s it still shows the forecast (weather.gov waited for 8 s at most: the estimate)
-  { const x = await openH({ route: slowNWS(18000), settle: 100 }), p = x.p, t0 = Date.now(); const L = await until(async () => (await boxOf(p)).wx === 'live', 12000), ms = Date.now() - t0;
+  { const x = await openH({ route: slowNWS(18000), settle: 100 }), p = x.p, t0 = Date.now();
+    await p.evaluate(() => { const W = document.getElementById('planSky'), f = () => { if (W.dataset.wx === 'live' && !window.__q100live) window.__q100live = performance.now(); }; f(); new MutationObserver(f).observe(W, { attributes: true, attributeFilter: ['data-wx'] }); }); /* (the moment it turns live, by the page's clock) */
+    const L = await until(async () => (await boxOf(p)).wx === 'live', 12000), ms = Date.now() - t0;
     const k = kinds(await reqs(p)), src = await p.evaluate(() => window.__q100.wxLast && window.__q100.wxLast.wbSource); await sleep(1500); const B = await boxOf(p);
-    ok(!!L && B.wx === 'live' && LINE.test(B.line || '') && k.geo === 1 && k.fc === 1 && k.nws === 1 && /estimated/.test(src || ''), '100.2: weather.gov answering after 18 s: the box shows the forecast within 12 s (' + ms + ' ms, weather.gov waited 8 s at most: the estimate), one request of each kind', { ms, k, src, B: B.wx }); await x.close(); }
-  // a Crunch while the box's lookup waits on weather.gov adopts it: one request of each kind, done when the box's lookup is
-  for (const [nws, at, within] of [[6000, 1000, 7500], [18000, 3000, 8000]]) {
-    const x = await openH({ route: slowNWS(nws), settle: 100 }), p = x.p; await until(async () => kinds(await reqs(p)).nws >= 1, 5000); await sleep(at); const t0 = Date.now(); await p.click('#calcBtn'); const done = await shown(p), ms = Date.now() - t0;
+    const gap = await p.evaluate(() => { const n = window.__q100t.find(([u]) => /weather\.gov/.test(u)); return n && window.__q100live ? Math.round(window.__q100live - n[1]) : null; }); /* (review round 3: from weather.gov's own request, by the HOOK's stamp) */
+    ok(!!L && B.wx === 'live' && LINE.test(B.line || '') && k.geo === 1 && k.fc === 1 && k.nws === 1 && /estimated/.test(src || '') && gap != null && gap >= 7500 && gap <= 9500, '100.2: weather.gov answering after 18 s: the box shows the forecast ' + gap + ' ms after the weather.gov request (its 8 s limit: 7.5-9.5 s), the estimate, one request of each kind (' + ms + ' ms after the app opened)', { ms, gap, k, src, B: B.wx }); await x.close(); }
+  /* a Crunch while the box's lookup waits on weather.gov adopts it: one request of each kind, done when the box's lookup is (tapped 1 and 3 s
+     after weather.gov's request; and 7 s after the box's place search, weather.gov at 18 s: the box still holds its lookup then, since its
+     15 s give-up outlasts weather.gov's 8 s; review round 3) */
+  for (const [nws, at, within, from] of [[6000, 1000, 7500, 'nws'], [18000, 3000, 6500, 'nws'], [18000, 7000, 3000, 'geo']]) {
+    const x = await openH({ route: slowNWS(nws), settle: 100 }), p = x.p; await until(async () => kinds(await reqs(p)).nws >= 1, 5000);
+    if (from === 'nws') await sleep(at); else { const g = await p.evaluate(() => (window.__q100t.find(([u]) => /geocoding/.test(u)) || [0, 0])[1]); await p.waitForFunction(([g, at]) => performance.now() >= g + at, [g, at], { timeout: 15000 }); }
+    const t0 = Date.now(); await p.click('#calcBtn'); const done = await shown(p), ms = Date.now() - t0;
     const k = kinds(await reqs(p)), src = await p.evaluate(() => window.__q100.wxLast && window.__q100.wxLast.wbSource);
-    ok(!!done && k.geo === 1 && k.fc === 1 && k.nws === 1 && ms < within && (nws < 8000 ? src === 'NWS forecast' : /estimated/.test(src || '')), '100.2: weather.gov answering after ' + nws / 1000 + ' s, Crunch tapped meanwhile: it takes the box\'s lookup (one request of each kind) and shows results with it (' + ms + ' ms, under ' + within / 1000 + ' s; ' + src + ')', { ms, k, src });
+    ok(!!done && k.geo === 1 && k.fc === 1 && k.nws === 1 && ms < within && (nws < 8000 ? src === 'NWS forecast' : /estimated/.test(src || '')), '100.2: weather.gov answering after ' + nws / 1000 + ' s, Crunch tapped ' + at / 1000 + ' s after the ' + (from === 'nws' ? 'weather.gov request' : 'place search of the box') + ': it takes the lookup of the box (one request of each kind) and shows results with it (' + ms + ' ms, under ' + within / 1000 + ' s; ' + src + ')', { ms, k, src });
     await x.close(); }
 });
 
@@ -306,6 +332,18 @@ section('keep', async () => {
       const L = await until(async () => (await boxOf(p)).wx === 'live', 8000), b = kinds(await reqs(p)), B = await boxOf(p);
       ok(!!L && B.sky && LINE.test(B.line || '') && b.fc === a.fc + 1, '100.2: the same, no Crunch: 10 minutes on the box asks again and shows the sky and number (not the cap for the saved copy\'s hour)', { a, b, B: [B.wx, B.line] }); }
     await x.close(); }
+  /* (review round 3) the same, but Crunch took the saved copy in on the failing network (main's fallback), the network back, the results taken
+     away by the sport (a timed run: the same key): a saved copy is not a live one for the box either, so it asks again once its 10 minutes
+     are up (none before) and shows the sky, the new forecast replacing the saved one (not the cap for the rest of the saved copy's hour) */
+  { let mode = 'live'; const x = await openH({ forecast: false, route: (r, u) => mode === 'live' ? WX(r, u) : /open-meteo|weather\.gov/.test(u) ? r.abort() : null }), p = x.p;
+    await ready(p, 'live', null); mode = 'fail'; await reload(p); await until(async () => (await reqs(p)).length > 0, 8000); await sleep(1000); await ready(p, 'none', 'clouds');
+    await crunch(p); const s0 = await p.evaluate(() => !!(window.__q100.wxLast && window.__q100.wxLast.stale));
+    mode = 'live'; await p.evaluate(() => dispatchEvent(new Event('online'))); await p.click('#sportBtn'); await p.click('#sportMenu [data-sport=run]'); await sleep(800); await ready(p, 'none', 'clouds'); const a = kinds(await reqs(p));
+    await tab(p, 'journal'); await tab(p, 'plan'); await sleep(1200); const b = kinds(await reqs(p));
+    await p.evaluate(() => { const T = window.__q100.skyBoxFetch.t || {}; Object.keys(T).forEach(k => { T[k] = Date.now() - (10 * 60e3 + 1000); }); }); await tab(p, 'journal'); await tab(p, 'plan');
+    const L = await until(async () => (await boxOf(p)).wx === 'live', 8000), c = kinds(await reqs(p)), B = await boxOf(p), st = await p.evaluate(() => { const Q = window.__q100; return { stale: (Q.wxLast && Q.wxLast.stale) || '', same: Q.wxKey === (Q.wxReq() || {}).key }; });
+    ok(s0 && b.all === a.all && !!L && !!B.sky && LINE.test(B.line || '') && c.geo === b.geo + 1 && c.fc === b.fc + 1 && !st.stale && st.same, '100.2: a saved forecast taken in by Crunch on a failing network, the network back, the sport changed (the same key): none asked within the 10 minutes, then one lookup, the box live and the saved copy replaced (review round 3)', { s0, a, b, c, st, B: [B.wx, B.line] });
+    await x.close(); }
 });
 
 section('race', async () => {
@@ -335,7 +373,8 @@ section('race', async () => {
     const x = await openH({ route, settle: 100 }), p = x.p, t0 = Date.now(); await until(async () => (await reqs(p)).length > 0, 5000); const a = kinds(await reqs(p)); await sleep(Math.max(0, 1900 - (Date.now() - t0))); answer = true;
     await sheet(p, () => setField(p, '#startTime', '09:00'));
     const B = await until(async () => { const b = await boxOf(p); return b.wx === 'live' && /^Thu 9:00\sAM\s·\sCarmel\s·\s\d+°$/.test(b.line || '') && b; }, 22000), ms = Date.now() - t0, b = kinds(await reqs(p));
-    ok(!!B && ms < 21000 && b.geo === a.geo + 1 && b.fc === a.fc + 1, '100.2: the box\'s lookup hung for good and the ride changed: after its 15 s it asks for the new ride and shows it (' + ms + ' ms after the app opened; one place search, one forecast)', { ms, a, b, B: B || await boxOf(p) });
+    const gap = await p.evaluate(() => { const G = window.__q100t.filter(([u]) => /geocoding/.test(u)); return G.length >= 2 ? Math.round(G[G.length - 1][1] - G[0][1]) : null; }); /* (review round 3: the 15 s held from below too, by the HOOK's stamps) */
+    ok(!!B && ms < 21000 && gap != null && gap >= 14000 && gap <= 16500 && b.geo === a.geo + 1 && b.fc === a.fc + 1, '100.2: the box\'s lookup hung for good and the ride changed: it asks for the new ride ' + gap + ' ms after its first place search (its 15 s give-up: 14-16.5 s) and shows it (' + ms + ' ms after the app opened; one place search, one forecast)', { ms, gap, a, b, B: B || await boxOf(p) });
     held.forEach(f => f()); await x.close(); }
   // the ride changed while the box's lookup is out (held 4 s): the new ride's forecast, nothing else happening; back to 8:00: asked again
   { let n = 0; const route = (r, u) => /api\.open-meteo\.com\/v1\/forecast/.test(u) ? (n++ === 0 ? new Promise(res => setTimeout(() => res(WX(r, u)), 4000)) : WX(r, u)) : null;
@@ -430,6 +469,13 @@ section('motion', async () => {
   const A = await p.evaluate(S => new Promise(res => { let go = 0, run = 0; const t0 = performance.now(); const look = () => { go = Math.max(go, document.querySelectorAll('.fwm-go').length); run = Math.max(run, document.getAnimations().filter(a => a.playState === 'running' && /^fw-/.test(a.animationName || '')).length);
     if (performance.now() - t0 < 1500) setTimeout(look, 50); else { const now = [...document.querySelectorAll(S)]; res({ go, run, n: now.length, same: now.length === window.__q100svg.length && now.length === 6 && now.every((s, i) => s === window.__q100svg[i]) }); } }; look(); }), SPOTS);
   ok(A.go === 0 && A.run === 0 && A.same, 'round rule a: back on Plan (Journal and back), a resize and the app back in front: nothing moves again, each spot keeps its drawing (the same svg nodes: fred and the five)', A);
+  /* (review round 3) a name is no change to what a friend shows: "Show their names" on, then off again (Settings and back), keeps each
+     drawing and moves nothing (a sync or a restore takes the same path: renderProfileRows, crewSoon) */
+  for (const on of [true, false]) {
+    await toSettings(p); await p.click('#prowBtn-crewnames'); await settle(p, 150); await tab(p, 'plan');
+    const N = await p.evaluate(S => new Promise(res => { let go = 0, run = 0; const V = document.getElementById('view-plan'), t0 = performance.now(); const look = () => { go = Math.max(go, V.querySelectorAll('.fwm-go').length); run = Math.max(run, document.getAnimations().filter(a => a.playState === 'running' && /^fw-/.test(a.animationName || '') && a.effect && V.contains(a.effect.target)).length);
+      if (performance.now() - t0 < 1500) setTimeout(look, 50); else { const now = [...document.querySelectorAll(S)]; res({ go, run, names: document.querySelectorAll('#planCrew .crew-n').length, same: now.length === 6 && now.every((s, i) => s === window.__q100svg[i]) }); } }; look(); }), SPOTS);
+    ok(N.go === 0 && N.run === 0 && N.same && N.names === (on ? 5 : 0), 'round rule a: "Show their names" turned ' + (on ? 'on' : 'off') + ': the names ' + (on ? 'under the friends' : 'gone') + ', nothing moves again and each spot keeps its drawing (the same svg nodes; review round 3)', N); }
   await x.close();
   for (const [what, o] of [['Reduce Motion', { motion: false }], ['Animate the world off', { motion: true, settings: { worldMotion: false } }]]) {
     const y = await openH(Object.assign({ query: '?sky=sun', width: 430, height: 932, settle: 50 }, o)); const s = await y.p.evaluate(() => new Promise(res => { let go = 0, run = 0, n = 0; const t0 = performance.now();
@@ -438,15 +484,21 @@ section('motion', async () => {
 });
 
 section('room', async () => {
-  for (const [w, h] of [[320, 568], [375, 667], [390, 844], [430, 932]]) for (const sc of [1, 1.5, 2]) {
-    const x = await openH({ width: w, height: h, scale: sc, settings: { crewNames: true } }), p = x.p; await until(async () => (await crewOf(p)).art === 5); await endScroll(p);
+  /* each size on the page with sign-in configured (review round 3: the Privacy link shown from the boot, by privInit, as on the live site:
+     its own 44 px row under the science link, the footer item next to the crew), and one on the Firebase-off page (no Privacy, as main) */
+  const be = new Backend(), SIZES = [[320, 568], [375, 667], [390, 844], [430, 932]].flatMap(([w, h]) => [1, 1.5, 2].map(sc => [w, h, sc, true])).concat([[390, 844, 1, false]]);
+  for (const [w, h, sc, cloud] of SIZES) {
+    const x = await openH(Object.assign({ width: w, height: h, scale: sc, settings: { crewNames: true } }, cloud ? { file: SYNCED, route: be.handler('room') } : {})), p = x.p; await until(async () => (await crewOf(p)).art === 5); await endScroll(p);
     const g = await p.evaluate(() => { const U = document.getElementById('planCrew').getBoundingClientRect(), T = document.querySelector('nav.tabs').getBoundingClientRect(), F = document.querySelector('#view-plan>.fredfoot').getBoundingClientRect();
-      const sb = document.querySelector('#view-plan>.fredfoot>.footlink'); let sr = sb.getBoundingClientRect(); if (sr.top < 0 || sr.bottom > innerHeight) { sb.scrollIntoView({ block: 'center' }); sr = sb.getBoundingClientRect(); }
-      const at = sr.width && sr.height ? document.elementFromPoint(sr.left + sr.width / 2, sr.top + sr.height / 2) : null, seen = getComputedStyle(sb).display !== 'none' && sr.width > 0 && sr.height > 0 && !!at && sb.contains(at); scrollTo(0, document.scrollingElement.scrollHeight);
-      return { shown: !document.getElementById('planCrew').hidden && U.height > 0, gap: Math.round(T.top - U.bottom), foot: Math.round(T.top - F.bottom), seen, sx: document.documentElement.scrollWidth > innerWidth }; });
-    ok(g.seen, 'QA: ' + w + ' x ' + h + ', ' + sc * 100 + '% text: the "Planning tool, not medical advice" footer stays, shown and not covered (its link is the element at its own centre)', g);
-    ok(g.shown ? g.gap >= 8 && g.foot >= 0 && !g.sx : true, '100.4, QA: ' + w + ' x ' + h + ', ' + sc * 100 + '% text: at the end of the scroll the crew sits ' + g.gap + ' px clear of the tab bar (8 or more), the footer clear of it, no sideways scroll', g);
-    ok(g.shown, 'room: ' + w + ' x ' + h + ', ' + sc * 100 + '% text: the crew shows (there is room)', g);
+      const vis = sb => { let sr = sb.getBoundingClientRect(); if (sr.top < 0 || sr.bottom > innerHeight) { sb.scrollIntoView({ block: 'center' }); sr = sb.getBoundingClientRect(); }
+        const at = sr.width && sr.height ? document.elementFromPoint(sr.left + sr.width / 2, sr.top + sr.height / 2) : null, v = !sb.hidden && getComputedStyle(sb).display !== 'none' && sr.width > 0 && sr.height > 0 && !!at && sb.contains(at); scrollTo(0, document.scrollingElement.scrollHeight); return v; };
+      const pb = document.querySelector('#view-plan>.fredfoot>.privlink');
+      return { shown: !document.getElementById('planCrew').hidden && U.height > 0, gap: Math.round(T.top - U.bottom), foot: Math.round(T.top - F.bottom), seen: vis(document.querySelector('#view-plan>.fredfoot>.footlink')), priv: vis(pb), privHidden: pb.hidden, sx: document.documentElement.scrollWidth > innerWidth }; });
+    const at = w + ' x ' + h + ', ' + sc * 100 + '% text' + (cloud ? '' : ', Firebase off');
+    ok(g.seen, 'QA: ' + at + ': the "Planning tool, not medical advice" footer stays, shown and not covered (its link is the element at its own centre)', g);
+    ok(cloud ? g.priv : g.privHidden, cloud ? 'QA: ' + at + ': the Privacy link (sign-in configured) shown and not covered (the element at its own centre; review round 3)' : 'QA: ' + at + ': no Privacy link without sign-in configured (as main)', g);
+    ok(g.shown ? g.gap >= 8 && g.foot >= 0 && !g.sx : true, '100.4, QA: ' + at + ': at the end of the scroll the crew sits ' + g.gap + ' px clear of the tab bar (8 or more), the footer clear of it, no sideways scroll', g);
+    ok(g.shown, 'room: ' + at + ': the crew shows (there is room)', g);
     await x.close(); }
   // no room: a taller tab bar leaves it out; back to its size, it is back. Judged on layout changes, never on a scroll
   const x = await openH(), p = x.p; await until(async () => (await crewOf(p)).art === 5);
@@ -487,12 +539,16 @@ section('theme', async () => {
     return { bg: getComputedStyle(W).backgroundColor, sky, first, wc, want, off: first && want.length === 3 ? Math.max(...first.map((v, i) => Math.abs(v - want[i]))) : null, ink: getComputedStyle(L).color, crew: getComputedStyle(document.getElementById('planCrew')).display }; });
   ok(g.bg === 'rgb(52, 52, 60)' && g.off != null && g.off <= 4 && g.ink === 'rgb(242, 242, 247)', '100.6: the run\'s graphite: the box takes the run\'s panel (#34343C), its sky\'s first stop 26% of the sky in it (within ' + g.off + ' of ' + (g.want || []).map(Math.round).join(', ') + '), the light words', g);
   ok(g.crew === 'none', '100.6 (provisional): the crew is left out on the run\'s graphite', g);
+  /* (review round 3) the box named for the session, as the run relabels its other words (q47): on the run "Run forecast", no ride word */
+  const lab = async () => (await p.locator('#planSky').ariaSnapshot()).split('\n')[0];
+  { const n = await lab(); ok(n === '- region "Run forecast":', '100.6, q47: on the run the box is announced as the run forecast, no ride word (' + n + ')', n); }
   const o = await p.evaluate(() => { const E = ['rideSec', 'planSky', 'carryCard', 'planSetBox'].map(id => document.getElementById(id)), fol = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING), R = E.map(e => e.getBoundingClientRect());
     return { dom: fol(E[0], E[1]) && fol(E[1], E[2]) && fol(E[1], E[3]), screen: R[0].bottom <= R[1].top + 1 && R[1].bottom <= R[2].top + 1 && R[1].bottom <= R[3].top + 1, tops: R.map(r => Math.round(r.top)), shown: E.map(e => e.getClientRects().length > 0) }; });
   ok(o.dom && o.screen && o.shown.every(Boolean), '100.1, Build: on the run the box sits after the ticket, before the Carry box and Settings (in the page and on the screen: ' + o.tops.join(', ') + ')', o);
   const pt = await painted(p); ok(pt.rows >= 1 && pt.same === 0, '100.6: the run\'s graphite: the line is painted over the sky (each of its ' + pt.rows + ' rows looks different with the line hidden)', pt);
   await p.click('#sportBtn'); await p.click('#sportMenu [data-sport=ride]'); await until(() => p.evaluate(() => !document.documentElement.classList.contains('run-theme'))); await sleep(300);
   ok((await crewOf(p)).on, 'theme: back on the ride the crew shows again', await crewOf(p));
+  { const n = await lab(); ok(n === '- region "Ride forecast":', 'theme: back on the ride the box is announced as the ride forecast (' + n + ')', n); }
   await x.close();
 });
 
@@ -540,8 +596,10 @@ section('sync', async () => {
   const A = await synced('A'), B = await synced('B');
   for (const x of [A, B]) await until(() => x.p.evaluate(() => { const o = JSON.parse(localStorage.getItem('bluebird.synccursor.v1') || 'null'); return !!(o && o.full); }), 20000);
   await until(() => doc().settings, 15000);
-  const priv = await A.p.evaluate(() => { const b = document.querySelector('#view-plan>.fredfoot>.privlink'), r = b && b.getBoundingClientRect(); return !!b && !b.hidden && getComputedStyle(b).display !== 'none' && r.width > 0 && r.height > 0; });
-  ok(priv, 'QA: where sign-in is configured, the Plan footer\'s Privacy link shows (the footer the crew follows)', priv);
+  const priv = await A.p.evaluate(() => { const b = document.querySelector('#view-plan>.fredfoot>.privlink'); if (!b) return { v: false }; b.scrollIntoView({ block: 'center' }); const r = b.getBoundingClientRect(); /* (in the middle of the screen: clear of the tab bar) */
+    const at = r.width && r.height ? document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) : null, v = !b.hidden && getComputedStyle(b).display !== 'none' && r.width > 0 && r.height > 0 && !!at && b.contains(at); scrollTo(0, 0);
+    return { v, r: [r.left, r.top, r.width, r.height].map(Math.round), at: at ? at.tagName + '#' + at.id + '.' + at.className : null, vh: innerHeight }; }); /* (not covered: the element at its own centre; review round 3) */
+  ok(priv.v, 'QA: where sign-in is configured, the Plan footer\'s Privacy link shows, not covered (the footer the crew follows)', priv);
   const nudge = async (cond, ms = 45000) => { const t = Date.now(); while (Date.now() - t < ms) { for (const x of [A, B]) await x.p.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await sleep(1500); const v = await cond().catch(() => null); if (v) return v; } return null; };
   await toSettings(A.p); await A.p.click('#prowBtn-crewnames'); await settle(A.p, 200);
   const up = await until(() => (doc().settings || {}).crewNames === true, 20000), at = doc().settingsAt || {};
@@ -549,9 +607,10 @@ section('sync', async () => {
   /* B stays on Plan: once A's value is in B's settings (a pull), B's crew follows it with nothing else happening (the settings applied
      redraw it: no tab tap, no app-open) */
   await B.p.evaluate(() => document.querySelector('nav.tabs button[data-view=plan]').click()); await settle(B.p, 200);
+  await until(async () => (await crewOf(B.p)).art === 5); await B.p.evaluate(() => { window.__q100crew = [...document.querySelectorAll('#planCrew .crew-a>svg')]; });
   const got = await nudge(() => B.p.evaluate(() => window.__q100.settings.crewNames === true));
-  await sleep(600); const bOk = await crewOf(B.p);
-  ok(!!got && bOk.names.length === 5, 'QA: the crew switches sync: B (on Plan) shows the names A turned on as soon as they arrive', bOk);
+  await sleep(600); const bOk = await crewOf(B.p), kept = await B.p.evaluate(() => { const now = [...document.querySelectorAll('#planCrew .crew-a>svg')]; return now.length === 5 && now.every((s, i) => s === window.__q100crew[i]); });
+  ok(!!got && bOk.names.length === 5 && kept, 'QA: the crew switches sync: B (on Plan) shows the names A turned on as soon as they arrive, each friend kept (the same drawings: a name is no new look; review round 3)', { bOk, kept });
   await toSettings(B.p); await B.p.click('#prowBtn-crewshow'); await settle(B.p, 200);
   await A.p.evaluate(() => document.querySelector('nav.tabs button[data-view=plan]').click()); await settle(A.p, 200);
   const gotA = await nudge(() => A.p.evaluate(() => window.__q100.settings.crewShow === false)); await sleep(600); const aOff = await crewOf(A.p);
@@ -577,6 +636,15 @@ section('backup', async () => {
   const z = await openH({ settings: { crewShow: false } }), q = z.p; await restore(q, old); await tab(q, 'plan'); await sleep(300); const d = await crewOf(q), sz = await q.evaluate(() => window.__q100.settings);
   ok(!d.on && d.art === 0 && sz.crewShow === false, 'backup: one without them on a device with the crew off: it stays off', { d, crewShow: sz.crewShow });
   await z.close();
+  /* (review round 3) the file's own values come back: a backup with the crew off, restored on a device with it on, turns it off; one with
+     the names off, restored on a device with them on, takes them away */
+  for (const [k, mine] of [['crewShow', {}], ['crewNames', { crewNames: true }]]) {
+    const s = await openH({ settings: { [k]: false } }), e = await s.p.evaluate(() => JSON.parse(JSON.stringify(window.__q100.backupData()))); await s.close();
+    ok(e.settings && e.settings[k] === false, 'backup: a backup made with ' + k + ' off carries it (backupData().settings.' + k + ' false)', e.settings && e.settings[k]);
+    const u = await openH({ settings: mine }), q = u.p; await until(async () => (await crewOf(q)).art === 5); await restore(q, e); await tab(q, 'plan'); await sleep(300);
+    const c = await crewOf(q), r = await q.evaluate(k => { const b = document.getElementById(k === 'crewShow' ? 'prowBtn-crewshow' : 'prowBtn-crewnames'); return { st: window.__q100.settings[k], ls: JSON.parse(localStorage.getItem('bluebird.settings.v2'))[k], pressed: b && b.getAttribute('aria-pressed') }; }, k);
+    ok(r.st === false && r.ls === false && r.pressed === 'false' && (k === 'crewShow' ? !c.on && c.art === 0 : c.on && c.names.length === 0), 'backup: one with ' + k + ' off restored on a device with it on: off (' + (k === 'crewShow' ? 'no crew, no art' : 'no names') + ', stored, the switch off; review round 3)', { c: [c.on, c.art, c.names.length], r });
+    await u.close(); }
 });
 
 section('media', async () => {

@@ -27,7 +27,7 @@ const M = [
   ['stale', 'nofc', s => rep(s, '&& !w.stale && !w.typical && !wxOld()){', '&& !w.typical && !wxOld()){')],
   ['offline', 'nofc', s => rep(s, " || navigator.onLine===false) return; /* Plan open and showing; offline: no lookup */", ") return;")],
   ['storm', 'fetch', s => rep(s, 'if(Date.now()-(T[R.key]||0)<SKY_RETRY) return; ', '')],
-  ['hourold', 'fetch', s => rep(s, "(wxAccepted && wxKey===R.key && !wxOld()) || skyKept(R)) return; /* no ride,", "(wxAccepted && wxKey===R.key) || skyKept(R)) return; /* no ride,")],
+  ['hourold', 'fetch', s => rep(s, "(wxAccepted && wxKey===R.key && !wxOld() && wxLast && !wxLast.stale && !wxLast.typical) || skyKept(R)) return; /* no ride,", "(wxAccepted && wxKey===R.key && wxLast && !wxLast.stale && !wxLast.typical) || skyKept(R)) return; /* no ride,")],
   ['nobusy', 'fetch', s => rep(s, 'if(wxBusy && wxBusy.key===R.key){', 'if(false){')],
   // 100.3: after Crunch, the computer layout
   ['boxstays', 'once,desk', s => rep(s, 'function skyShown(){ ', 'function skyShown(){ return false; ')],
@@ -101,6 +101,22 @@ const M = [
   ['c2-label', 'names', s => rep(s, "U.setAttribute('aria-label', 'The crew');", '')],
   ['c2-ariaart', 'names', s => rep(s, "a, ()=>F.friend(i, {idp:'cw'+i+'-'}), 'crew:'+i, {cls:'fw-vm0'});", "a, ()=>F.friend(i, {idp:'cw'+i+'-'}), 'crew:'+i, {cls:'fw-vm0'}); a.removeAttribute('aria-hidden');")],
   ['c2-caps', 'looks', s => rep(s, 'letter-spacing:.07em;text-transform:uppercase;color:var(--text-body);overflow-wrap:anywhere}', 'letter-spacing:.07em;color:var(--text-body);overflow-wrap:anywhere}')],
+  // review round 3: the app problems as the branch had them, and the reviewers' test mutants
+  ['r3-savedbox', 'keep', s => rep(s, '(wxAccepted && wxKey===R.key && !wxOld() && wxLast && !wxLast.stale && !wxLast.typical) || skyKept(R)) return;', '(wxAccepted && wxKey===R.key && !wxOld()) || skyKept(R)) return;')], /* the box counts a saved copy Crunch fell back on as in hand: the cap for the rest of its hour, the network back */
+  ['r3-savedfw', 'keep', s => rep(s, 'if(wxAccepted && wxKey===R.key && !wxOld() && !((quiet || (wxBusy && wxBusy.key===R.key)) && wxLast && (wxLast.stale || wxLast.typical))) return true;', 'if(wxAccepted && wxKey===R.key && !wxOld()) return true;')], /* the box asks, but fetchWeather answers it from the saved copy with no request */
+  ['r3-label', 'theme', s => rep(s, "const sk=$('planSky'); if(sk) sk.setAttribute('aria-label', run ? 'Run forecast' : 'Ride forecast');", '')], /* the box announced as the ride forecast on the run */
+  ['r3-linehtml', 'fetch', s => rep(s, 'if(P._l!==line){ P._l=line; P.innerHTML=line; }', 'if(P.innerHTML!==line) P.innerHTML=line;')], /* the guard against innerHTML (&nbsp;): every render replaces the line */
+  ['r3-bkshow', 'backup', s => rep(s, 'Object.keys(pcw).forEach(k=>{ if(!(d.settings && k in d.settings))', "Object.keys(pcw).forEach(k=>{ if(k==='crewShow' || !(d.settings && k in d.settings))")], /* a restore keeps this device's crewShow over the file's */
+  ['r3-bknames', 'backup', s => rep(s, 'Object.keys(pcw).forEach(k=>{ if(!(d.settings && k in d.settings))', "Object.keys(pcw).forEach(k=>{ if(k==='crewNames' || !(d.settings && k in d.settings))")], /* the same for crewNames */
+  ['r3-retry60', 'fetch', s => rep(s, 'const SKY_RETRY=10*60e3,', 'const SKY_RETRY=60e3,')], /* the box tries a failed ride again after a minute */
+  ['r3-retry9', 'fetch', s => rep(s, 'const SKY_RETRY=10*60e3,', 'const SKY_RETRY=9*60e3,')], /* ... after 9 minutes */
+  ['r3-quiet6', 'fetch,race', s => rep(s, 'const WX_QUIET_MS=15e3, WX_WAIT_MS=4e3;', 'const WX_QUIET_MS=6e3, WX_WAIT_MS=4e3;')], /* the box gives up before weather.gov's 8 s: a Crunch then makes a second lookup */
+  ['r3-quiet12', 'race', s => rep(s, 'const WX_QUIET_MS=15e3, WX_WAIT_MS=4e3;', 'const WX_QUIET_MS=12e3, WX_WAIT_MS=4e3;')], /* ... at 12 s (only the give-up's own timing shows it) */
+  ['r3-nws10', 'fetch', s => rep(s, 'tm=setTimeout(()=>ctl.abort(), 8000); /* q100: 8 s', 'tm=setTimeout(()=>ctl.abort(), 10000); /* q100: 8 s')], /* weather.gov given 10 s */
+  ['r3-nws65', 'fetch', s => rep(s, 'tm=setTimeout(()=>ctl.abort(), 8000); /* q100: 8 s', 'tm=setTimeout(()=>ctl.abort(), 6500); /* q100: 8 s')], /* weather.gov given 6.5 s */
+  ['r3-namesredo', 'motion,sync', s => rep(s, "const ids=crewOf(crewDay()), k=ids.join(','), names=settings.crewNames===true;", "const names=settings.crewNames===true, ids=crewOf(crewDay()), k=ids.join(',')+(names ? '+n' : '');")], /* a names change remounts the five: they move again */
+  ['r3-priv320', 'room', s => css(s, '@media (max-width:340px){ #view-plan>.fredfoot>.privlink{display:none!important} }')], /* Privacy gone at 320 px */
+  ['r3-privcover', 'room,sync', s => css(s, '#view-plan>.fredfoot:has(>.privlink:not([hidden]))+#planCrew{margin-top:-44px;position:relative;z-index:50}')], /* the crew over Privacy where sign-in is configured */
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mut100.log'); fs.mkdirSync(path.dirname(out), { recursive: true });
 for (const [name, only, f] of M) {
