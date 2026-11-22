@@ -2290,3 +2290,55 @@
     before). The change only widens what the strip section measures and asks of FORMER_V8, so the other mutants, each already FAIL, cannot
     pass through it: not run again.
   - App: no change (the gap was in the kit); q100-front stays at 11a8d56, cache v123.
+- v9 check round 2 (the acceptance checkers again; two problems, both low, tests lens; both fixed in the kit, no app change).
+  - Problem 1: on v9, q99 no longer measured wool socks over bare shins above boots on Safari or at 3x for 5 of the 8 skins. On v8 the
+    list `socks-wool boots` read 156-164 / 136-144 at Chromium 2x on every skin, inside the band (under 180), so every other screen judged
+    all 36 riders (and 425 on the freezing ride's list with them). v9 leaves out the white base sock under boots, so the wool sock's
+    leave-one-out now replaces skin: 180 / 144 on fair, light, ruddy, dark and deep brown, exactly the band's edge (`v.d48 < 180`), and
+    they fell out (6 and 3 riders left, tan skin). Reproduced: the checker's probe100/mut9-wksockboots/null.html (sha1 605d5c4f; Safari only,
+    no wool socks there on those five skins) with q99 at d985944, Q99_ONLY=strip: `OK: item 99: Your rider, and the rider on the Closet card
+    (8363 checks)` (443 s, probe100/v9r2/runs/old-wksockboots-1.log; its WebKit lines "3 riders" and "6 riders ... least 144 / 144, tan
+    skin"). Real, kit side. The same kind of gap as round 1, outside FORMER_V8 (its list has wool socks).
+  - The fix (q99, the checker's more robust option; nothing loosened): V8_NEAR, the 43 lists and items item 99's q99 measured on Chromium
+    3x, WebKit 2x and WebKit 3x on v8 (taken from probe99/acc2/runs/q99-main.log, `OK (8608 checks)`, the same 43 on each screen; 32 lists).
+    Every Chromium 2x reading of one of them goes to the other screens whatever it reads (as FORMER_V8 does for its cases), and one new
+    check asks each of the 43 measured on all three screens for every rider judged on it at Chromium 2x, all 8 skins ("strip: other
+    screens: each list and item item 99 measured on Safari and 3x on v8 (V8_NEAR, 43) is measured ... (3318) ..."). Changing the band
+    test to `<=` would also have caught the 180 readings, but by a hair; the band, SHOW, PAT_SHOW, OWN, the by-design rules, ACCEPTED_V8
+    entry 6 and FORMER_V8 are unchanged. The other screens' pass grows from 3387 riders and lists to 4088 (the gloves lists from 12 riders
+    to 29, `jersey-med ... gloves` from 210 to 425, the two wool-sock lists back to 425 and 36); the band's widest gap is still 79%.
+  - Problem 2: nothing held FROM-APP-CHAT-7 point 5 (the thermal jersey's cuff no longer overhangs the sleeve, FROM-DESIGN-CHAT-7 point 5):
+    the checker's probe100/mut9-cuffwide/null.html (sha1 b3433ae3; v9 with the cuff dashes as wide across as v8's, ink 31 and cuff 26, butt
+    caps kept) passed q99 in full, `OK (8605 checks)`. Reproduced: probe100/v9check2-tests/cuffpx.mjs reads 180 px changed against v9, 27
+    on the vest, for the default rider and a Black jersey; grep finds no cuff, overhang or viewBox-bounds check in q97, q98, q99, motion,
+    budgets or layout. Never held before, so not a loosening; real, kit side.
+  - The fix (q99, strip section): with the vest, alone and on the cold starter list, the default rider and RIDER99 in their jerseys and in
+    Black, at 2x and 3x strip size, as the strip draws it and with both arms in each of FW's 11 poses, and the reach pose where FW draws it
+    (on the bike, the person at .62), in Chromium and WebKit (200 drawings each): the cuff's paint (the drawing against the same with
+    riderOutfit's extra `{cuff: null}`, more than 48 in a channel, alpha too, drawn with 60 units round the viewBox) must land only on the
+    sleeve (where the sleeve's colour paints, found by drawing o.armSleeve in two flag colours, or within its 4-unit ink outline), none
+    outside the viewBox, and some cuff in every drawing. One check per engine. v9 reads 0 off the sleeve in every drawing (every cuff
+    pixel is on the sleeve's colour itself, so a 2-unit margin would still read 0); v8 (main's page) 46-48 px at 2x on the strip and off
+    the sleeve in 188 of the 200; the mutant 86-87 px at 2x on the strip, 176 of 200 (its wrap leaves FW.bike alone). The least cuff is 46
+    device px (Chromium) / 48 (WebKit), Black jersey on the bike at 2x. Probe: probe100/v9r2/cuffprobe.mjs and cuffq99.mjs (the q99 block's
+    own text run on a page).
+  - The viewBox part (my decision): drawn alone, person() in the reach pose puts the arm and hand past x 200 (the hand to 221.5), and 10
+    device px of v9's cuff with them, all on the sleeve (v8 20). The reach pose is drawn only by FW.bike (the app never calls it), and there
+    the cuff paints nothing outside the bike's viewBox (v9 0, v8 0). So the viewBox is held in every pose but the reach drawn alone, where
+    the sleeve rule holds it; FROM-DESIGN-CHAT-7's "paint outside the viewBox: 0, reach included" is true on the bike, not for person()
+    alone (a note for the design chat).
+  - The checks bite: new q99, Q99_ONLY=strip: mut9-wksockboots `FAIL 5` (468 s, runs/new-wksockboots-1.log: the two lists on WebKit 2x and
+    3x read 0 / 0 on light skin, and the band check 0%); mut9-cuffwide `FAIL 2` (427 s, runs/new-cuffwide-1.log: the cuff check in Chromium
+    and in WebKit, 87 / 86 px off the sleeve on the strip at 2x). mut99 gains both as v9c2-wksockboots and v9c2-cuffwide, byte-identical to
+    the checker's (DRY build sha1s equal); mut99 now 158.
+  - Proof, one at a time on fred100/null.html (probe100/v9r2/runs.sh, logs and summary.txt in probe100/v9r2/runs/; load 3-5 from other
+    work): q99 with main's page second `OK: item 99: Your rider, and the rider on the Closet card (8650 checks)` (965 s; 8647 and the three
+    new checks: V8_NEAR and the cuff in each engine; the main section skips as before); q97 (main second) `OK (128 checks)`; q98 in its
+    parts (main second) `OK (253 checks)`, `OK (49)`, `OK (21)`; motion on the 16 rider screens `OK ... (27 checks)`; budgets `OK: fred
+    world budgets: 16 screens ... (host reference 1.15-1.15 ms, quiet at most 1.8) ... (62 checks)` (host busy only in its self-tests);
+    smoke `OK (14 checks)`; npm test in wt-q100 1824 tests, 1777 pass, 0 fail, 47 todo. Contrast, layout and inventory not rerun (only
+    q99's strip section changed; no app change).
+  - Mutants (probe100/w/mutants.log, through mut99): v9c2-wksockboots `FAIL 5`, v9c2-cuffwide `FAIL 2`. The other 156 not run again: the
+    change adds readings to the strip section's other-screens pass and three checks, and takes nothing away, so a mutant that failed
+    still fails.
+  - App: no change (both gaps were in the kit); q100-front stays at 11a8d56, cache v123, fred world v9.

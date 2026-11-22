@@ -130,7 +130,9 @@
 //            with toe covers or bare shoes; wool socks over leg wear above shoe covers at 3x) each printed "now shows" and "never under SHOW"
 //            on every screen of its width on an otherwise green run, so they are gone and those cases are judged in full as any item (and
 //            each case measured on every screen in every skin, FORMER_V8, so Safari and 3x keep judging them as item 99's q99 did on v8,
-//            where they read close to the line; v9 check round 1: the v8 widths alone left fair skin's leg wear above boots out); one
+//            where they read close to the line; v9 check round 1: the v8 widths alone left fair skin's leg wear above boots out; v9 check
+//            round 2: so is every list and item item 99's q99 measured on those screens on v8, V8_NEAR, since v9 read wool socks over bare
+//            shins above boots at the band's edge; and the thermal jersey's cuff, point 5, lands only on its sleeve in every pose FW draws); one
 //            entry is left, dark gloves on deep brown skin, read by their #C9D1DA cuff ("for the record", unchanged in v9). Inside its width a reading under SHOW passes
 //            at or over the entry's floor for that item on that screen (90% of the item's least v8 reading there, pixels changed and own
 //            colour separately: per item, since the fingerless gloves could lose their cuff over the full-finger gloves' floor), and
@@ -1273,6 +1275,37 @@ function accRec(e, scr, id, L, r, v, under, tag) { const k = e.n + '|' + scr, w 
 // of the line; the widest gap measured, leg warmers over overshoes on tan skin, 156 px here and 116 in WebKit at 2x, a quarter less): list and
 // rider -> the items and their measurements here, measured again as other screens draw them at the end of the strip section
 const NEAR = new Map(), NEAR_BAND = 1.5;
+// V8_NEAR (v9 check round 2): the lists and items item 99's q99 measured on the other screens on v8 (probe99/acc2/runs/q99-main.log: the same
+// 43 on each), measured on each of them whatever Chromium at 2x reads, for every rider judged on it there, as FORMER_V8 does for its cases. v9
+// reads some past the band: wool socks over bare shins above boots read 156 / 136 on every skin on v8 and 180 / 144 on v9 on fair, light,
+// ruddy, dark and deep brown (the band is under 180), so they left Safari and 3x (mut99's v9c2-wksockboots, Safari alone drawing them as
+// nothing there, passed); a later build can move others out the same way. list -> its items
+const V8_NEAR = new Set([
+  ['jersey-heavy base-ls jacket-thermal arms tights-light gloves-thermal skullcap gaiter socks-wool shoes', 'socks-wool'],
+  ['jersey-heavy base-ls vest arms knees gloves cap socks-wool toes', 'gloves socks-wool'],
+  ['jersey-heavy base-ls vest arms knees gloves cap socks-wool', 'gloves socks-wool'],
+  ['jersey-heavy base-thermal jacket-thermal arms legs gloves-thermal skullcap gaiter overshoes', 'legs'],
+  ['jersey-heavy base-thermal jacket-thermal arms tights-heavy gloves-thermal skullcap gaiter overshoes', 'tights-heavy'],
+  ['jersey-heavy base-thermal jacket-thermal arms tights-light gloves-thermal skullcap gaiter overshoes', 'tights-light'],
+  ['jersey-heavy base-thermal jacket-winter arms gloves-lobster balaclava gaiter socks-wool boots', 'socks-wool'],
+  ['jersey-heavy base-thermal jacket-winter arms legs gloves-lobster balaclava gaiter boots', 'boots legs'],
+  ['jersey-heavy base-thermal jacket-winter arms legs gloves-lobster balaclava gaiter overshoes', 'legs'],
+  ['jersey-heavy base-thermal jacket-winter arms tights-heavy gloves-lobster balaclava gaiter boots', 'boots tights-heavy'],
+  ['jersey-heavy base-thermal jacket-winter arms tights-heavy gloves-lobster balaclava gaiter overshoes', 'tights-heavy'],
+  ['jersey-heavy base-thermal jacket-winter arms tights-heavy gloves-lobster balaclava gaiter socks-wool boots', 'tights-heavy'],
+  ['jersey-heavy base-thermal jacket-winter arms tights-light gloves-lobster balaclava gaiter boots', 'boots tights-light'],
+  ['jersey-heavy base-thermal jacket-winter arms tights-light gloves-lobster balaclava gaiter overshoes', 'tights-light'],
+  ['jersey-heavy vest arms legs gloves-thermal head boots', 'boots legs'], ['jersey-heavy vest arms legs gloves-thermal head overshoes', 'legs'],
+  ['jersey-light sun-sleeves bibs gloves-finger socks-summer', 'gloves-finger'], ['jersey-med base-ss arms bibs knees gloves-finger toes', 'gloves-finger'],
+  ['jersey-med base-ss vest jacket-rain arms knees gloves cap socks-wool toes', 'gloves socks-wool'],
+  ['jersey-med base-ss vest jacket-rain arms knees gloves cap socks-wool', 'gloves socks-wool'],
+  ['jersey-med base-ss vest jacket-rain arms legs gloves cap socks-wool toes', 'gloves'], ['jersey-med vest arms legs gloves cap toes', 'gloves'],
+  ['knees socks-wool toes', 'socks-wool'], ['knees socks-wool', 'socks-wool'], ['legs boots', 'boots legs'], ['legs overshoes', 'legs'],
+  ['legs socks-wool shoes', 'socks-wool'], ['socks-wool boots', 'socks-wool'], ['tights-heavy boots', 'boots tights-heavy'], ['tights-heavy overshoes', 'tights-heavy'],
+  ['tights-light boots', 'boots tights-light'], ['tights-light overshoes', 'tights-light']
+].flatMap(([L, ids]) => ids.split(' ').map(id => L + '|' + id)));
+const V8N_SEEN = new Map(); // list|item -> screen -> the riders measured (J), so each screen can be held to Chromium at 2x's
+function v8nRec(id, L, r, scr) { const k = L.join(' ') + '|' + id; if (!V8_NEAR.has(k)) return; const w = V8N_SEEN.get(k) || {}; (w[scr] || (w[scr] = new Map())).set(J(r), r.skin); V8N_SEEN.set(k, w); }
 // the direct lists (the v6 gaps v7 fixed that no ride reaches, and the socks' edge); the outer layers and the rider's fields the wide sweep
 // varies on every jersey (review round 7); each leg wear under overshoes with and without wool socks, and the socks over bare shins under
 // overshoes and over leg wear above shoe covers (v8 check round 1); FOUND's cases (v8 check round 2), each in every jersey and every skin
@@ -1293,7 +1326,7 @@ function judge(tag, S, px, agg, only) {
   const L = S.ids || [], chk = (c, name, d) => { if (!agg) return ok(c, name, d); agg.n++; if (!c) agg.bad.push(name); }, ride = / ride \(/.test(tag);
   for (const id of L) { if (byDesign(id, L) || (only && !only.includes(id))) continue; const v = px[id], d = !!v && v.d48 >= SHOW.d48, o = !!v && (v.own == null || v.own >= SHOW.own);
     /* ACCEPTED_V8: a reading inside an entry's v8 width (Chromium at 2x) passes under SHOW at or over its floor; at SHOW it prints "now shows" */
-    const acc = v ? accOf(id, L, S.r, SCR[0]) : null, under = !(d && o); if (acc) accRec(acc, SCR[0], id, L, S.r, v, under, tag); if (v) formerRec(id, L, S.r, v, SCR[0], tag);
+    const acc = v ? accOf(id, L, S.r, SCR[0]) : null, under = !(d && o); if (acc) accRec(acc, SCR[0], id, L, S.r, v, under, tag); if (v) { formerRec(id, L, S.r, v, SCR[0], tag); v8nRec(id, L, S.r, SCR[0]); }
     if (acc && under) { const fl = floorOf(acc, SCR[0], id); chk(floorOk(acc, SCR[0], id, v), 'strip: ' + tag + ': ' + id + ' reads under SHOW (' + v.d48 + ' device px changed, ' + v.own + ' in its own colour), accepted on v8 (ACCEPTED_V8 ' + acc.n + ', FROM-APP-CHAT-7 ' + acc.point + ') ' + (DUMP ? 'measured on Chromium at 2x (Q99_ACCEPT_DUMP: no width or floor applied; ' + id + '\'s floor ' : 'at or over its floor on Chromium at 2x (' + id + '\'s, ') + fl[0] + ' / ' + fl[1] + ')', { v, L }); }
     else chk(d && o, 'strip: ' + tag + ': ' + id + ' shows on the rider (' + (v ? v.d48 + ' device px changed' + (v.own != null ? ', ' + v.own + ' in its own colour' : '') : 'not measured') + ')', { v, L });
     FIXED_BY_V7.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = FIXED_SEEN.get(k);
@@ -1301,9 +1334,9 @@ function judge(tag, S, px, agg, only) {
     /* the cases v7 held, and those found unjudged (FOUND): the least pixels changed and the least in its own colour, each with where; shows only if every judgement did */
     track(FIXED8_SEEN, FIXED_BY_V8, id, L, S.r, v, d && o, ride, tag); track(FOUND_SEEN, FOUND, id, L, S.r, v, d && o, ride, tag);
     /* close to the line: measured again on other screens (Chromium at 3x, WebKit at 2x and 3x) */
-    /* (an accepted reading too: its floor holds on every screen q99 measures it on; acc marks it, out of the band's own check; and any reading of
-       an entry's case inside its width on another screen) */
-    if ((d && o && (v.d48 < SHOW.d48 * NEAR_BAND || (v.own != null && v.own < SHOW.own * NEAR_BAND))) || (acc && under) || accElsewhere(id, L, S.r) || (v && formerElsewhere(id, L, S.r))) { const k = L.join(' ') + '|' + J(S.r), w = NEAR.get(k) || { ids: L, r: S.r, items: new Map(), tag }; w.items.set(id, acc && under ? Object.assign({ acc: true }, v) : v); NEAR.set(k, w); }
+    /* (an accepted reading too: its floor holds on every screen q99 measures it on; acc marks it, out of the band's own check; any reading of
+       a retired entry's case, FORMER_V8; and any of a list and item item 99 measured there on v8, V8_NEAR) */
+    if ((d && o && (v.d48 < SHOW.d48 * NEAR_BAND || (v.own != null && v.own < SHOW.own * NEAR_BAND))) || (acc && under) || accElsewhere(id, L, S.r) || (v && (formerElsewhere(id, L, S.r) || V8_NEAR.has(L.join(' ') + '|' + id)))) { const k = L.join(' ') + '|' + J(S.r), w = NEAR.get(k) || { ids: L, r: S.r, items: new Map(), tag }; w.items.set(id, acc && under ? Object.assign({ acc: true }, v) : v); NEAR.set(k, w); }
     EDGES.forEach((f, n) => { if (!f.ids.includes(id) || !f.when(L, S.r)) return; const k = n + ':' + id, w = EDGE_SEEN.get(k), rd = ride || !!(w && w.ride);
       if (!w || v.d48 < w.v.d48) EDGE_SEEN.set(k, { f, id, v, tag, shows: d && o, n: (w ? w.n : 0) + 1, ride: rd }); else { w.n++; w.ride = rd; } }); }
 }
@@ -1458,7 +1491,7 @@ section('strip', async () => {
         P.forEach((q, i) => { const v = q[e.id], h = e.V[i], under = !(v.d48 >= sh.d48 && (v.own == null || v.own >= sh.own)), acc = accOf(e.id, e.ids, e.R[i], scr);
           /* ACCEPTED_V8: inside an entry's width on this screen, under SHOW at or over its floor here; at SHOW, "now shows" */
           if (acc) accRec(acc, scr, e.id, e.ids, e.R[i], v, under, e.R[i].skin + ' skin, ' + e.R[i].kit + ' jersey, the list ' + e.ids.join(' '));
-          formerRec(e.id, e.ids, e.R[i], v, scr, e.R[i].skin + ' skin, ' + e.R[i].kit + ' jersey, the list ' + e.ids.join(' '));
+          formerRec(e.id, e.ids, e.R[i], v, scr, e.R[i].skin + ' skin, ' + e.R[i].kit + ' jersey, the list ' + e.ids.join(' ')); v8nRec(e.id, e.ids, e.R[i], scr);
           if (under && acc) na++;
           if (under && (!acc || !floorOk(acc, scr, e.id, v))) bad.push(e.R[i].skin + ' skin, ' + e.R[i].kit + ' jersey: ' + v.d48 + (v.own != null ? ' / ' + v.own : '') + (acc ? ' (under ACCEPTED_V8 ' + acc.n + '\'s floor here for ' + e.id + ', ' + floorOf(acc, scr, e.id).join(' / ') + ')' : ''));
           /* the widest gap: this screen's reading by area against Chromium at 2x's, pixels changed and own colour (an item that showed there: the band's
@@ -1467,7 +1500,14 @@ section('strip', async () => {
         ok(!bad.length, 'strip: ' + eng + ' at ' + sc + 'x (limit ' + sh.d48 + ' / ' + sh.own + ' device px): the list ' + e.ids.join(' ') + ': ' + e.id + ' shows on every rider it was close to the line for, or reads within ACCEPTED_V8\'s width here ' + (DUMP ? 'as measured (Q99_ACCEPT_DUMP: no width or floor applied)' : 'at or over its floor') + ' (' + e.R.length + ' riders, ' + na + ' accepted; the least ' + lo.v.d48 + (lo.v.own != null ? ' / ' + lo.v.own : '') + ', ' + lo.r.skin + ' skin; first ' + e.tag + ')', bad.slice(0, 6)); }
       await x.close(); }
     await wkb.close();
-    ok(!!gap && gap.f > 1 / NEAR_BAND, 'strip: other screens: the band is wide enough: the widest gap reads ' + (gap ? Math.round(gap.f * 100) + '% of Chromium at 2x by area (' + gap.eng + ' at ' + gap.sc + 'x, ' + gap.id + ' on ' + gap.skin + ' skin: ' + gap.here + ' -> ' + gap.there + ', the list ' + gap.list + ')' : 'not measured') + ', over the ' + Math.round(100 / NEAR_BAND) + '% the band allows', gap); }
+    ok(!!gap && gap.f > 1 / NEAR_BAND, 'strip: other screens: the band is wide enough: the widest gap reads ' + (gap ? Math.round(gap.f * 100) + '% of Chromium at 2x by area (' + gap.eng + ' at ' + gap.sc + 'x, ' + gap.id + ' on ' + gap.skin + ' skin: ' + gap.here + ' -> ' + gap.there + ', the list ' + gap.list + ')' : 'not measured') + ', over the ' + Math.round(100 / NEAR_BAND) + '% the band allows', gap);
+    /* V8_NEAR: each list and item measured on every other screen for each rider judged on it here, every skin */
+    const v8m = [], v8n = [...V8_NEAR].reduce((a, k) => a + ((V8N_SEEN.get(k) || {})[SCR[0]] || new Map()).size, 0);
+    for (const k of V8_NEAR) { const w = V8N_SEEN.get(k) || {}, here = w[SCR[0]];
+      if (!here) { v8m.push(k + ': on no list judged here'); continue; }
+      for (const scr of SCR) { const there = w[scr] || new Map(), lost = [...here.keys()].filter(j => !there.has(j)), sk = SK8.filter(x => ![...there.values()].includes(x));
+        if (lost.length || sk.length) v8m.push(k + ': ' + scr + ': ' + (lost.length ? lost.length + ' of ' + here.size + ' riders not measured' : '') + (sk.length ? ' (no ' + sk.join(', ') + ' skin)' : '')); } }
+    ok(!v8m.length, 'strip: other screens: each list and item item 99 measured on Safari and 3x on v8 (V8_NEAR, ' + V8_NEAR.size + ') is measured on Chromium at 3x and WebKit at 2x and 3x for every rider judged on it on Chromium at 2x (' + v8n + '), every skin, whatever it reads here', v8m.slice(0, 6)); }
   // the cases v7 held, judged in full on v8: each printed with its least (pixels changed; and in its own colour) beside v7's, and each part's;
   // every item of each entry, and each of its parts, judged on a ride's list (v8 check round 1: any one item did; point 1's legs and
   // tights-light were never on one, and its leg wear without wool socks never judged)
@@ -1504,6 +1544,40 @@ section('strip', async () => {
     ok(!miss.length, 'strip: ACCEPTED_V8 ' + e.n + ' (FROM-APP-CHAT-7 ' + e.point + ', retired with v9): its case is still judged on every screen, item and skin, against SHOW (' + SCR.length + ' screens, ' + e.ids.join(' ') + ', ' + SK8.length + ' skins; v8 width ' + Object.entries(e.width).map(([s, W]) => s + ' ' + Object.values(W).reduce((a, x) => a + x.length, 0)).join(', ') + ')', miss); }
   const unseen = FIXED_BY_V7.flatMap((f, n) => f.ids.filter(id => !FIXED_SEEN.has(n + ':' + id)).map(id => f.point + ' ' + id));
   ok(!unseen.length, 'strip: each v6 gap v7 fixed (' + FIXED_BY_V7.length + ' entries, every item of each) is judged on v7, on a ride or a direct list', unseen);
+  // the thermal jersey's cuff (FROM-APP-CHAT-7 point 5; v9 check round 2: nothing held it, and a v9 whose cuff is as wide across as v8's, onto
+  // the vest, passed q99): with the vest, alone and on the cold starter list, both riders in their jerseys and in Black, at 2x and 3x (strip
+  // size: 0.5 CSS px a unit), as the strip draws it and with both arms in each of FW's 11 poses (FROM-DESIGN-CHAT-7 point 5 measured them), and
+  // the reach pose where FW draws it, on the bike (the person at .62), in Chromium and WebKit. The cuff's paint (the drawing against the same
+  // with o.cuff null, more than 48 in a channel, alpha too, drawn with 60 units round the viewBox) lands only on the sleeve: where the sleeve's
+  // colour paints (o.armSleeve in two flag colours) or within its 4-unit ink outline (v8 13-137 px off it in every case, v9 0); none outside
+  // the viewBox (the reach pose drawn alone puts the arm and hand past x 200, so there only the sleeve holds it); and some in every case
+  { const wkb = await webkit.launch(), POSES = ['down', 'wave', 'thumb', 'horn', 'cross', 'run', 'wheel', 'reach', 'up', 'head', 'clip'];
+    for (const eng of ['Chromium', 'WebKit']) { const x = await openH({ noErrs: true, browser: eng === 'WebKit' ? wkb : browser }), p = x.p;
+      const C = await p.evaluate(async ([R99, POSES]) => { const D = FW.RIDER_DEFAULT, R = [D, R99].flatMap(r => [r, Object.assign({}, r, { kit: '#1E1E24', kit2: '' })]), M = 60, out = [];
+        const c = document.createElement('canvas'), x = c.getContext('2d', { willReadFrequently: true }), dif = (a, b, i) => Math.max(...[0, 1, 2, 3].map(j => Math.abs(a[i + j] - b[i + j])));
+        const draw = async (s, W, H) => { c.width = W; c.height = H; const img = new Image(), u = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' })); img.src = u; try { await img.decode(); x.clearRect(0, 0, W, H); x.drawImage(img, 0, 0, W, H); } finally { URL.revokeObjectURL(u); img.src = ''; } return x.getImageData(0, 0, W, H).data; };
+        /* svg(extra): the drawing; vb its viewBox; s the person's scale in it; k device px a unit */
+        const one = async (tag, svg, vb, s, k, held) => { const W = Math.round((vb[2] + 2 * M) * k), H = Math.round((vb[3] + 2 * M) * k), mk = ex => { const t = FW.plain(svg(ex));
+            if (!t.includes('viewBox="' + vb.join(' ') + '"')) throw new Error(tag + ': viewBox'); return t.replace(/viewBox="[^"]+"/, 'viewBox="' + [vb[0] - M, vb[1] - M, vb[2] + 2 * M, vb[3] + 2 * M].join(' ') + '"').replace('<svg ', `<svg width="${W}" height="${H}" `); };
+          const A = await draw(mk({}), W, H), B = await draw(mk({ cuff: null }), W, H), F1 = await draw(mk({ cuff: null, armSleeve: '#FF00FF' }), W, H), F2 = await draw(mk({ cuff: null, armSleeve: '#00FF00' }), W, H);
+          const rad = Math.ceil(4 * s * k), band = q => dif(F1, F2, q * 4) > 8; let n = 0, off = 0, outside = 0;
+          for (let q = 0; q < W * H; q++) { if (dif(A, B, q * 4) <= 48) continue; n++; const px = q % W, py = Math.floor(q / W), ux = (px + 0.5) / k - M, uy = (py + 0.5) / k - M; let on = false;
+            if (held && (ux < 0 || uy < 0 || ux > vb[2] || uy > vb[3])) outside++;
+            for (let dy = -rad; dy <= rad && !on; dy++) for (let dx = -rad; dx <= rad && !on; dx++) { const yy = py + dy, xx = px + dx; on = dx * dx + dy * dy <= rad * rad && xx >= 0 && yy >= 0 && xx < W && yy < H && band(yy * W + xx); }
+            if (!on) off++; }
+          out.push({ tag, n, off, outside }); };
+        for (const r of R) for (const sc of [2, 3]) { const k = sc / 2, who = r.kit + ' jersey, ' + sc + 'x';
+          for (const L of [['jersey-heavy', 'vest'], ['jersey-heavy', 'vest', 'arms', 'legs', 'gloves-thermal', 'head', 'shoes']]) for (const pose of [null, ...POSES]) {
+            const e = pose ? { armL: pose, armR: pose } : {}, svg = ex => FW.riderOutfit(r, L, Object.assign({}, e, ex)), vb = /viewBox="([^"]+)"/.exec(svg({}))[1].split(/\s+/).map(Number);
+            await one(who + ', the list ' + L.join(' ') + ', ' + (pose ? 'both arms ' + pose : 'as the strip draws it'), svg, vb, 1, k, pose !== 'reach'); }
+          /* on the bike: the person options riderOutfit makes for the vest and the thermal jersey, in its order */
+          const o = FW.riderBase(r); FW.OUTFIT_LOOK.vest(o); FW.OUTFIT_LOOK['jersey-heavy'](o);
+          await one(who + ', on the bike (reach)', ex => FW.bike({ rider: Object.assign({}, o, ex) }), [0, -64, 320, 284], .62, k, true); }
+        return out; }, [RIDER99, POSES]);
+      const bad = C.filter(q => q.off || q.outside || !q.n), lo = C.reduce((m, q) => !m || q.n < m.n ? q : m, null);
+      ok(C.length === 4 * 2 * (2 * 12 + 1) && !bad.length, 'strip: the thermal jersey\'s cuff in ' + eng + ' lands only on the sleeve and inside the viewBox, in every pose FW draws (' + C.length + ' drawings; the least cuff ' + (lo && lo.n) + ' device px, ' + (lo && lo.tag) + ')', bad.slice(0, 6));
+      await x.close(); }
+    await wkb.close(); }
   // the detector itself: an item that draws nothing in every version (bib shorts: the rider's default look) is judged as not showing; the
   // leg warmers and toe covers show, in their own colours
   { const x = await openH({ noErrs: true }), p = x.p, D = await p.evaluate(() => FW.RIDER_DEFAULT), a = await pxOf(p, D, ['legs', 'bibs'], OWN), b = await pxOf(p, D, ['shoes', 'knees', 'toes'], OWN);

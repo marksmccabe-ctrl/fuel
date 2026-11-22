@@ -214,6 +214,12 @@ const M = [
   // with no wool socks drawn as nothing on fair skin and heavy tights there on tan skin, outside entries 2 and 3's v8 widths (item 99's q99
   // on v8 judged both there through the band, FAIL 35; FORMER_V8 measured only its widths on other screens, OK 8363 on v9)
   ['v9c1-wkfair', 'strip', s => fwWrap(s, "if(!/Chrome/.test(navigator.userAgent) && r && (r.skin==='fair' || (r.skin==='tan' && ids.includes('tights-heavy'))) && (ids.includes('boots') || ids.includes('overshoes')) && !ids.includes('socks-wool')) ids=ids.filter(x=>!" + LEGJS + ".includes(x)); return ro(r, ids, e);")],
+  // v9 check round 2 (probe100/v9check2-tests/mkmut.mjs, the checker's mut9-wksockboots and mut9-cuffwide): on Safari only, wool socks over bare
+  // shins above boots drawn as nothing on the five skins v9 reads at 180 / 144 at Chromium 2x, the band's edge (item 99's q99 on v8 judged
+  // all eight on every screen, 156 / 136; OK 8647 on v9 at d985944: V8_NEAR); and the thermal jersey's cuff as wide across as v8's (ink 31,
+  // cuff 26, v9's butt caps kept), so it reaches past the sleeve onto the vest (OK 8605 at d985944: the cuff check)
+  ['v9c2-wksockboots', 'strip', s => fwWrap(s, "if(!/Chrome/.test(navigator.userAgent) && r && !['tan','olive','brown'].includes(r.skin) && ids.includes('boots') && ids.includes('socks-wool') && !ids.some(x=>" + LEGJS + ".includes(x) || x==='knees')) ids=ids.filter(x=>x!=='socks-wool'); return ro(r, ids, e);")],
+  ['v9c2-cuffwide', 'strip', s => fwWrap(s, "const t=ro(r, ids, e); return t.split('stroke-width=\"26\" stroke-linecap=\"butt\"').join('stroke-width=\"31\" stroke-linecap=\"butt\"').split('stroke-width=\"19\" stroke-linecap=\"butt\"').join('stroke-width=\"26\" stroke-linecap=\"butt\"');")],
   ['v8a-dump', 'strip', s => fwWrap(s, "if(r && r.skin==='deep' && ids.includes('boots') && !ids.includes('socks-wool')) ids=ids.filter(x=>!" + LEGJS + ".includes(x)); return ro(r, ids, e);"), dir => ({ Q99_ACCEPT_DUMP: path.join(dir, 'dump.jsonl') })],
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mutants.log');
