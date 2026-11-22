@@ -1036,13 +1036,15 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
     // a screen whose animations are all paused (the bundle's .fw-paused on a scene): its window has no motion, so it is not measured (a
     // 'frame' failure), whatever it reads, and the walk's state records that window (held against no failures, a frame gap: dropped, the
     // failure would still show)
+    /* (item 100: plan-before has art of its own, the sky box and the crew, moving: out of the way here, so only the paused scene is on the screen) */
+    await p.evaluate(() => { const st = document.createElement('style'); st.id = 'kitNoArt'; st.textContent = '#planSky,#planCrew{display:none!important}'; document.head.append(st); });
     await probe(p, 'fwkJ', 'fw-scene fw-phone', 'width:360px'); await mountJs(p, 'fwkJ', 'scene', 'kit:j');
     const jGo = await until(async () => { const x = spotOf(await audit(p), 'fwkJ'); return x && x.go && x.running ? x : null; }, 3000);
     await p.evaluate(() => document.getElementById('fwkJ').classList.add('fw-paused'));
     const jRun = await p.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length);
     const OJ = [], SJ = walkState(), LJ = Object.assign({}, BUDGET, { refMs: 1e9, frameMs: 1e9 }); let QJ = null;
     try { QJ = await screenFrame('self-test paused', p, jGo ? jGo.running : 0, false, REF, SJ, OJ, LJ, nowait); }
-    finally { await unmount(p, ['fwkJ']); }
+    finally { await unmount(p, ['fwkJ']); await p.evaluate(() => { const st = document.getElementById('kitNoArt'); if (st) st.remove(); }); }
     const gJ = gaps(SJ, [], LJ).frame.filter(x => x[0] === 'self-test paused');
     C.ok(!!jGo && jRun === 0 && QJ.H.judged && OJ.length === 1 && OJ[0].rule === 'frame' && /^not measured/.test(OJ[0].detail) && gJ.length === 1 && /not measured with the screen.s motion running/.test(gJ[0][1]), 'self-test: a screen whose animations are all paused (' + jRun + ' running): its window is not measured with the screen\'s motion running, a frame failure (' + (OJ[0] ? OJ[0].detail.slice(0, 120) : 'none') + '), and the walk\'s state records it (with no failures, ' + (gJ.length ? 'a frame gap' : 'no gap') + ')', { OJ, gJ });
     // a window read at another CPU slowdown than the rule's (the page's CDP session giving 5 when the kit asks for 6: what the kit sends is
@@ -1097,7 +1099,9 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
     const om = await openScreen(HOOKED, s, { browser: B, motion: false });
     try { await walker(B, HOOKED, REF, SM, OM, EM, BUDGET)(sM, om); } finally { await om.close(); for (const [n, e] of EM) ERRS.push([n + ' (self-test)', e]); }
     const rM = rep(OM, SM, BUDGET, EM), gM = gaps(SM, [], BUDGET).motion;
-    C.ok(OM.length === 1 && OM[0].rule === 'motion' && /Reduce Motion on/.test(OM[0].detail) && rM.includes('  FAIL ' + line(OM[0])) && last(rM) === 'FAIL 1' && (SM.by[sM.name] || {}).reduce === 1 && gM.length === 1 && gM[0][0] === sM.name,
+    /* (a screen with fwMount calls of its own, plan-before since item 100, also has them refused: an 'insert' failure, the page opened again had another gate) */
+    const xM = OM.filter(f => !(f.rule === 'insert' && /^not opened as the walk opens a screen/.test(f.detail)));
+    C.ok(xM.length === 1 && OM.length <= 2 && xM[0].rule === 'motion' && /Reduce Motion on/.test(xM[0].detail) && OM.every(f => rM.includes('  FAIL ' + line(f))) && last(rM) === 'FAIL ' + OM.length && (SM.by[sM.name] || {}).reduce === 1 && gM.length === 1 && gM[0][0] === sM.name,
       'self-test: a screen opened with Reduce Motion on (as walk() never opens one): ' + (OM.length ? OM.map(f => f.rule + ' "' + f.detail.slice(0, 70) + '"').join(', ') : 'no failure') + ', "' + last(rM) + '" through the report; its record, with no failures, ' + (gM.length ? 'a motion gap' : 'no gap'), { OM: OM.map(line), rM, by: SM.by[sM.name], gM });
     // a screen opened with Reduce Motion off and Animate the world on (the self-test screen stores no worldMotion: on unless false) whose
     // gate stays shut (an init script takes html.fw-anim off whenever it is put on): exactly one 'motion' failure, the gate shut, and its
@@ -1106,7 +1110,8 @@ async function selfTest(B, HOOKED, C, ERRS, REF, FAILS) {
     CTX_INIT = { fn: GATE_SHUT, arg: null }; try { og = await openScreen(HOOKED, s, { browser: B, motion: true }); } finally { CTX_INIT = null; }
     try { await walker(B, HOOKED, REF, SG, OG, EG, BUDGET)(sG, og); } finally { await og.close(); for (const [n, e] of EG) ERRS.push([n + ' (self-test)', e]); }
     const rG = rep(OG, SG, BUDGET, EG), gG = gaps(SG, [], BUDGET).motion, byG = SG.by[sG.name] || {};
-    C.ok(OG.length === 1 && OG[0].rule === 'motion' && /gate is shut/.test(OG[0].detail) && rG.includes('  FAIL ' + line(OG[0])) && last(rG) === 'FAIL 1' && byG.reduce === 0 && byG.shut === 1 && gG.length === 1 && gG[0][0] === sG.name && /gate shut/.test(gG[0][1]),
+    const xG = OG.filter(f => !(f.rule === 'insert' && /^not opened as the walk opens a screen/.test(f.detail)));
+    C.ok(xG.length === 1 && OG.length <= 2 && xG[0].rule === 'motion' && /gate is shut/.test(xG[0].detail) && OG.every(f => rG.includes('  FAIL ' + line(f))) && last(rG) === 'FAIL ' + OG.length && byG.reduce === 0 && byG.shut === 1 && gG.length === 1 && gG[0][0] === sG.name && /gate shut/.test(gG[0][1]),
       'self-test: a screen opened with Reduce Motion off and Animate the world on but fred world\'s gate shut (kept off by an init script): ' + (OG.length ? OG.map(f => f.rule + ' "' + f.detail.slice(0, 90) + '"').join(', ') : 'no failure') + ', "' + last(rG) + '" through the report; its record (Reduce Motion ' + byG.reduce + ', gate shut ' + byG.shut + '), with no failures, ' + (gG.length ? 'a motion gap' : 'no gap'), { OG: OG.map(line), rG, by: byG, gG });
     // a page opened again for a screen's fwMount calls not at the rule's rate (here in a browser of its own, which the kit gives no
     // slowdown: as the walk never opens one) has its calls refused: an 'insert' failure, not opened at 6x, and the walk's record of it

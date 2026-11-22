@@ -239,11 +239,16 @@ function pageAudit(cfg) {
   };
   // the floating layer a thing sits in: a fixed or sticky box, or a positioned menu, listbox, dialog or popover
   const FL = new Map();
+  // a sticky box is stuck (floating) when it sits at its offset from the screen's edge: top:N at N px from the top, bottom:N at N px from
+  // the bottom; elsewhere the page has scrolled it to where it would sit unstuck
+  const stuck = x => { const c = cs(x), r = x.getBoundingClientRect(), t = parseFloat(c.top), b = parseFloat(c.bottom);
+    return (!isNaN(t) && Math.abs(r.top - t) < 1) || (!isNaN(b) && Math.abs(innerHeight - r.bottom - b) < 1) || (isNaN(t) && isNaN(b)); };
   const floatOf = e => {
     if (FL.has(e)) return FL.get(e);
     let f = null;
     for (let x = e; x && x !== de; x = x.parentElement) {
       const p = cs(x).position;
+      if (p === 'sticky' && !stuck(x)) continue; /* (item 100: a sticky bar not stuck now, scrolled with the page into its own place, is page: the Crunch bar at the end of a long Plan, under the header) */
       if (p === 'fixed' || p === 'sticky' || (p === 'absolute' && (/^(menu|listbox|dialog|alertdialog|tooltip)$/.test(x.getAttribute('role') || '') || x.hasAttribute('popover')))) { f = x; break; }
     }
     FL.set(e, f); return f;

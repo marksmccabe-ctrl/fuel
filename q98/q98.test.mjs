@@ -646,7 +646,8 @@ async function twoDev(page, o = {}) {
   } finally { for (const d of D) await d.close(); }
   return r;
 }
-const none = s => !!s && s.b.ride === 'none' && !s.b.run && s.f.length === 0;
+/* no results and no weather card's fred; since item 100 the Plan's sky box shows his look while no results are up (fred once: only there) */
+const none = s => !!s && s.b.ride === 'none' && !s.b.run && s.f.every(f => /^planSky:/.test(f)) && s.f.length === (/id="planSky"/.test(SRC) ? 1 : 0);
 const only = (s, run) => !!s && (run ? s.b.run && s.b.ride === 'none' : s.b.ride === 'block' && !s.b.run) && s.f.length === 1;
 function twoOks(r, where) {
   return [[only(r.run, true), 'once: two devices (' + where + '): A Crunched a run: its box shown, one fred', r.run],
