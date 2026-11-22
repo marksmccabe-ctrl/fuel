@@ -5598,8 +5598,8 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
    no move at all, a still frame (sun and rays still, frost drawn, no drops, flakes or heat lines). Every gradient outside the year chart's
    edge fades is in this block ---------- */
 :root{--wx-fog:rgba(186,195,203,.62)} html.run-theme{--wx-fog:rgba(150,160,170,.26)}
-#results>.r-wx,#runResults>.r-wx{position:relative;isolation:isolate;overflow:hidden}
-#results>.r-wx[data-title]::before,#runResults>.r-wx[data-title]::before,.r-wx .rwx-main,.r-wx .rwx-note,.r-wx .rwx-tile>*{position:relative;z-index:3}
+#results>.r-wx,#runResults>.r-wx,#planSky{position:relative;isolation:isolate;overflow:hidden} /* q100: and the Plan's sky box */
+#results>.r-wx[data-title]::before,#runResults>.r-wx[data-title]::before,.r-wx .rwx-main,.r-wx .rwx-note,.r-wx .rwx-tile>*,.r-wx .pvs-l{position:relative;z-index:3}
 .rwx-tile{position:relative;background:var(--panel)}
 .rwx-scene{position:absolute;left:0;right:0;top:0;height:176px;z-index:0;pointer-events:none;overflow:hidden;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
 .rwx-fog{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
@@ -5617,11 +5617,11 @@ html.run-theme .rwx-bg{background:linear-gradient(180deg,color-mix(in srgb,var(-
    the letters' edges, where a rain cloud, frost or the heat sky held the title and the sub line under 4.5:1; with the edge every word keeps
    AA over every sky, light and dark. While a sky cross-fades out (data-sky-out, wxSkySet) its feather stays: going to a clear night, or
    from fog to another sky, the words would otherwise lose it while the old sky is still there */
-.r-wx:is([data-sky],[data-sky-out])[data-title]::before,.r-wx:is([data-sky],[data-sky-out]) .rwx-temp,.r-wx:is([data-sky],[data-sky-out]) .rwx-sub,.r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-tile,.r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
+.r-wx:is([data-sky],[data-sky-out])[data-title]::before,.r-wx:is([data-sky],[data-sky-out]) .rwx-temp,.r-wx:is([data-sky],[data-sky-out]) .rwx-sub,.r-wx:is([data-sky],[data-sky-out]) .pvs-l,.r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-tile,.r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
 /* graphite: the edge 2 px wide (rings at 1, 1.5 and 2 px, the last in 16 directions) over a copy of each letter. The grey sub line
    (#A1A1AA) is only 4.8:1 on the panel, so a white flake, the green leaf or a teal streak passing close to its letters held it under
    4.5:1 for a moment */
-html.run-theme .r-wx:is([data-sky],[data-sky-out])[data-title]::before,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .rwx-temp,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .rwx-sub,html.run-theme .r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-tile,html.run-theme .r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),2px 0 0 var(--panel),-2px 0 0 var(--panel),0 2px 0 var(--panel),0 -2px 0 var(--panel),2px 2px 0 var(--panel),-2px 2px 0 var(--panel),2px -2px 0 var(--panel),-2px -2px 0 var(--panel),2px 1px 0 var(--panel),-2px 1px 0 var(--panel),2px -1px 0 var(--panel),-2px -1px 0 var(--panel),1px 2px 0 var(--panel),-1px 2px 0 var(--panel),1px -2px 0 var(--panel),-1px -2px 0 var(--panel),0 0 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
+html.run-theme .r-wx:is([data-sky],[data-sky-out])[data-title]::before,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .rwx-temp,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .rwx-sub,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .pvs-l,html.run-theme .r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-tile,html.run-theme .r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),2px 0 0 var(--panel),-2px 0 0 var(--panel),0 2px 0 var(--panel),0 -2px 0 var(--panel),2px 2px 0 var(--panel),-2px 2px 0 var(--panel),2px -2px 0 var(--panel),-2px -2px 0 var(--panel),2px 1px 0 var(--panel),-2px 1px 0 var(--panel),2px -1px 0 var(--panel),-2px -1px 0 var(--panel),1px 2px 0 var(--panel),-1px 2px 0 var(--panel),1px -2px 0 var(--panel),-1px -2px 0 var(--panel),0 0 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
 /* over a sky the arrow (no feather) gets a crisp edge in the panel colour, 2.25 px round its stroke (.rwx-arr-e, drawn under it): it keeps its
    3:1 (#8E8E93 on white, #A1A1AA on graphite) over every sky and anything passing behind it */
 .rwx-arr .rwx-arr-e{display:none} .r-wx:is([data-sky],[data-sky-out]) .rwx-arr .rwx-arr-e{display:inline;stroke:var(--panel);stroke-width:5.6}
@@ -5715,7 +5715,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 .rwx-layer.rwx-pre,.rwx-layer.rwx-out{opacity:0}
 /* print: paper has no sky, so no feather and no arrow edge either (each feather layer would print as one more copy of the word, in the PDF's
    text too, and graphite's as a dark smudge round it on white paper) */
-@media print{ .r-wx[data-title]::before,.r-wx .rwx-temp,.r-wx .rwx-sub,.r-wx .rwx-tile,.r-wx .rwx-note{text-shadow:none!important} .r-wx .rwx-arr .rwx-arr-e{display:none!important} .r-wx>.rwx-scene,.r-wx>.rwx-fog,.r-wx>.rwx-fred{display:none!important} }
+@media print{ .r-wx[data-title]::before,.r-wx .rwx-temp,.r-wx .rwx-sub,.r-wx .rwx-tile,.r-wx .rwx-note,.r-wx .pvs-l{text-shadow:none!important} .r-wx .rwx-arr .rwx-arr-e{display:none!important} .r-wx>.rwx-scene,.r-wx>.rwx-fog,.r-wx>.rwx-fred{display:none!important} }
 /* }} q87 sky */
 /* q98 fred {{ ---------- q98 (item 98, fred Nov 5): fred in the living sky, top right of both weather boxes (#rWeather, the run's #runWx;
    on the computer layout too, where the box is wider). His layer (.rwx-fred, a fwMount spot, wxFred) is his base box: the 200-unit body,
@@ -5749,9 +5749,36 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
   .r-wx.wx-arm>.rwx-fred{display:none!important} .r-wx.wx-go>.rwx-fred{animation:rwx-fred-in 700ms var(--ease-out) backwards}
   .rwx-fred.rwx-x{transition:opacity 480ms var(--ease-out)!important}
 }
-@media print{ .r-wx .rwx-temps,.r-wx .rwx-sub{padding-right:0!important} .r-wx .rwx-main{min-height:0!important}
+@media print{ .r-wx .rwx-temps,.r-wx .rwx-sub,.r-wx .pvs-l{padding-right:0!important} .r-wx .rwx-main{min-height:0!important}
   .rwx-main.sub-wide.sub-room .rwx-sky{grid-row:1 / span 2} .rwx-main.sub-wide.sub-room .rwx-temps{align-self:end} .rwx-main.sub-wide.sub-room .rwx-sub{grid-column:2;margin-top:4px} } /* review: a sub-line under the square only for his room (wxFitRows: .sub-room) prints beside it, as on main */
 /* }} q98 fred */
+/* q100 front {{ ---------- q100 (item 100, fred Nov 5): the Plan's front page. The sky box (#planSky, between the ride ticket and
+   Settings): a plain Plan box (white, the 1.5 px outline, the panel radius; graphite on the run, its sky mixed in as item 98's run box),
+   at least tall enough for fred and never a fixed height. Its top is the forecast's sky (item 87's masked layer, wxSkySet: the rules
+   above name #planSky beside the weather boxes) with fred in it, always shown here: his room is kept beside the one line (time · place
+   · temperature, over the sky with the card's feather), which wraps rather than run under him (no explanation line, item 76). The crew
+   (#planCrew, after the footer, on the page, no band): five friends at one body size: a slot is its friend's FW.box width at the
+   body's scale (--bw: friends 10, 12 and 17 are wider; --sw the five boxes' widths in bodies, so one row fills the column; --ch the
+   tallest box's height, so the names under them line up). With names on, a slot is at least as wide as its name: at 150% and 200% text
+   the row wraps, nothing cut or on top of another. Not on the computer layout. The run's graphite: left out (provisional, Mark's call:
+   v9's crew outline and dark kit sink into #26262C; the bundle has no on-dark crew yet; this one rule is the switch). Print: no sky,
+   fred or crew. Forced colours: the art out (item 97's spot rule), the box's edge kept, the sky out with it ---------- */
+#planSky{margin:0;min-height:calc(var(--wxf) * 1.3);padding:14px 16px;border:var(--ol) solid var(--chip-line);border-radius:var(--r-panel);background:var(--panel);color:var(--text)}
+#planSky[hidden]{display:none}
+#planSky .rwx-g{padding:0;border:0;border-radius:0;background:none}
+#planSky>.rwx-fred{display:block}
+#planSky .pvs-l{margin:0;padding-right:calc(var(--wxf) * 1.21 - 10px);font:700 var(--t-caps)/1.5 var(--font);letter-spacing:.07em;text-transform:uppercase;color:var(--text-body);overflow-wrap:anywhere}
+#planSky .pvs-t{font:700 1.25rem/1 var(--font);letter-spacing:0;color:var(--text);white-space:nowrap}
+.crew{container-type:inline-size;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.crew[hidden]{display:none}
+.crew-f{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;max-width:100%;margin:0;padding:0}
+.crew-a{position:relative;width:calc((100vw - 65px) * var(--bw,1) / var(--sw,5));width:calc((100cqw - 33px) * var(--bw,1) / var(--sw,5));aspect-ratio:var(--bw,1) / var(--ch,1.5);line-height:0}
+.crew-a>svg{position:absolute;left:0;top:0;display:block;width:100%;height:auto;overflow:visible}
+.crew-n{display:block;max-width:100%;margin:4px 0 0;font:600 .75rem/1.25 var(--font);color:var(--text-body);text-align:center;overflow-wrap:anywhere}
+html.dk #planCrew,html.run-theme #planCrew{display:none!important}
+@media print{ #planCrew{display:none!important} }
+@media (forced-colors:active){ #planSky>.rwx-scene,#planSky>.rwx-fog{display:none!important} #planCrew .crew-a{display:none!important} }
+/* }} q100 front */
 /* q88 volume colour {{ ---------- q88 (item 88, fred Oct 15): Volume's colour (PDF p.4, fred-motion-3.html › Volume). The season card is
    the hero (deep blue, fred's teal and green stripes at its right edge), This week (planned or not) the blue tile, 6-week avg the teal tile,
    Consistency the green tile, Hours per year teal; every other Volume box stays white (the off-season card keeps its teal tint). Every
@@ -6505,6 +6532,8 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
     <button type="button" class="pv-rrow run-only nut-only" id="aidRowBtn" aria-haspopup="dialog"><span class="pl-place">Water stops / aid</span><span class="pl-stops" id="aidRowV">None</span><span class="gr-c" aria-hidden="true"></span></button>
   </section>
 
+  <section class="r-wx pv-sky" id="planSky" aria-label="Ride forecast"></section><!-- q100 (item 100): the sky box: the forecast's sky, fred dressed for it, time · place · temperature (skyBoxRender); out after Crunch -->
+
   <!-- q31/q32: the BOTTLES card: fred decides | My bottles, and the plain water row (nothing is calculated here before Crunch) -->
   <section class="pv-card pv-sec pv-carry nut-only run-only" id="carryCard" aria-labelledby="carryH"><!-- q42: CARRY replaces Bottles for runs -->
     <div class="pv-chead"><h2 class="v-caps pv-h" id="carryH">Carry</h2><span class="pv-cnote">what you run with</span></div>
@@ -6668,6 +6697,7 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
   </div>
   <div class="plan-saved" id="planSaved" role="status" hidden><span>Saved to Journal ✓</span><span aria-hidden="true"> · </span><button type="button" id="planSavedView">View ›</button></div>
   <div class="fredfoot"><button class="footlink" data-science>Planning tool, not medical advice · <b>The science behind it →</b></button><button type="button" class="privlink" data-privacy hidden>Privacy</button></div>
+  <ul class="crew" id="planCrew" hidden></ul><!-- q100 (item 100): the crew, five friends a day after the footer, on the page (crewRender) -->
 </section>
 
 <!-- ================= SETTINGS (v3-8, spec p.11; q4-2): search + four collapsible groups (closed at first, remembered per device) of striped rows; every editor opens in the settings sheet ================= -->
@@ -6750,10 +6780,12 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="training" hidden><button type="button" class="prow-h" id="prowBtn-training" data-sheet="training" aria-haspopup="dialog" data-kw="import history files"><span class="prow-l">Imported training</span><span class="prow-v" id="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
-  <section class="pgroup sg-fw gs gs-blue sp-both" aria-labelledby="pgT-fw"><!-- item 97: fred world (items 100 and 101 add their switches here) -->
+  <section class="pgroup sg-fw gs gs-blue sp-both" aria-labelledby="pgT-fw"><!-- item 97: fred world (items 100 and 101 add their switches here; item 100: Show the crew, Show their names) -->
     <h2 class="peyebrow gs-h" id="pgH-fw"><span class="pg-t" id="pgT-fw">fred world</span></h2>
     <div class="pcard gs-b" id="pgB-fw">
       <div class="prow prow-sw" data-prow="worldmotion"><button type="button" class="prow-h gr-swb" id="prowBtn-worldmotion" aria-pressed="true" data-kw="fred world animate animation motion move moving characters still"><span class="prow-l">Animate the world</span><span class="gsw-k" aria-hidden="true"></span></button></div>
+      <div class="prow prow-sw" data-prow="crewshow"><button type="button" class="prow-h gr-swb" id="prowBtn-crewshow" aria-pressed="true" data-kw="fred world crew friends people characters front page plan"><span class="prow-l">Show the crew</span><span class="gsw-k" aria-hidden="true"></span></button></div>
+      <div class="prow prow-sw" data-prow="crewnames"><button type="button" class="prow-h gr-swb" id="prowBtn-crewnames" aria-pressed="false" data-kw="fred world crew friends names first names labels"><span class="prow-l">Show their names</span><span class="gsw-k" aria-hidden="true"></span></button></div>
     </div>
   </section>
   <section class="pgroup sg-acct gs gs-black sp-both" aria-labelledby="pgT-acct">
@@ -10405,7 +10437,7 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids; item 92: the
    weigh-ins, the deficits (settings.volume) and the Profile weight (settings.weightLb, which the newest weigh-in sets); item 99: the rider's look
    (settings.rider, and the Closet card's strip that draws it). */
-const APP_BUILD='fred-shell-v123'; // = sw.js CACHE (the kit checks)
+const APP_BUILD='fred-shell-v124'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
@@ -10576,6 +10608,7 @@ function goTo(view){
   window.scrollTo(0, back ? (lastY['view-'+view]||0) : 0);
   jfDraw(); if(view==='journal') Promise.resolve().then(jmArm); // r1016 (item 90): the compact bar follows the new page; the Journal's first view in an app open sweeps in (once the code that called goTo is done: a list opened from Plan or Settings shows no sweep and leaves it for later)
   if(view==='plan' && typeof wxAutoRefresh==='function') setTimeout(wxAutoRefresh); // q63: Results opens with a forecast under an hour old
+  if(view==='plan'){ skySoon(); crewSoon(); } /* q100: the sky box's forecast when Plan opens (throttled); the crew's five for today */
 }
 document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.view)));
 $('editProfileBtn').addEventListener('click',()=>goTo('profile'));
@@ -10785,7 +10818,7 @@ function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){}
   set('libCount', fav ? `${all.length} · ${fav} ★` : `${all.length} products`);
   { const B=bikes(); set('prowV-bikes', B.length===1 ? `${B[0].name} · ${B[0].cages} cage${B[0].cages===1?'':'s'}` : B.length ? `${B.length} bikes` : 'None'); } // r1013: one Bikes row (its sheet lists them and adds one)
   set('prowV-caps', `${trim1(+settings.coldPct)} · ${trim1(+settings.modPct)} · ${trim1(+settings.hotPct)}%`); set('prowV-heat', `WBGT ${tempDisp(settings.wbgtCold)}° · ${tempDisp(settings.wbgtHot)}°`);
-  [['prowBtn-samerecipe','sameRecipe'],['prowBtn-heatadj','heatAdj'],['prowBtn-worldmotion','worldMotion']].forEach(([id,k])=>{ const b=$(id), on=k==='worldMotion' ? settings[k]!==false : !!settings[k]; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); fwGate(); /* item 97: on unless turned off; the gate follows the settings shown (a sync, a restore) */
+  [['prowBtn-samerecipe','sameRecipe'],['prowBtn-heatadj','heatAdj'],['prowBtn-worldmotion','worldMotion'],['prowBtn-crewshow','crewShow'],['prowBtn-crewnames','crewNames']].forEach(([id,k])=>{ const b=$(id), on=k==='worldMotion' || k==='crewShow' ? settings[k]!==false : k==='crewNames' ? settings[k]===true : !!settings[k]; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); fwGate(); crewSoon(); /* item 97: on unless turned off; the gate follows the settings shown (a sync, a restore); q100: the crew too (shown unless turned off, names only once chosen) */
   if(document.activeElement!==$('firstGel')) $('firstGel').value=firstGelMin();
   set('prowV-planfor', {nutrition:'Nutrition', clothing:'Clothing', both:'Nutrition & clothing'}[planMode()]);
   set('prowV-advanced', `${metric() ? 'Metric' : 'US'} · ${volNorm(settings.volume).weekStart==='sun' ? 'Sunday' : 'Monday'}`);
@@ -12146,6 +12179,74 @@ function wxTiles(w, i, durMin, rain, dp, idk='r'){
 // no forecast (offline, or the date too far out): the same card, the feels-like fred falls back on, no rows
 function wxCardNone(i){ return `<div class="rwx-g"><div class="rwx-main"><span class="rwx-sky">${wxIcon('therm', true)}</span><div class="rwx-read"><p class="rwx-temps"><span class="rwx-temp">${tempDisp(i.tempF)}°</span></p><p class="rwx-sub">Feels-like · no forecast</p></div></div></div>
       <p class="rwx-note">Couldn't get the forecast. Crunch again when you're online.</p>`; }
+/* ---------- q100 (item 100): the Plan's front page. The sky box (#planSky, between the ride ticket and Settings, both sports): the
+   forecast's sky for the ride the Plan has set, through the weather card's own parts (item 87's masked layer by wxSkySet, fred by wxFred
+   in item 98's looks, its loops by wxLoop), and one line of the app's words: time · place · temperature. Only a live forecast of this
+   ride draws a sky and a number: with no place the lookup finds, no forecast (a failed lookup, a saved one from the cache, typical
+   weather past ~10 days) or offline, fred wears his cap (the bundle's clouds look: FW.bird with no wear) and the line is time · place.
+   The forecast is fetchWeather's, Crunch's own lookup (its key, its hour-old rule, its cache), asked quietly when Plan opens (the tab, the
+   app back in front, the Plan sheet closed on a changed ride): one lookup at a time, none offline, and a ride whose lookup failed is not
+   asked again from here for 10 minutes (as wxAutoRefresh), so tab switches and a failing network make no storm. After Crunch the box is
+   out (the weather card carries the forecast and fred: fred once on the page), so too on the computer layout whenever Results is shown
+   beside the Plan-a-ride column it sits in; a new ride (or results taken away) brings it back. ---------- */
+const SKY_RETRY=10*60e3;
+function skyShown(){ const R=$('results'), N=$('runResults'); return !!(R && getComputedStyle(R).display!=='none') || !!(N && !N.hidden); } /* results up, either sport (computed: a scheduled ride's plan hides the ride's results on the computer layout) */
+function skyLive(R){ const w=wxLast; return R && w && wxAccepted && wxKey===R.key && !w.stale && !w.typical ? w : null; } /* this ride's forecast, live (not the cache's saved one, not typical weather) */
+function skyBoxRender(){ const W=$('planSky'); if(!W) return; const out=skyShown(); if(W.hidden!==out) W.hidden=out; if(out) return;
+  const R=wxReq(), w=skyLive(R), sk=w ? wxSkyOf(w) : null, fk=w ? sk||'night' : 'clouds', st=R ? R.start : $('startTime').value||'',
+    day=R && /^(\d{4})-(\d{2})-(\d{2})$/.exec(R.date), city=s=>String(s||'').split(',')[0].trim();
+  let t=''; if(day && /^\d{2}:\d{2}$/.test(st)){ const d=new Date(+day[1], +day[2]-1, +day[3], +st.slice(0,2), +st.slice(3)); t=d.toLocaleDateString(undefined,{weekday:'short'})+' '+d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}).replace(/\s/g, '\u00a0'); } /* (8:00 AM never split) */
+  const tp=w ? wxTempAt(w, w.startMin) : null, deg=w ? tempDisp(tp!=null ? tp : w.air) : null, L=[t, city(w ? w.place : shortPlace(wxPlace()))].filter(Boolean).map(esc);
+  const line=L.join(' · ')+(deg!=null ? (L.length ? ' · ' : '')+`<b class="pvs-t">${deg}°</b>` : '');
+  let g=W.querySelector(':scope>.rwx-g'); if(!g){ g=document.createElement('div'); g.className='rwx-g'; g.innerHTML='<p class="pvs-l" id="planSkyL"></p>'; W.append(g); }
+  if(sk) g.dataset.sky=sk; else delete g.dataset.sky; g.dataset.fred=fk; W.dataset.wx=w ? 'live' : 'none';
+  const P=g.firstElementChild; if(P.innerHTML!==line) P.innerHTML=line;
+  wxDress(W, true); } /* in place: the same sky and look keep their layers and fred (no restart); another cross-fades as on the card */
+function skySoon(){ if(skySoon.t) return; skySoon.t=setTimeout(()=>{ skySoon.t=0; skyBoxFetch(); }, 0); }
+function skyBoxFetch(){ skyBoxRender(); const W=$('planSky'), T=skyBoxFetch.t||(skyBoxFetch.t={}); if(!W || W.hidden || skyBoxFetch.p) return;
+  if(!$('view-plan').classList.contains('active') || $('planSheet').classList.contains('open') || document.visibilityState==='hidden' || navigator.onLine===false) return; /* Plan open and showing; offline: no lookup */
+  const R=wxReq(); if(!R || R.ahead>10 || (wxAccepted && wxKey===R.key && !wxOld())) return; /* no ride, typical weather only, or Crunch's rule: a forecast under an hour old is kept */
+  if(Date.now()-(T[R.key]||0)<SKY_RETRY) return; T[R.key]=Date.now();
+  skyBoxFetch.p=fetchWeather(true).catch(()=>false).then(()=>{ skyBoxFetch.p=null; skyBoxRender(); }); }
+/* ---------- q100 (item 100): the crew (#planCrew, after the Plan's footer, on the page): five friends a day, by the local date alone
+   (the same five all day, on every device and reload): the five after the last day's in FW.FRIENDS' order, round the 19 (day d: friends
+   5d to 5d+4, mod 19), so each friend comes round every 3 or 4 days, never two days running, 5 days in 19; the two Robs (9 and 17) are 8
+   apart in that order, so never in one day's five. Each is a kept fwMount spot (its own id prefix; the bundle's fw-vm0 with --fw-d
+   offsets each bob without adding a loop: 5 bobs and 3 blinks at most, fred's busiest look in the box adds 7), moving 6-8 s when first
+   seen in an app open, then still (still under Reduce Motion and with Animate the world off). One body size: a slot is its friend's
+   FW.box width at the body's scale (10, 12 and 17 are wider). Names (Settings › fred world › Show their names, off unless chosen): the
+   first name under each friend, real text; off, no name anywhere (the list hidden from the accessibility tree too). Shown (Show the crew,
+   on unless turned off) only where it can sit at least 8 px clear of the tab bar (and a bar pinned over it) at the end of the scroll:
+   judged when the layout changes (a resize, a phone turned, the text size, a bar coming or going), never on a scroll; left out
+   otherwise. Not on the computer layout; not on the run's graphite (CSS, provisional). The first names are the app's (the bundle has the
+   drawings only), in FW.FRIENDS order. ---------- */
+const CREW_NAMES=['Ryan','Dustin','Chelsea','Bobby','Anne','Heather','Luke','Mark','Maria','Rob','Marc','Katie','Bentley','John','Steve','Julia','Chiara','Rob','Paul'];
+const CREW_ROOM=8; /* px clear of the tab bar at the end of the scroll */
+function crewDay(d=new Date()){ return Math.round(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())/864e5); } /* the local date as a day number (no clock time, no DST) */
+function crewOf(day){ const n=CREW_NAMES.length, s=((day*5)%n+n)%n; return [0,1,2,3,4].map(k=>(s+k)%n); }
+function crewRender(){ const U=$('planCrew'), F=window.FW; if(!U) return; const on=settings.crewShow!==false && !!(F && F.friend && F.FRIENDS && F.FRIENDS.length>=CREW_NAMES.length);
+  if(!on){ if(U.dataset.k){ U.querySelectorAll('.crew-a').forEach(a=>fwMount(a, '')); U.textContent=''; delete U.dataset.k; } U.hidden=true; return; } /* turned off: no art kept */
+  const ids=crewOf(crewDay()), k=ids.join(','), names=settings.crewNames===true;
+  if(U.dataset.k!==k){ U.querySelectorAll('.crew-a').forEach(a=>fwMount(a, '')); U.textContent=''; U.dataset.k=k; /* a new day: its five */
+    const B=ids.map(i=>F.box(F.friend(i))); U.style.setProperty('--sw', String(+(B.reduce((n,b)=>n+b.w, 0)/200).toFixed(4))); U.style.setProperty('--ch', String(+(Math.max(...B.map(b=>b.h))/200).toFixed(4)));
+    ids.forEach((i,j)=>{ const li=document.createElement('li'); li.className='crew-f'; li.dataset.i=i; li.style.setProperty('--bw', String(+(B[j].w/200).toFixed(4)));
+      const a=document.createElement('div'); a.className='crew-a'; a.style.setProperty('--fw-d', `-${(j*.6).toFixed(1)}s`); li.append(a); U.append(li); }); }
+  U.querySelectorAll('.crew-f').forEach(li=>{ const i=+li.dataset.i, a=li.querySelector('.crew-a'); fwMount(a, ()=>F.friend(i, {idp:'cw'+i+'-'}), 'crew:'+i, {cls:'fw-vm0'});
+    let n=li.querySelector('.crew-n'); if(names && !n){ n=document.createElement('span'); n.className='crew-n'; n.textContent=CREW_NAMES[i]; li.append(n); } else if(!names && n) n.remove(); });
+  if(names){ U.removeAttribute('aria-hidden'); U.setAttribute('aria-label', 'The crew'); } else { U.setAttribute('aria-hidden', 'true'); U.removeAttribute('aria-label'); }
+  U._on=true; crewFit(); }
+function crewFit(){ const U=$('planCrew'); if(!U || !U.dataset.k || settings.crewShow===false) return; U.hidden=false; const r=U.getBoundingClientRect(); if(!r.height) return; /* (Plan not shown, the computer layout, the run: nothing to judge) */
+  const H=innerHeight, end=r.bottom-(Math.max(0, document.scrollingElement.scrollHeight-H)-scrollY); let top=H; /* its bottom on the screen at the end of the scroll */
+  ['nav.tabs', '#planBar', '#planSaved'].forEach(s=>{ const e=document.querySelector(s), b=e && e.getClientRects().length && e.getBoundingClientRect(), cs=b && getComputedStyle(e).position; if(b && (cs==='fixed' || cs==='sticky') && b.top>H/2) top=Math.min(top, b.top); });
+  U.dataset.room=String(Math.round(top-end)); U.hidden=top-end<CREW_ROOM; }
+function crewSoon(){ if(crewSoon.t) return; crewSoon.t=setTimeout(()=>{ crewSoon.t=0; crewRender(); }, 0); } /* (after the code that changed settings: a sync, a restore, the boot pass) */
+/* the box out while results are shown (before a frame shows both freds: a MutationObserver's word comes before the next frame), back
+   when they go; the crew judged again whenever the layout under it changes (sizes only: a scroll changes none) */
+{ const mo=new MutationObserver(()=>{ const W=$('planSky'), o=skyShown(); if(W.hidden!==o) W.hidden=o; skySoon(); }); mo.observe($('results'), {attributes:true, attributeFilter:['style']}); mo.observe($('runResults'), {attributes:true, attributeFilter:['hidden']}); mo.observe($('view-plan'), {attributes:true, attributeFilter:['data-ride']}); }
+if('ResizeObserver' in window){ const ro=new ResizeObserver(roDefer(crewFit)); ['view-plan','planBar','planSaved'].forEach(id=>ro.observe($(id))); ro.observe(document.querySelector('nav.tabs')); }
+addEventListener('resize', ()=>{ crewFit(); skySoon(); }); /* (a phone turned or a window resized: the computer layout comes or goes) */
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible'){ skySoon(); crewSoon(); } }); /* the app back in front: a lookup if due, a new day's crew */
+onAppOpen(crewSoon); skySoon(); crewSoon();
 function renderWeather(r, mode){ // q87 (item 87): mode as render's; any but a fresh Crunch or an opened plan changes the shown card in place (wxPut)
   const W=$('rWeather'), M=$('rWxMore'); const i=r.i, w=wxLast, nut=!!r.b; // nut: a fuel result to explain (Clothing can draw this card from the inputs alone)
   const morph=mode!=='fresh' && mode!=='open' && W.getClientRects().length>0 && !!W.querySelector(':scope>.rwx-g');
@@ -12251,6 +12352,8 @@ function renderToday(){ durBtnRender(); planSetRender();
 function setSwitch(id, key){ $(id).addEventListener('click',()=>{ settings=Object.assign({}, settings, {[key]:!settings[key]}); save(KEYS.settings, settings); prowSoon(); persistInputs(); if(lastResult && !lastResult.stale && $('results').style.display!=='none') recrunchQuiet(); }); }
 setSwitch('prowBtn-samerecipe','sameRecipe'); setSwitch('prowBtn-heatadj','heatAdj');
 $('prowBtn-worldmotion').addEventListener('click',()=>{ settings=Object.assign({}, settings, {worldMotion:settings.worldMotion===false}); save(KEYS.settings, settings); fwGate(); prowSoon(); }); /* item 97: stored once changed (on unless false) */
+$('prowBtn-crewshow').addEventListener('click',()=>{ settings=Object.assign({}, settings, {crewShow:settings.crewShow===false}); save(KEYS.settings, settings); crewRender(); prowSoon(); }); /* q100: stored once changed, as worldMotion (no DEFAULT_SETTINGS entry: item 96 syncs it key by key) */
+$('prowBtn-crewnames').addEventListener('click',()=>{ settings=Object.assign({}, settings, {crewNames:settings.crewNames!==true}); save(KEYS.settings, settings); crewRender(); prowSoon(); });
 $('firstGel').addEventListener('change',()=>{ const v=Math.max(0, Math.round(+$('firstGel').value||0)); settings=Object.assign({}, settings, {firstGel:v}); save(KEYS.settings, settings); $('firstGel').value=v; prowSoon(); persistInputs(); });
 $('tgCaf').addEventListener('click',()=>{ if(lastResult && adjStale()) return; todayCaf = cafEffective() ? 'off' : 'on'; renderToday(); if(lastResult) recrunch(); else persistInputs(); }); // r1013: Adjust this ride › Caffeine
 ['durH','durM'].forEach(id=>$(id).addEventListener('change', renderToday));
@@ -12324,7 +12427,7 @@ function planLineText(){ const parts=[], rt=route, D=rt.mode==='distance';
   const place=($('wxLoc').value||'').trim().split(',')[0].trim(); if(place) parts.push(place);
   return parts.length ? 'Your plan: '+parts.join(' · ') : ''; }
 function planLineRender(){ const el=$('planLine'); if(!el) return; const t=planLineText(); el.textContent=t; el.hidden=!t; }
-function updateSummaries(){
+function updateSummaries(){ skySoon(); /* q100: the sky box follows the ride (its lookup waits for the Plan sheet to close) */
   const gel=lib.gels.find(g=>g.id===$('gelSel').value), pw=lib.powders.find(p=>p.id===$('powderSel').value);
   const salt=(lib.salts||[]).find(x=>x.id===$('saltSel').value); const oz = $('bottleSize').value==='custom' ? volIn($('customOz').value) : +$('bottleSize').value;
   const kv=(k,v)=>`<div><dt>${k}</dt><dd>${v}</dd></div>`, bike=defaultBike(), cm=cafSettings().mode;
@@ -14537,14 +14640,21 @@ function wxRideHours(pts, startMin, durMin){ const P=(pts||[]).filter(p=>p.min!=
   const r1=x=>x==null ? null : Math.round(x*10)/10, out=[];
   for(let k=0;k*60<durMin-1e-9;k++){ const len=Math.min(60, durMin-k*60), mid=startMin+k*60+len/2; out.push({frac:len/60, f:r1(at(mid,'feel')), air:r1(at(mid,'temp')), dew:r1(at(mid,'dew')), w:r1(at(mid,'wbgtF'))}); } // q56: each hour's WBGT (its heat band)
   return {h:out, s:r1(at(startMin,'feel')), e:r1(at(startMin+durMin,'feel'))}; }
-async function fetchWeather(){
-  const q=wxPlace(), date=$('wxDate').value; const out=$('wxOut');
-  if(!q||!date) return false;
+/* q100 (item 100): the ride a lookup is for, as Crunch reads it (the Plan's place, date, start and length; null without one), shared by
+   Crunch and the Plan's sky box, so both find the same forecast under the same key */
+function wxReq(){ const q=wxPlace(), date=$('wxDate').value;
+  if(!q||!date) return null;
   const start=$('startTime').value||'08:00'; const i=readInputs();
   if(typeof sport==='function' && sport()==='run' && RUNP && RUNP.mode==='distance'){ const R=readRunInputs(); if(R.miles>0) i.durMin=Math.round(R.miles*(R.paceSec>0 ? R.paceSec : 510)/60); } // r1008: a distance run's own length (the Duration fields are the ride's)
-  if(!(i.durMin>0)) return false;
+  if(!(i.durMin>0)) return null;
   const pick=pickedPlace(); // a picked suggestion or "Use my location": its coordinates go straight to the forecast
-  const rest=[date,start,i.durMin].join('|'), key=q+'|'+rest+(pick?'|'+pick.lat+','+pick.lon:''); if(wxAccepted && wxKey===key && !wxOld()) return true; // q63: an hour-old forecast is looked up again
+  const rest=[date,start,i.durMin].join('|'); return {q, date, start, i, pick, rest, key:q+'|'+rest+(pick?'|'+pick.lat+','+pick.lon:''), ahead:Math.round((new Date(date+'T12:00:00')-new Date(todayISO()+'T12:00:00'))/864e5)}; }
+let wxBusy=null; /* q100: the lookup in flight ({key, p}): a Crunch during the sky box's lookup of the same ride waits for it (no second request) */
+async function fetchWeather(quiet){ const R=wxReq(); if(!R) return false; /* quiet: the sky box's lookup (item 100), no note under the form */
+  if(wxAccepted && wxKey===R.key && !wxOld()) return true; // q63: an hour-old forecast is looked up again
+  if(wxBusy && wxBusy.key===R.key){ const ok=await wxBusy.p.catch(()=>false); if((ok && wxKey===R.key) || quiet) return ok; } /* (one that failed: a Crunch tries again, and says so) */
+  const p=wxLookup(R, quiet), b=wxBusy={key:R.key, p}; try{ return await p; } finally{ if(wxBusy===b) wxBusy=null; } }
+async function wxLookup(R, quiet){ const {q, date, start, i, pick, rest, key}=R, out=quiet ? document.createElement('div') : $('wxOut'); /* (quiet: its notes go nowhere) */
   out.style.display='block'; out.innerHTML='<div class="note info">Looking up the forecast…</div>';
   try{
     const g=pick ? {lat:pick.lat, lon:pick.lon, name:shortPlace(pick.name)} : await geocode(q);
