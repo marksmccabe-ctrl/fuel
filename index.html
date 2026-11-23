@@ -5600,7 +5600,7 @@ html.run-theme #view-plan{--bx-blue:var(--outline);--bx-teal:var(--outline);--bx
    edge fades is in this block ---------- */
 :root{--wx-fog:rgba(186,195,203,.62)} html.run-theme{--wx-fog:rgba(150,160,170,.26)}
 #results>.r-wx,#runResults>.r-wx,#planSky{position:relative;isolation:isolate;overflow:hidden} /* q100: and the Plan's sky box */
-#results>.r-wx[data-title]::before,#runResults>.r-wx[data-title]::before,.r-wx .rwx-main,.r-wx .rwx-note,.r-wx .rwx-tile>*,.r-wx .pvs-l{position:relative;z-index:3}
+#results>.r-wx[data-title]::before,#runResults>.r-wx[data-title]::before,.r-wx .rwx-main,.r-wx .rwx-note,.r-wx .rwx-tile>*,.r-wx .pvs-l,.r-wx .pvs-h,.r-wx .rwx-hol{position:relative;z-index:3}
 .rwx-tile{position:relative;background:var(--panel)}
 .rwx-scene{position:absolute;left:0;right:0;top:0;height:176px;z-index:0;pointer-events:none;overflow:hidden;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
 .rwx-fog{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
@@ -5618,11 +5618,11 @@ html.run-theme .rwx-bg{background:linear-gradient(180deg,color-mix(in srgb,var(-
    the letters' edges, where a rain cloud, frost or the heat sky held the title and the sub line under 4.5:1; with the edge every word keeps
    AA over every sky, light and dark. While a sky cross-fades out (data-sky-out, wxSkySet) its feather stays: going to a clear night, or
    from fog to another sky, the words would otherwise lose it while the old sky is still there */
-.r-wx:is([data-sky],[data-sky-out])[data-title]::before,.r-wx:is([data-sky],[data-sky-out]) .rwx-temp,.r-wx:is([data-sky],[data-sky-out]) .rwx-sub,.r-wx:is([data-sky],[data-sky-out]) .pvs-l,.r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-tile,.r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
+.r-wx:is([data-sky],[data-sky-out])[data-title]::before,.r-wx:is([data-sky],[data-sky-out]) .rwx-temp,.r-wx:is([data-sky],[data-sky-out]) .rwx-sub,.r-wx:is([data-sky],[data-sky-out]) .pvs-l,.r-wx:is([data-sky],[data-sky-out]) .pvs-h,.r-wx:is([data-sky],[data-sky-out]) .rwx-hol,.r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-tile,.r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
 /* graphite: the edge 2 px wide (rings at 1, 1.5 and 2 px, the last in 16 directions) over a copy of each letter. The grey sub line
    (#A1A1AA) is only 4.8:1 on the panel, so a white flake, the green leaf or a teal streak passing close to its letters held it under
    4.5:1 for a moment */
-html.run-theme .r-wx:is([data-sky],[data-sky-out])[data-title]::before,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .rwx-temp,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .rwx-sub,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .pvs-l,html.run-theme .r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-tile,html.run-theme .r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),2px 0 0 var(--panel),-2px 0 0 var(--panel),0 2px 0 var(--panel),0 -2px 0 var(--panel),2px 2px 0 var(--panel),-2px 2px 0 var(--panel),2px -2px 0 var(--panel),-2px -2px 0 var(--panel),2px 1px 0 var(--panel),-2px 1px 0 var(--panel),2px -1px 0 var(--panel),-2px -1px 0 var(--panel),1px 2px 0 var(--panel),-1px 2px 0 var(--panel),1px -2px 0 var(--panel),-1px -2px 0 var(--panel),0 0 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
+html.run-theme .r-wx:is([data-sky],[data-sky-out])[data-title]::before,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .rwx-temp,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .rwx-sub,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .pvs-l,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .pvs-h,html.run-theme .r-wx:is([data-sky],[data-sky-out]) .rwx-hol,html.run-theme .r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-tile,html.run-theme .r-wx:is([data-sky=fog],[data-sky-out=fog]) .rwx-note{text-shadow:1px 0 0 var(--panel),-1px 0 0 var(--panel),0 1px 0 var(--panel),0 -1px 0 var(--panel),1px 1px 0 var(--panel),-1px 1px 0 var(--panel),1px -1px 0 var(--panel),-1px -1px 0 var(--panel),1.5px 0 0 var(--panel),-1.5px 0 0 var(--panel),0 1.5px 0 var(--panel),0 -1.5px 0 var(--panel),1.5px 1.5px 0 var(--panel),-1.5px 1.5px 0 var(--panel),1.5px -1.5px 0 var(--panel),-1.5px -1.5px 0 var(--panel),2px 0 0 var(--panel),-2px 0 0 var(--panel),0 2px 0 var(--panel),0 -2px 0 var(--panel),2px 2px 0 var(--panel),-2px 2px 0 var(--panel),2px -2px 0 var(--panel),-2px -2px 0 var(--panel),2px 1px 0 var(--panel),-2px 1px 0 var(--panel),2px -1px 0 var(--panel),-2px -1px 0 var(--panel),1px 2px 0 var(--panel),-1px 2px 0 var(--panel),1px -2px 0 var(--panel),-1px -2px 0 var(--panel),0 0 0 var(--panel),0 0 2px var(--panel),0 0 8px var(--panel),0 0 16px var(--panel),0 0 24px var(--panel)}
 /* over a sky the arrow (no feather) gets a crisp edge in the panel colour, 2.25 px round its stroke (.rwx-arr-e, drawn under it): it keeps its
    3:1 (#8E8E93 on white, #A1A1AA on graphite) over every sky and anything passing behind it */
 .rwx-arr .rwx-arr-e{display:none} .r-wx:is([data-sky],[data-sky-out]) .rwx-arr .rwx-arr-e{display:inline;stroke:var(--panel);stroke-width:5.6}
@@ -5693,7 +5693,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
      WBGT and UV markers slide in from the left (900 ms spring, from 520 ms plus the step), the needle swings from north (1.1 s spring, from
      560 ms), the drop fills to the chance of rain (900 ms, from 700 ms) and the sky fades in (700 ms); its loops wait for it */
   .r-wx.wx-arm>.rwx-scene,.r-wx.wx-arm>.rwx-fog{opacity:0!important} .r-wx.wx-arm *{animation-play-state:paused!important}
-  .r-wx.wx-arm .rwx-main{opacity:0!important;transform:translateY(8px)!important} .r-wx.wx-arm .rwx-tile::before,.r-wx.wx-arm .rwx-tile>*{opacity:0!important;transform:translateY(10px)!important}
+  .r-wx.wx-arm :is(.rwx-main,.rwx-hol){opacity:0!important;transform:translateY(8px)!important} .r-wx.wx-arm .rwx-tile::before,.r-wx.wx-arm .rwx-tile>*{opacity:0!important;transform:translateY(10px)!important}
   /* a tile rises as its panel (drawn by its ::before meanwhile) and its words, never as itself: a moving tile would hold its words in a
      stacking context of its own, under the fog (z-index 2), until it landed, and they would snap sharp then */
   .r-wx:is(.wx-arm,.wx-go) .rwx-tile{background:none;border-color:transparent}
@@ -5703,7 +5703,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
   .rwx-tile:nth-child(1){--wxi:0} .rwx-tile:nth-child(2){--wxi:1} .rwx-tile:nth-child(3){--wxi:2} .rwx-tile:nth-child(4){--wxi:3} .rwx-tile:nth-child(5){--wxi:4} .rwx-tile:nth-child(6){--wxi:5}
   .rwx-seg,.rwx-fill{transform-origin:0 50%}
   .r-wx.wx-go>.rwx-scene,.r-wx.wx-go>.rwx-fog{transition:opacity 700ms var(--ease-out)!important}
-  .r-wx.wx-go .rwx-main{transition:opacity var(--t-slow) var(--ease-out) 120ms,transform var(--t-slow) var(--ease-out) 120ms!important}
+  .r-wx.wx-go :is(.rwx-main,.rwx-hol){transition:opacity var(--t-slow) var(--ease-out) 120ms,transform var(--t-slow) var(--ease-out) 120ms!important}
   .r-wx.wx-go .rwx-tile::before,.r-wx.wx-go .rwx-tile>*{transition:opacity var(--t-slow) var(--ease-out) calc(220ms + var(--wxi,0) * 60ms),transform var(--t-slow) var(--ease-out) calc(220ms + var(--wxi,0) * 60ms)!important}
   .r-wx.wx-go .rwx-seg,.r-wx.wx-go .rwx-fill{transition:transform 650ms var(--ease-out) calc(480ms + var(--wxi,0) * 60ms)!important}
   .r-wx.wx-go .rwx-tick{transition:transform 900ms var(--ease-spring) calc(520ms + var(--wxi,0) * 60ms)!important}
@@ -5716,7 +5716,7 @@ html.run-theme .rwx-cl svg{opacity:.5;filter:brightness(.72)} /* dark: the cloud
 .rwx-layer.rwx-pre,.rwx-layer.rwx-out{opacity:0}
 /* print: paper has no sky, so no feather and no arrow edge either (each feather layer would print as one more copy of the word, in the PDF's
    text too, and graphite's as a dark smudge round it on white paper) */
-@media print{ .r-wx[data-title]::before,.r-wx .rwx-temp,.r-wx .rwx-sub,.r-wx .rwx-tile,.r-wx .rwx-note,.r-wx .pvs-l{text-shadow:none!important} .r-wx .rwx-arr .rwx-arr-e{display:none!important} .r-wx>.rwx-scene,.r-wx>.rwx-fog,.r-wx>.rwx-fred{display:none!important} }
+@media print{ .r-wx[data-title]::before,.r-wx .rwx-temp,.r-wx .rwx-sub,.r-wx .rwx-tile,.r-wx .rwx-note,.r-wx .pvs-l,.r-wx .pvs-h,.r-wx .rwx-hol{text-shadow:none!important} .r-wx .rwx-arr .rwx-arr-e{display:none!important} .r-wx>.rwx-scene,.r-wx>.rwx-fog,.r-wx>.rwx-fred{display:none!important} }
 /* }} q87 sky */
 /* q98 fred {{ ---------- q98 (item 98, fred Nov 5): fred in the living sky, top right of both weather boxes (#rWeather, the run's #runWx;
    on the computer layout too, where the box is wider). His layer (.rwx-fred, a fwMount spot, wxFred) is his base box: the 200-unit body,
@@ -5784,6 +5784,17 @@ html.dk #planCrew,html.run-theme #planCrew{display:none!important}
 @media print{ #planCrew{display:none!important} #planSky{min-height:0!important} #planSky .pvs-l::before{display:none} }
 @media (forced-colors:active){ #planSky>.rwx-scene,#planSky>.rwx-fog{display:none!important} #planCrew .crew-a{display:none!important} }
 /* }} q100 front */
+/* q101 holidays {{ ---------- q101 (item 101, fred Nov 5): the line naming the day of fred's look (holLine): real text, no explanation
+   (item 76). On the weather card (.rwx-hol, after the reading) it sits under fred, right-aligned under his body, and shows only where he
+   does (item 98's cut: the same container query); in the sky box (#planSkyH, after the one line) it flows beside him in the room his float
+   keeps, then under him at larger text, so the box's own line, its fit and its dots are untouched. Over a sky it takes the feather the
+   other words have (light and graphite). Print: fred out, the line kept (left-aligned, no room); forced colours: the art out, the line
+   in the system colours ---------- */
+.rwx-hol{display:none;margin:6px 0 0;padding-right:calc(var(--wxf) * .2);font:700 .9375rem/1.3 var(--font);color:var(--text);text-align:right;overflow-wrap:break-word}
+@container rwx (min-width:max(305px, calc(167px + 6.25rem))){ .r-wx[data-look] .rwx-hol{display:block} }
+#planSky .pvs-h{margin:6px 0 0;font:700 .9375rem/1.3 var(--font);color:var(--text);overflow-wrap:break-word}
+@media print{ .r-wx .rwx-hol{display:block!important;padding-right:0;text-align:left} }
+/* }} q101 holidays */
 /* q88 volume colour {{ ---------- q88 (item 88, fred Oct 15): Volume's colour (PDF p.4, fred-motion-3.html › Volume). The season card is
    the hero (deep blue, fred's teal and green stripes at its right edge), This week (planned or not) the blue tile, 6-week avg the teal tile,
    Consistency the green tile, Hours per year teal; every other Volume box stays white (the off-season card keeps its teal tint). Every
@@ -6785,12 +6796,14 @@ if(/\/settings\/?(index\.html)?$/.test(location.pathname)) location.replace(loca
       <div class="prow" data-prow="training" hidden><button type="button" class="prow-h" id="prowBtn-training" data-sheet="training" aria-haspopup="dialog" data-kw="import history files"><span class="prow-l">Imported training</span><span class="prow-v" id="prowV-training"></span><span class="prow-chev" aria-hidden="true"></span></button></div>
     </div>
   </section>
-  <section class="pgroup sg-fw gs gs-blue sp-both" aria-labelledby="pgT-fw"><!-- item 97: fred world (items 100 and 101 add their switches here; item 100: Show the crew, Show their names) -->
+  <section class="pgroup sg-fw gs gs-blue sp-both" aria-labelledby="pgT-fw"><!-- item 97: fred world (items 100 and 101 add their switches here; item 100: Show the crew, Show their names; item 101: Holiday looks, Cultural and religious holidays) -->
     <h2 class="peyebrow gs-h" id="pgH-fw"><span class="pg-t" id="pgT-fw">fred world</span></h2>
     <div class="pcard gs-b" id="pgB-fw">
       <div class="prow prow-sw" data-prow="worldmotion"><button type="button" class="prow-h gr-swb" id="prowBtn-worldmotion" aria-pressed="true" data-kw="fred world animate animation motion move moving characters still"><span class="prow-l">Animate the world</span><span class="gsw-k" aria-hidden="true"></span></button></div>
       <div class="prow prow-sw" data-prow="crewshow"><button type="button" class="prow-h gr-swb" id="prowBtn-crewshow" aria-pressed="true" data-kw="fred world crew friends people characters front page plan"><span class="prow-l">Show the crew</span><span class="gsw-k" aria-hidden="true"></span></button></div>
       <div class="prow prow-sw" data-prow="crewnames"><button type="button" class="prow-h gr-swb" id="prowBtn-crewnames" aria-pressed="false" data-kw="fred world crew friends names first names labels"><span class="prow-l">Show their names</span><span class="gsw-k" aria-hidden="true"></span></button></div>
+      <div class="prow prow-sw" data-prow="holidaylooks"><button type="button" class="prow-h gr-swb" id="prowBtn-holidaylooks" aria-pressed="true" data-kw="fred world holiday holidays looks birthday race day halloween christmas new year costume hat"><span class="prow-l">Holiday looks</span><span class="gsw-k" aria-hidden="true"></span></button></div>
+      <div class="prow prow-sw" data-prow="holidaycare"><button type="button" class="prow-h gr-swb" id="prowBtn-holidaycare" aria-pressed="true" data-kw="fred world holiday holidays cultural religious hanukkah diwali lunar new year eid"><span class="prow-l">Cultural and religious holidays</span><span class="gsw-k" aria-hidden="true"></span></button></div>
     </div>
   </section>
   <section class="pgroup sg-acct gs gs-black sp-both" aria-labelledby="pgT-acct">
@@ -10441,12 +10454,13 @@ function copyText(text, okMsg){ // called straight from the tap: writeText first
    Never in it: medications and the stack (settings.meds / medsOther / stack, the plan's meds and stack caffeine, the Medications note;
    their names are also scrubbed from the text), birthday, recent places, barcodes, the journal, races, account and sync ids; item 92: the
    weigh-ins, the deficits (settings.volume) and the Profile weight (settings.weightLb, which the newest weigh-in sets); item 99: the rider's look
-   (settings.rider, and the Closet card's strip that draws it). */
-const APP_BUILD='fred-shell-v124'; // = sw.js CACHE (the kit checks)
+   (settings.rider, and the Closet card's strip that draws it); item 101: Cultural and religious holidays (settings.holidayCare: says
+   something of the rider's beliefs, and no plan reads it). */
+const APP_BUILD='fred-shell-v125'; // = sw.js CACHE (the kit checks)
 const DBG_ERRS=[];
 window.addEventListener('error', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:String(e.message||e.error||'error'), at:(e.filename||'').split('/').pop()+':'+(e.lineno||'')}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
 window.addEventListener('unhandledrejection', e=>{ DBG_ERRS.push({t:new Date().toISOString(), msg:'promise: '+String(e.reason && (e.reason.message||e.reason))}); if(DBG_ERRS.length>20) DBG_ERRS.shift(); });
-const DBG_DROP_SET=['birthday','meds','medsOther','stack','barcodes','recentPlaces','raceName','chapterId','chapterCompare','gender','volume','news','profileSeen','winsTag','raceSummaryView','bikeTombs','journalHeader','weightLb','weightAt','rider'];
+const DBG_DROP_SET=['birthday','meds','medsOther','stack','barcodes','recentPlaces','raceName','chapterId','chapterCompare','gender','volume','news','profileSeen','winsTag','raceSummaryView','bikeTombs','journalHeader','weightLb','weightAt','rider','holidayCare'];
 const DBG_DROP_KEY=/^(meds|medsOther|stack|stackCaf|stk|birthday|barcodes?|email|uid|userId|token|accessToken|refreshToken|password|secret)$/i;
 // a plain, cycle-free copy: numbers to 3 decimals, long lists and strings cut (and said), functions and page elements left out
 function dbgClean(x, depth=0, path=new WeakSet()){
@@ -10823,7 +10837,7 @@ function renderProfileRows(){ setTimeout(()=>{ try{ setSportApply(); }catch(e){}
   set('libCount', fav ? `${all.length} · ${fav} ★` : `${all.length} products`);
   { const B=bikes(); set('prowV-bikes', B.length===1 ? `${B[0].name} · ${B[0].cages} cage${B[0].cages===1?'':'s'}` : B.length ? `${B.length} bikes` : 'None'); } // r1013: one Bikes row (its sheet lists them and adds one)
   set('prowV-caps', `${trim1(+settings.coldPct)} · ${trim1(+settings.modPct)} · ${trim1(+settings.hotPct)}%`); set('prowV-heat', `WBGT ${tempDisp(settings.wbgtCold)}° · ${tempDisp(settings.wbgtHot)}°`);
-  [['prowBtn-samerecipe','sameRecipe'],['prowBtn-heatadj','heatAdj'],['prowBtn-worldmotion','worldMotion'],['prowBtn-crewshow','crewShow'],['prowBtn-crewnames','crewNames']].forEach(([id,k])=>{ const b=$(id), on=k==='worldMotion' || k==='crewShow' ? settings[k]!==false : k==='crewNames' ? settings[k]===true : !!settings[k]; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); fwGate(); crewSoon(); /* item 97: on unless turned off; the gate follows the settings shown (a sync, a restore); q100: the crew too (shown unless turned off, names only once chosen) */
+  [['prowBtn-samerecipe','sameRecipe'],['prowBtn-heatadj','heatAdj'],['prowBtn-worldmotion','worldMotion'],['prowBtn-crewshow','crewShow'],['prowBtn-crewnames','crewNames'],['prowBtn-holidaylooks','holidayLooks'],['prowBtn-holidaycare','holidayCare']].forEach(([id,k])=>{ const b=$(id), on=['worldMotion','crewShow','holidayLooks','holidayCare'].includes(k) ? settings[k]!==false : k==='crewNames' ? settings[k]===true : !!settings[k]; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); fwGate(); crewSoon(); holSoon(); /* item 97: on unless turned off; the gate follows the settings shown (a sync, a restore); q100: the crew too (shown unless turned off, names only once chosen); q101: the look (the switches, the birthday) */
   if(document.activeElement!==$('firstGel')) $('firstGel').value=firstGelMin();
   set('prowV-planfor', {nutrition:'Nutrition', clothing:'Clothing', both:'Nutrition & clothing'}[planMode()]);
   set('prowV-advanced', `${metric() ? 'Metric' : 'US'} · ${volNorm(settings.volume).weekStart==='sun' ? 'Sunday' : 'Monday'}`);
@@ -12107,6 +12121,66 @@ function wxPut(W, html, morph){ W.querySelectorAll('.rl').forEach(r=>rlEnd(r.par
   if(!wxKids(L, N, M=>W.append(...M))){ L.forEach(n=>n.remove()); W.append(...N); } /* (the card patched by its shared front: a note that comes or goes leaves .rwx-g in place) */
   wxDress(W, !!morph); if(s) wxMorph(W, s); }
 function wxDress(W, morph){ const g=W.querySelector(':scope>.rwx-g'); wxSkySet(W, g && g.dataset.sky || '', morph); wxFred(W, morph); wxLoop(W); } /* (wxLoop watches the sky's loops; fred's spot has its own loopWhileVisible, fwMount's, and a clear night's fred is still) */
+/* ---------- q101 (item 101): holidays and the birthday look. One look at a time, chosen by the device's local date and time now (the
+   day the rider sees fred, not the planned ride's), in this order: the care holidays (FW.HOLIDAYS' care:1 entries: Memorial Day, Hanukkah,
+   Diwali, Lunar New Year, Eid) > the rider's birthday (settings.birthday's month and day; Feb 29 on Feb 28 in other years; none when empty)
+   > the rider's own race day (a race in Races dated today; never on Memorial Day weekend, Saturday to Monday) > KOM Kitty (item 102's
+   slot, holKitty) > the other holidays > the weather look. Ties inside a tier: the shorter span first (a day's own holiday over a season:
+   the 4th of July over the Tour, Eid over Hanukkah), then FW.HOLIDAYS' order. Left out (no computable date): the Tour's mountain stages,
+   Kona, the Indy 500; the milestone look is item 104's. fred wears the look (its wear; the Tour, its colours) instead of the weather's
+   wherever he appears (the sky box, the weather card, the run's box; the box's cap with no forecast too); the sky stays the app's (FW's
+   DECO and sky are not used); a clear night keeps him still (item 98). The look's line names the day under fred on the card, beside him
+   in the box (real text; the art stays aria-hidden). Settings › fred world: Holiday looks (off: no holiday, birthday or race look) and
+   Cultural and religious holidays (off: no Hanukkah, Diwali, Lunar New Year or Eid; Memorial Day is civic and stays under Holiday looks
+   alone). Chosen again at midnight and at HOL_EVE (Hanukkah's eve) while the app is open, when it comes back to the front, at an app open
+   and when settings or races change; fred is mounted again only when the look changes (wxFred's key), so he moves only then. ---------- */
+/* the five-year table (2026-2031): the days no rule computes. Lunar New Year: the first day of the lunar year, China time (Hong Kong
+   Observatory's conversion tables, timeanddate). Diwali: the main day (Lakshmi Puja), the US date (drikpanchang for New York and Los
+   Angeles, timeanddate's US listing, AstroSage; a day before India's in 2027, 2030 and 2031). Hanukkah: its first day (hebcal,
+   timeanddate, the US Naval Observatory); the look from HOL_EVE the evening before, through the eighth day. Eid: the first day of Eid
+   al-Fitr and of Eid al-Adha, one look for both (the Umm al-Qura calendar, van Gent, Utrecht University; the Fiqh Council of North
+   America; local moon sighting can move it a day). The Tour de France: the organisers' announced dates (2026-2028); a year not here takes
+   the usual pattern, the first Saturday of July to the Sunday 22 days later. Every row confirmed by two independent checks (Nov 23, 2026);
+   tests/engine/holidays.test.mjs fails once less than 12 months of the table are left (HOL_THRU). */
+const HOL_TABLE={'lunar-new-year':['2026-02-17','2027-02-06','2028-01-26','2029-02-13','2030-02-03','2031-01-23'],
+  diwali:['2026-11-08','2027-10-28','2028-10-17','2029-11-05','2030-10-25','2031-11-13'],
+  hanukkah:['2026-12-05','2027-12-25','2028-12-13','2029-12-02','2030-12-21','2031-12-10'],
+  eid:['2026-03-20','2026-05-27','2027-03-09','2027-05-16','2028-02-26','2028-05-05','2029-02-14','2029-04-24','2030-02-04','2030-04-13','2031-01-24','2031-04-02'],
+  tour:[['2026-07-04','2026-07-26'],['2027-07-02','2027-07-25'],['2028-06-24','2028-07-16']]};
+const HOL_THRU='2031-12-31';
+const HOL_EVE=16; /* Hanukkah's look from 16:00 local the evening before its first day: a fixed hour (the app knows no place's sunset) before December sunset in nearly every US city (Boston 4:11 pm, Seattle 4:16 pm, New York 4:28 pm), so he is dressed by the first candle */
+const HOL_FAITH=['hanukkah','diwali','lunar-new-year','eid']; /* Cultural and religious holidays (Memorial Day is civic: not here) */
+const HOL_LINE={'new-year':'Happy New Year', valentines:'Happy Valentine’s Day', 'st-patricks':'Happy St. Patrick’s Day', spring:'Happy spring', 'memorial-day':'Memorial Day', 'july-4':'Happy 4th of July', 'labor-day':'Happy Labor Day', halloween:'Happy Halloween', thanksgiving:'Happy Thanksgiving', winter:'Happy holidays', hanukkah:'Happy Hanukkah', diwali:'Happy Diwali', 'lunar-new-year':'Happy Lunar New Year', eid:'Eid Mubarak', 'running-day':'Global Running Day', 'bike-to-work':'Bike to Work Day', tour:'Tour de France', 'race-day':'Race day', birthday:'Happy birthday'}; /* titles only (item 76); Memorial Day quiet, no "Happy" */
+const holI=t=>t.toISOString().slice(0,10), holD=(y,m,d)=>new Date(Date.UTC(y,m-1,d)), holAdd=(s,n)=>{ const t=new Date(s+'T00:00:00Z'); t.setUTCDate(t.getUTCDate()+n); return holI(t); }; /* calendar days in UTC: no clock time, no daylight saving */
+const holLeap=y=>y%4===0 && (y%100!==0 || y%400===0);
+function holNth(y, m, dow, n){ if(n>0){ const w=holD(y,m,1).getUTCDay(); return holI(holD(y, m, 1+(dow-w+7)%7+7*(n-1))); } const L=holD(y,m+1,0); return holI(holD(y, m, L.getUTCDate()-(L.getUTCDay()-dow+7)%7)); } /* the nth weekday dow (0 Sunday) of month m (1-12), n -1 the last */
+function holEaster(y){ const a=y%19, b=Math.floor(y/100), c=y%100, d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7, m=Math.floor((a+11*h+22*l)/451), n=h+l-7*m+114; return holI(holD(y, Math.floor(n/31), n%31+1)); } /* Western Easter Sunday: the Anonymous Gregorian Computus (Meeus/Butcher) */
+function holSpans(y){ const p=n=>String(n).padStart(2,'0'), on=(m,d)=>y+'-'+p(m)+'-'+p(d), e=holEaster(y), T=HOL_TABLE, tr=T.tour.find(r=>+r[0].slice(0,4)===y), t0=tr ? tr[0] : holNth(y,7,6,1);
+  const S=[['new-year',on(12,31),(y+1)+'-01-01'],['valentines',on(2,14)],['st-patricks',on(3,17)],['spring',holAdd(e,-1),e],['memorial-day',holNth(y,5,1,-1)],['july-4',on(7,4)],['labor-day',holNth(y,9,1,1)],['halloween',on(10,31)],['thanksgiving',holNth(y,11,4,4)],['winter',on(12,20),on(12,26)],['running-day',holNth(y,6,3,1)],['bike-to-work',holNth(y,5,5,3)],['tour',t0,tr ? tr[1] : holAdd(t0,22)]];
+  ['lunar-new-year','diwali','eid'].forEach(id=>T[id].forEach(s=>{ if(+s.slice(0,4)===y) S.push([id,s]); })); T.hanukkah.forEach(s=>{ if(+s.slice(0,4)===y) S.push(['hanukkah',s,holAdd(s,7)]); });
+  return S.map(([id,a,b])=>({id, a, b:b||a})); } /* each holiday that starts in year y: {id, a (first day), b (last day)} */
+function holKitty(t, o){ return null; } /* item 102: KOM Kitty's season goes here, between the race day and the other holidays (under Holiday looks) */
+function holAt(t, o){ const F=window.FW; if(!o || o.looks===false || !(F && F.HOLIDAYS)) return null;
+  const p=n=>String(n).padStart(2,'0'), y=t.getFullYear(), md=p(t.getMonth()+1)+'-'+p(t.getDate()), iso=y+'-'+md, nx=holAdd(iso,1), eve=t.getHours()>=HOL_EVE;
+  const H=new Map(F.HOLIDAYS.flatMap(g=>g[1]).map((h,j)=>[h.id, Object.assign({j}, h)])), look=id=>H.has(id) ? Object.assign({}, H.get(id), {line:HOL_LINE[id]}) : null;
+  const on=[...holSpans(y-1), ...holSpans(y)].filter(s=>H.has(s.id) && (s.a<=iso && iso<=s.b || s.id==='hanukkah' && eve && s.a===nx) && (o.care!==false || !HOL_FAITH.includes(s.id)));
+  const by=(a,b)=>(Date.parse(a.b)-Date.parse(a.a))-(Date.parse(b.b)-Date.parse(b.a)) || H.get(a.id).j-H.get(b.id).j, care=on.filter(s=>H.get(s.id).care).sort(by)[0];
+  if(care) return look(care.id);
+  const bd=/^\d{4}-(\d{2}-\d{2})$/.exec(o.birthday||''); if(bd && (bd[1]===md || bd[1]==='02-29' && md==='02-28' && !holLeap(y))) return look('birthday');
+  const mem=holNth(y,5,1,-1); if((o.races||[]).some(r=>r && r.date===iso) && !(holAdd(mem,-2)<=iso && iso<=mem)) return look('race-day'); /* (Memorial Day weekend, Saturday to Monday: never a race look) */
+  const k=holKitty(t, o); if(k) return k;
+  const oth=on.filter(s=>!H.get(s.id).care).sort(by)[0]; return oth ? look(oth.id) : null; } /* the look at local time t: FW.HOLIDAYS' entry with its line, or null (the weather look) */
+let HOLC=null; /* the look now: {k: its id or '', L} */
+function holNow(){ let R=[]; try{ R=races; }catch(e){} /* (before the Races code has run at boot: none yet; holSoon follows) */ return holAt(new Date(), {looks:settings.holidayLooks!==false, care:settings.holidayCare!==false, birthday:settings.birthday, races:R}); }
+function holCur(){ if(!HOLC){ const L=holNow(); HOLC={k:L ? L.id : '', L}; holArm(); } return HOLC.L; }
+function holTick(){ const L=holNow(), k=L ? L.id : ''; holArm(); if(HOLC && HOLC.k===k) return; HOLC={k, L}; ['planSky','rWeather','runWx'].forEach(id=>{ const W=$(id); if(W && W.querySelector(':scope>.rwx-g')) wxFred(W, true); }); } /* a new look: each fred there dressed again (cross-fading with motion, as a forecast change); the same look: nothing */
+function holSoon(){ if(holSoon.t) return; holSoon.t=setTimeout(()=>{ holSoon.t=0; holTick(); }, 0); }
+function holArm(){ clearTimeout(holArm.t); const n=new Date(), h=n.getHours()>=HOL_EVE, a=new Date(n.getFullYear(), n.getMonth(), n.getDate()+(h ? 1 : 0), h ? 0 : HOL_EVE); holArm.t=setTimeout(holTick, Math.min(a-n+250, 864e5)); } /* the next midnight or HOL_EVE, whichever comes first (a device asleep: late, and the app back in front asks again) */
+function holLine(W, g, L){ if(!g) return; const box=W.id==='planSky', t=L ? L.line : ''; let P=g.querySelector(box ? ':scope>.pvs-h' : ':scope>.rwx-hol');
+  if(!t){ if(P) P.remove(); return; }
+  if(!P){ P=document.createElement('p'); P.className=box ? 'pvs-h' : 'rwx-hol'; if(box) P.id='planSkyH'; const a=g.querySelector(box ? ':scope>.pvs-l' : ':scope>.rwx-main'); if(a) a.after(P); else g.append(P); }
+  if(P.textContent!==t) P.textContent=t; } /* the line naming the day: the box's beside fred under its own line, the card's under fred (also in wxCardHTML, so a render patches it in place) */
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') holSoon(); }); onAppOpen(holSoon);
 /* q98 (item 98): fred in the living sky. His look is the card's (data-fred on .rwx-g: its sky, or night on a clear night; none without a
    forecast), FW.bird in the bundle's weather wear as it ships (FW.WX_WEAR: sun shades and spritz, heat shades and sweat, freeze beanie,
    scarf and puffs, wind scarf, clouds none, fog the cap lamp and its beam, rain the umbrella, snow beanie and scarf; a clear night the
@@ -12118,15 +12192,15 @@ function wxDress(W, morph){ const g=W.querySelector(':scope>.rwx-g'); wxSkySet(W
    wing at each flap's peak), so rain went without the flap; v5 (19:46) leaves out the flapping right wing when that wing holds a prop,
    so in the rain his left wing flaps and the right one, holding the umbrella, is the still copy only (FROM-APP-CHAT-3 point 6) */
 const WX_FRED={night:{cls:'fw-bird', still:true}};
-function wxFred(W, morph){ const g=W.querySelector(':scope>.rwx-g'), F=window.FW, k=g && F && F.WX_WEAR && F.WX_WEAR[g.dataset.fred] ? g.dataset.fred : '', o=WX_FRED[k]||{cls:'fw-bird'}, key='wx:'+k, draw=()=>F.bird({wear:F.WX_WEAR[k]});
-  const L=[...W.querySelectorAll(':scope>.rwx-fred')], cur=L.find(x=>!x.classList.contains('rwx-out')), fade=morph && motionOK();
-  if(k) W.dataset.fred=k; else delete W.dataset.fred;
+function wxFred(W, morph){ const g=W.querySelector(':scope>.rwx-g'), F=window.FW, k=g && F && F.WX_WEAR && F.WX_WEAR[g.dataset.fred] ? g.dataset.fred : '', L=k ? holCur() : null, id=L ? 'hol:'+L.id+(k==='night' ? ':n' : '') : k, o=L ? {cls:'fw-bird', still:k==='night'} : WX_FRED[k]||{cls:'fw-bird'}, key='wx:'+id, draw=L ? ()=>F.bird(Object.assign({wear:L.wear.slice(), champ:L.champ}, L.col)) : ()=>F.bird({wear:F.WX_WEAR[k]}); /* q101: a holiday look (holCur) instead of the weather's, keyed on its own (still on a clear night) */
+  const S=[...W.querySelectorAll(':scope>.rwx-fred')], cur=S.find(x=>!x.classList.contains('rwx-out')), fade=morph && motionOK();
+  if(k) W.dataset.fred=k; else delete W.dataset.fred; if(L) W.dataset.look=L.id; else delete W.dataset.look; holLine(W, g, L);
   const out=x=>{ clearTimeout(x._wxT); fwMount(x, ''); x.remove(); if(!W.querySelector(':scope>.rwx-fred.rwx-out')) delete W.dataset.fredOut; };
-  if(!fade) L.filter(x=>x!==cur || x.dataset.k!==k).forEach(out); /* (a fresh Crunch: one still fading out goes now, as the sky's) */
-  if(cur && cur.dataset.k===k) return fwMount(cur, draw, key, o); /* the same look: kept */
+  if(!fade) S.filter(x=>x!==cur || x.dataset.k!==id).forEach(out); /* (a fresh Crunch: one still fading out goes now, as the sky's) */
+  if(cur && cur.dataset.k===id) return fwMount(cur, draw, key, o); /* the same look: kept */
   if(cur && fade){ clearTimeout(cur._wxT); /* (his own fade-in's timer, as wxSkySet's W._wxS2: left, it would take .rwx-x off mid-fade) */ cur.classList.add('rwx-x','rwx-out'); W.dataset.fredOut=cur.dataset.k; cur._wxT=setTimeout(()=>out(cur), 520); moHold(540); }
   if(!k) return;
-  const h=draw(), b=F.box(h), N=document.createElement('div'); N.className='rwx-fred rwx-keep'+(fade ? ' rwx-x rwx-pre' : ''); N.dataset.k=k;
+  const h=draw(), b=F.box(h), N=document.createElement('div'); N.className='rwx-fred rwx-keep'+(fade ? ' rwx-x rwx-pre' : ''); N.dataset.k=id;
   [['--fx', b.x/200], ['--fy', b.y/200], ['--fs', b.scale]].forEach(([n, v])=>N.style.setProperty(n, String(+v.toFixed(4))));
   W.querySelector(':scope>.rwx-fog').after(N); fwMount(N, h, key, o);
   if(fade){ moFlush(N); N.classList.remove('rwx-pre'); N._wxT=setTimeout(()=>N.classList.remove('rwx-x'), 520); } }
@@ -12141,11 +12215,11 @@ function wxCardHTML(w, i, durMin, idk='r'){
   const st=i.startTime||'08:00', endClock=clockAt(st, durMin).replace(/(am|pm)$/,''), kind=wxSkyKind(w), dp=w.dew!=null?w.dew:dewF(w.air, w.rh), sk=wxSkyOf(w), ds=sk ? ` data-sky="${sk}"` : ''; // q87: the sky (none on a clear night: the static moon)
   const t0=wxTempAt(w, w.startMin), t1=wxTempAt(w, w.startMin+durMin), now=t0!=null?t0:w.air, d = t1!=null ? tempDisp(t1)-tempDisp(now) : 0, moves=Math.abs(d)>2;
   const sub=[w.cond||''].concat(moves ? [`${d>0?'warming':'cooling'} to ${tempDisp(t1)}° by ${endClock}`] : []).filter(Boolean).join(' · ');
-  const rain=wxRainRide(w);
+  const rain=wxRainRide(w), L=holCur();
   return `<div class="rwx-g"${ds} data-fred="${sk||'night'}"><div class="rwx-main"><span class="rwx-sky"${ds}>${sk ? wxSkyIcon(sk, idk) : wxIcon(kind, true, w.sky==='night'?0:1)}</span><div class="rwx-read">`
     +`<p class="rwx-temps"><span class="rwx-temp">${tempDisp(now)}°</span>${moves?`<span class="rwx-to"><svg class="rwx-arr" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="rwx-arr-e" d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg><span class="loc-sr"> to </span><span class="rwx-temp rwx-temp2">${tempDisp(t1)}°</span></span>`:''}</p>`
     +`${sub?`<p class="rwx-sub">${esc(sub[0].toUpperCase()+sub.slice(1))}</p>`:''}</div></div>`
-    +wxTiles(w, i, durMin, rain, dp, idk)+`</div>`
+    +(L ? `<p class="rwx-hol">${esc(L.line)}</p>` : '')+wxTiles(w, i, durMin, rain, dp, idk)+`</div>` /* q101: the look's line under fred (holLine keeps it) */
     +(w.stale?`<p class="rwx-note">Saved forecast from ${esc(w.stale)}</p>`:w.typical?`<p class="rwx-note">Typical weather · no forecast yet</p>`:''); }
 // the ride's highest hourly chance of rain. Open-Meteo's precipitation_probability covers the hour BEFORE its time, so the hours that
 // overlap the ride are the points after the start up to the first one at or past the finish (saved at fetch time; an older saved forecast
@@ -12367,6 +12441,7 @@ setSwitch('prowBtn-samerecipe','sameRecipe'); setSwitch('prowBtn-heatadj','heatA
 $('prowBtn-worldmotion').addEventListener('click',()=>{ settings=Object.assign({}, settings, {worldMotion:settings.worldMotion===false}); save(KEYS.settings, settings); fwGate(); prowSoon(); }); /* item 97: stored once changed (on unless false) */
 $('prowBtn-crewshow').addEventListener('click',()=>{ settings=Object.assign({}, settings, {crewShow:settings.crewShow===false}); save(KEYS.settings, settings); crewRender(); prowSoon(); }); /* q100: stored once changed, as worldMotion (no DEFAULT_SETTINGS entry: item 96 syncs it key by key) */
 $('prowBtn-crewnames').addEventListener('click',()=>{ settings=Object.assign({}, settings, {crewNames:settings.crewNames!==true}); save(KEYS.settings, settings); crewRender(); prowSoon(); });
+['holidayLooks','holidayCare'].forEach(k=>$('prowBtn-'+k.toLowerCase()).addEventListener('click',()=>{ settings=Object.assign({}, settings, {[k]:settings[k]===false}); save(KEYS.settings, settings); holTick(); prowSoon(); })); /* q101: on unless turned off, stored once changed (no DEFAULT_SETTINGS entry: item 96 syncs each key by key) */
 $('firstGel').addEventListener('change',()=>{ const v=Math.max(0, Math.round(+$('firstGel').value||0)); settings=Object.assign({}, settings, {firstGel:v}); save(KEYS.settings, settings); $('firstGel').value=v; prowSoon(); persistInputs(); });
 $('tgCaf').addEventListener('click',()=>{ if(lastResult && adjStale()) return; todayCaf = cafEffective() ? 'off' : 'on'; renderToday(); if(lastResult) recrunch(); else persistInputs(); }); // r1013: Adjust this ride › Caffeine
 ['durH','durM'].forEach(id=>$(id).addEventListener('change', renderToday));
@@ -16066,7 +16141,7 @@ $('backupFile').addEventListener('change',ev=>{
 // restore a backup (d: the parsed file). Profile, closet, bikes and products are replaced; journal entries and races merge, newest edit wins.
 function restoreAll(d){
   const ms=v=>typeof v==='number' ? v : (Date.parse(v)||0), oldTombs=Object.assign({}, settings.bikeTombs);
-  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pwa=settings.weightAt, pmb=settings.myBottles, pba=settings.bottleAsk, prd=riderOwn(settings), pcw={crewShow:settings.crewShow, crewNames:settings.crewNames}; // an older backup without a mode / birthday / gender (item 100: the crew switches) keeps this device's
+  const ph=settings.journalHeader; /* r1017 (item 91) */ const pm=settings.planMode, pb=settings.birthday, pg=settings.gender, pv=settings.volume, pn=settings.raceName, pw=settings.weightLb, pwa=settings.weightAt, pmb=settings.myBottles, pba=settings.bottleAsk, prd=riderOwn(settings), pcw={crewShow:settings.crewShow, crewNames:settings.crewNames, holidayLooks:settings.holidayLooks, holidayCare:settings.holidayCare}; // an older backup without a mode / birthday / gender (item 100: the crew switches) keeps this device's
   normalizeJournal(d.journal||[]).forEach(x=>{ if(!x || !x.id) return; const i=journal.findIndex(e=>e.id===x.id); if(i<0) journal.push(x); else if(ms(x.updatedAt)>ms(journal[i].updatedAt)) journal[i]=x; });
   journal.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(d.library){ lib=d.library; if(!lib.salts) lib.salts=JSON.parse(JSON.stringify(DEFAULT_SALTS)); if(!lib.bottles) lib.bottles=[]; mergeAddedProducts(); dropBrands(lib); fillForms(); fillRatios(); buildBottleOptions(); renderBottles(); } if(d.settings){ const ds={}; Object.keys(d.settings).forEach(k=>{ if(k!=='__proto__') ds[k]=d.settings[k]; }); settings=Object.assign({},DEFAULT_SETTINGS,ds); } /* item 99: a file's own "__proto__" key (JSON.parse makes one) is never copied: Object.assign would make it the settings' prototype, and every key it holds (a rider) would read as set without being stored */
@@ -16076,7 +16151,7 @@ function restoreAll(d){
   if(!(d.settings && 'raceName' in d.settings)){ if(pn) settings.raceName=pn; else delete settings.raceName; } else if(typeof settings.raceName!=='string') settings.raceName='';
   if(!(d.settings && 'birthday' in d.settings)) settings.birthday=pb; if(!(d.settings && 'gender' in d.settings)) settings.gender=pg;
   if(riderOwn(d.settings)==null){ if(prd) settings.rider=prd; else delete settings.rider; } riderSetNorm(settings); /* item 99: a backup without a rider (no key, or null: riderNorm's "no rider") keeps this device's (as birthday and gender); a tampered one draws the default */
-  Object.keys(pcw).forEach(k=>{ if(!(d.settings && k in d.settings)){ if(pcw[k]!==undefined) settings[k]=pcw[k]; else delete settings[k]; } }); /* item 100: a backup without the crew switches keeps this device's (no change, so nothing to sync) */
+  Object.keys(pcw).forEach(k=>{ if(!(d.settings && k in d.settings)){ if(pcw[k]!==undefined) settings[k]=pcw[k]; else delete settings[k]; } }); /* item 100: a backup without the crew switches keeps this device's (no change, so nothing to sync); q101: the holiday switches too */
   if(typeof settings.birthday!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(settings.birthday)) settings.birthday=''; if(!['','female','male','nonbinary'].includes(settings.gender)) settings.gender='';
   if(d.settings){ // a bike you bring back is yours again: one that was deleted (here or in its own file) gets a new id, so no tombstone removes it
     const dead=Object.assign({}, oldTombs, d.settings.bikeTombs), ren={}; if(Object.keys(dead).length) settings.bikeTombs=dead;
@@ -16610,7 +16685,7 @@ function renderRaceList(){
 document.addEventListener('click',e=>{ if(!e.target.closest('[data-rl-all]')) return; rlAll=true; const n=RL_FIRST; renderRaceList();
   const f=[...document.querySelectorAll('#raceList .race-rows li:not([hidden]) .race-row')].filter(b=>!b.classList.contains('up'))[n]; if(f) f.focus({preventScroll:true}); });
 // one call redraws the whole tab (the Summary builder's renderRaceSummary() first, then the list)
-function renderRaces(){ winsUpgradeAll(); renderRaceSummary(); renderRaceList(); if(SYNC_ON) gateBanners(); }
+function renderRaces(){ holSoon(); /* q101: a race today is the race-day look */ winsUpgradeAll(); renderRaceSummary(); renderRaceList(); if(SYNC_ON) gateBanners(); }
 $('raceLogBtn').addEventListener('click',()=>openRaceFlow(null));
 $('raceImportBtn').addEventListener('click',()=>openRaceImport());
 // delegated hooks any Races markup can use: data-race-open="<id>", data-race-log, data-race-import, data-race-birthday (Profile > Birthday)
