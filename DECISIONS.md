@@ -2875,3 +2875,48 @@
       inventory `OK: inventory nothing removed (7 checks)`; npm test in wt-q100 1829 tests, 1782 pass, 0 fail, 47 todo; every inline
       script compiles (probe100/rv3/syn/syn.mjs: 5 scripts OK).
   - Open as before (round 6's list).
+- Kit step (the whole kit, tools/runkit.sh, on fred100 = q100-front db59e7a, v124, rebuilt with mknull.sh, byte-identical to the
+  review's page, sha1 f9444883; KIT_ITEMS unset, so q91-q100 all ran; KIT_MAIN default, fred/null.html = main 8c66750, v123, sha1
+  a3ea1d76; Mac Studio, Nov 23; scratch in kit100/):
+  - Screens: the 14 of the build were already in lib/screens.mjs with their needs ('#planSky': plan-sky-sun, -rain, -snow, -night,
+    -none, -noplace, -offline, -run, desktop-plan-sky, desktop-plan-sky-results; '#planCrew': plan-crew, plan-crew-names,
+    plan-crew-names-320-200, plan-crew-names-430-150), and run() already skips a screen whose needs the page lacks ("skipped (needs
+    ...)"). Each checked again on a screenshot of the final page (kit100/shots.mjs, kit100/shots/): the box between the ticket and
+    Settings with "THU 8:00 AM · CARMEL · 61°" in a sunny sky (fred in sunglasses), rain (umbrella), snow (beanie), "THU 8:00 PM · CARMEL
+    · 66°" with no sky and fred in his night vest, "THU 8:00 AM · CARMEL" with fred in his cap and no sky for none, noplace and offline
+    (data-wx none, data-fred clouds), the run's graphite with "Run forecast" (rain, the box before the Carry box; the crew out there, the
+    provisional rule); the crew of five after the footer above the tab bar (no names, aria-hidden; with names "Chiara, Rob, Paul, Ryan,
+    Dustin" and the list "The crew"; two rows at 320 px / 200%, one row at 430 px / 150%, room 36-40 px); on 1280 x 800 the box under
+    the ticket in the Plan-a-ride column, and after Crunch Results beside it with the box hidden. On main's page all of them print
+    `skipped (needs #planSky)` or `skipped (needs #planCrew)` (kit100/shots-main run).
+  - Added (2): plan-sky-rain-320-200 and plan-sky-run-320-200 (320 x 568, scale 2, rain, the ride and the run's graphite). At 200%
+    on a 320 px screen the line takes four rows ("THU" / "8:00 AM ·" / "CARMEL ·" beside fred, "61°" under him over the box's lower
+    sky); contrast and motion see a screen at its own text size only, and the one 200% Plan screen (plan-crew-names-320-200) has the
+    box scrolled off, so no audit had judged the line's words over the lower sky. Both checked on screenshots; a probe of the contrast
+    audit with them and the other skies at 200% and 250% (kit100/kcwrap.mjs, screens added to the list in memory only) was `OK ...
+    (44 checks)`, 4 or 5 of each screen's texts on sampled backdrops; layout walks a scaled screen only at one of its own sizes, so 250% is
+    not a layout screen.
+  - Not added: the box in metric units (review round 4 found a q100 gap; the app was right, and the box looks the same with 16° for
+    61°: nothing new for an audit); the crew's room for the home indicator (round 4: a bottom margin of env(safe-area-inset-bottom);
+    the kit's open() has no safe-area inset, so every audit sees it at 0, as the existing crew screens; q100's room section holds it
+    with the inset through CDP at six sizes, 35-39 px clear); the line past 200% (round 5: 40-53 px roots): the audits' text sizes
+    stop at 200% (the spec's QA sizes), the probe above found nothing at 250%, and the fault round 5 fixed (a time split over two
+    rows) is not one an audit rule reads; q100's fit section holds it in Chromium and WebKit.
+  - Run (kit100/runkit1.out, logs kit2/logs/runkit-20261123-014544-26620), every line OK on the first run: `kit: OK: 19 steps passed,
+    0 item tests skipped (10052 s)`; answer 1829 tests, 1782 pass, 0 fail (47 todo); smoke 14 checks; contrast 161 screens (4 known on
+    main), 348 checks; layout 150 screens (438 opened) at 320/375/430 and 161 (471) at 390, no new failures; inventory nothing removed
+    (7 checks; item 100 only adds); motion 169 screens, 56 checks; budgets 161 screens, the reference 1.08-1.43 ms, costliest frame
+    1.5 ms (plan-wx-fred-snow), slowest insert 24.2 ms at 6x (plan-avatar-rider), most nodes 703, 62 checks, host busy only in its
+    self-tests (desktop-wx-fred-run read twice); q91 324, q92 285, q93 209, q95 43, q96 101, q97 128, q98 321 (856 s), q99 8650 (986 s,
+    under the 1500 s step), q100 319 (424 s). Budgets now counts all 161 screens "with fred world art": the box's fred and the crew are
+    mounted in #view-plan on every screen (Journal, Settings: 469 nodes in 6 spots, 0 running, as the walk requires); item 99's run had
+    46 of 145.
+  - Layout's notes: the KNOWN_ON_MAIN overlap of plan-saved (#calcBtn + #planSavedView) was not seen at 430 px either this time (item
+    99's run saw it there; 40 known on main at 430 then, 39 now). Not item 100's: LAYOUT_ONLY=plan-saved at 430 px shows no known
+    failure on main's page now as well (the strip's timing); the entry stays, main has the strip over the Crunch bar. The other
+    not-seen notes are the same as item 99's run.
+  - No app change (q100-front stays at db59e7a, cache v124), no new exemption (no inventory/allow.json, KNOWN_ON_MAIN, EXEMPT,
+    SOLID_ALLOW, SIDEWAYS_OK, ELLIPSIS_OK or KEYFRAMES entry), no audit change. The only kit change is the two screens, made before
+    the run, so the run above is the end-to-end run after the last change. Not revisited (decided or waiting on Mark): v9's brick red
+    boots, the crew left out on the run's graphite (html.run-theme #planCrew{display:none}, provisional), docs/LEGAL.md "Crew
+    likenesses" (item 100 cannot merge before it), q99's FORMER_V8 and ACCEPTED_V8 entry 6.

@@ -221,6 +221,15 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
   nothing removed, motion 153 (56 checks), budgets 145 (46 with fred world art), q91 324, q92 285, q93 209, q95 43, q96 101, q97 126,
   q98 321, q99 8609. No app change and no exemption in the kit step. On main's page the 16 print `skipped (needs ...)`. Merged Nov 21
   (main 8c66750, v123): fred/null.html is now main with item 99 (sha a3ea1d76), so the 16 screens run on main from here on.
+- Item 100 brings 16 screens (needs '#planSky': plan-sky-sun, -rain, -snow, -night, -none, -noplace, -offline, -run, desktop-plan-sky,
+  desktop-plan-sky-results, and from the kit step plan-sky-rain-320-200 and plan-sky-run-320-200, the line at 200% over the box's lower
+  sky; needs '#planCrew': plan-crew, plan-crew-names, plan-crew-names-320-200, plan-crew-names-430-150). A screen may carry its own
+  route (tried before the kit's). New test q100/q100.test.mjs (about 7 min; q100/mut100.mjs, 110 mutants). Proof on q100-front (db59e7a,
+  v124), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 8c66750, v123), Mac Studio: `kit: OK: 19 steps passed, 0 item tests
+  skipped (10052 s)`; answer 1782 pass, contrast 161 screens, layout 150 (438 opened) at 320/375/430 and 161 (471) at 390, inventory
+  nothing removed, motion 169 (56 checks), budgets 161 (all with fred world art: the box and crew sit in #view-plan on every screen),
+  q91 324, q92 285, q93 209, q95 43, q96 101, q97 128, q98 321, q99 8650, q100 319. No app change and no exemption in the kit step.
+  On main's page the 16 print `skipped (needs ...)`.
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with
