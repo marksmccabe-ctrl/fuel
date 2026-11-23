@@ -66,6 +66,11 @@
 //            layout changes, never on a scroll; a tablet and a phone turned (768 x 1024, 1024 x 768, 844 x 390): each friend at most 76 px a
 //            body, the crew no taller than that, the row centred (check round 2); review round 4: the home indicator's 34 px inset (CDP's
 //            safe-area override: 375 / 390 / 430 px, 17 and 21 px text, one with sign-in configured): the crew shows, 8 px or more clear
+//   saved    kit step (a skeptic): after Save to Journal (the box back, the page longer) the "Saved to Journal ✓ · View ›" strip never covers
+//            Crunch: in every frame of its first second, at the end of a scroll through the page and back, Crunch shows 44 px or more and
+//            none of it under the strip, a tap at its centre reaches it, the strip's View its own; after the strip, Crunch back in its place
+//            (320, 375, 390, 430 x 844 at 100 / 150 / 200% text, 320 x 568 at 100 and 200%, WebKit 390 x 844 and 320 x 568 / 200%, the
+//            computer layout, where Crunch never moves)
 //   theme    100.6: the run's graphite: the box follows the run (the panel #34343C, its sky's first stop 26% of the sky in it, light words,
 //            painted over the sky), on the run between the ticket and the Carry box and Settings (in the page and on the screen); the crew
 //            left out there (provisional decision), back on the ride; the box announced as "Run forecast" on the run, "Ride forecast" on
@@ -638,6 +643,52 @@ section('room', async () => {
     ok(!g.dk && g.over === 0 && g.tall <= g.ch + .5 && (!g.shown || (g.h <= g.ch + 1 && g.centre <= 1.5)), 'QA: ' + w + ' x ' + h + ' (a tablet or a phone turned): each friend at most 76 px a body (' + g.A.map(a => a.w).join(', ') + '; fred ' + g.fred + '), the crew ' + g.h + ' px tall (at most ' + g.ch.toFixed(1) + ')' + (g.shown ? ', the row centred' : ', left out here: no room'), g);
     if (w === 768) ok(g.shown, 'room: 768 x 1024: the crew shows', g);
     await y.close(); }
+});
+
+section('saved', async () => {
+  /* kit step (a skeptic): after Save to Journal Plan is the ticket again and the box is back (116 px), so the pinned Crunch went down to the
+     tab bar where the fixed "Saved to Journal ✓ · View ›" strip (z-index 6, 5 s) sits: at 100% text 11 px of Crunch showed (main, a
+     shorter page, 56: Crunch in place above the strip), and a tap at its centre found the strip. The layout audit skips a covered target,
+     so this is held here: from the first frame the strip shows, in every frame for a second, Crunch is on the screen, no part of it under
+     the strip, at least 44 px of it showing, and what a tap at its centre reaches; through a scroll of the whole page while the strip
+     shows, no part of Crunch under it; the strip's View its own centre; once the strip is gone Crunch is back in its place (its pinned
+     bottom as before the save) and still reached. 320-430 px x 844, 100/150/200% text (main's known cover at 150% and 200% ends too),
+     320 x 568, WebKit, and the computer layout (the strip in the plan's column: Crunch never moved there) */
+  const wk = await webkit.launch();
+  const SIZES = [320, 375, 390, 430].flatMap(w => [1, 1.5, 2].map(sc => ['Chromium', browser, w, 844, sc]))
+    .concat([['Chromium', browser, 320, 568, 1], ['Chromium', browser, 320, 568, 2], ['WebKit', wk, 390, 844, 1], ['WebKit', wk, 320, 568, 2], ['Chromium', browser, 1280, 800, 1]]);
+  for (const [eng, b, w, h, sc] of SIZES) {
+    const x = await openH({ width: w, height: h, scale: sc, browser: b, noErrs: true }), p = x.p, at = eng + ', ' + w + ' x ' + h + ', ' + sc * 100 + '% text';
+    const bot0 = await p.evaluate(() => getComputedStyle(document.getElementById('crunchBar')).bottom);
+    await crunch(p);
+    await p.evaluate(() => { const C = document.getElementById('calcBtn'), S = document.getElementById('planSaved');
+      /* Crunch's part on the screen (below the sticky header, above the bottom tab bar and the window's edge), the part of it under the
+         strip (both ways: on the computer layout the strip is in another column), and what a tap at the centre of that part reaches */
+      window.__q100cl = () => { const c = C.getBoundingClientRect(), s = S.getBoundingClientRect(), hd = document.querySelector('body>header'), nv = document.querySelector('nav.tabs');
+        const hb = hd && hd.getClientRects().length ? Math.max(0, hd.getBoundingClientRect().bottom) : 0, nr = nv && nv.getClientRects().length ? nv.getBoundingClientRect() : null, nt = nr && nr.top > innerHeight / 2 ? nr.top : innerHeight;
+        const top = Math.max(c.top, hb), bot = Math.min(c.bottom, nt), on = Math.max(0, bot - top), xo = S.hidden || !s.height ? 0 : Math.max(0, Math.min(c.right, s.right) - Math.max(c.left, s.left));
+        const under = xo > 0 ? Math.max(0, Math.min(bot, s.bottom) - Math.max(top, s.top)) : 0, hit = on > 0 ? document.elementFromPoint(c.left + c.width / 2, (top + bot) / 2) : null;
+        return { on: Math.round(on), under: Math.round(under), clear: Math.round(on - under), hit: !!hit && C.contains(hit), at: hit ? (hit.id || hit.className || hit.tagName) : null, c: [Math.round(c.top), Math.round(c.bottom)], s: S.hidden ? null : [Math.round(s.left), Math.round(s.top), Math.round(s.right), Math.round(s.bottom)] }; };
+      const W = window.__q100sv = { n: 0, bad: [], least: null, done: false }; let t0 = 0;
+      const f = t => { if (!S.hidden && S.getClientRects().length) { if (!t0) t0 = t; const m = window.__q100cl(); W.n++; if (!W.least || m.clear < W.least.clear) W.least = m; if (m.under || m.clear < 44 || !m.hit) W.bad.push(m); } /* (on the computer layout Crunch is in the page, not pinned: 49 px of it above the fold at 1280 x 800, the rest a scroll away) */
+        if (t0 && t - t0 > 1000) { W.done = true; return; } requestAnimationFrame(f); }; requestAnimationFrame(f); });
+    await p.click('#journalBtn'); await until(() => p.evaluate(() => window.__q100sv.done), 8000);
+    const fr = await p.evaluate(() => window.__q100sv);
+    const st = await p.evaluate(() => { const V = document.getElementById('planSavedView').getBoundingClientRect(), v = document.elementFromPoint(V.left + V.width / 2, V.top + V.height / 2);
+      return Object.assign(window.__q100cl(), { dk: document.documentElement.classList.contains('dk'), y: Math.round(scrollY), view: !!v && v.id === 'planSavedView', bot: getComputedStyle(document.getElementById('crunchBar')).bottom }); });
+    const walk = await p.evaluate(() => new Promise(res => { const H = document.scrollingElement.scrollHeight - innerHeight, bad = []; let y = 0, n = 0;
+      const step = () => { scrollTo(0, y); requestAnimationFrame(() => requestAnimationFrame(() => { const m = window.__q100cl(); n++; if (m.under || (m.on >= 44 && !m.hit)) bad.push(Object.assign({ y: Math.round(scrollY) }, m));
+        if (y >= H) { const shown = !document.getElementById('planSaved').hidden; scrollTo(0, 0); requestAnimationFrame(() => res({ n, H, bad: bad.slice(0, 4), shown })); } else { y = Math.min(H, y + 40); step(); } })); }; step(); }));
+    ok(fr.n >= 10 && !fr.bad.length, 'kit step, ' + at + ': after Save to Journal, in every frame of the first second of the strip (' + fr.n + '), Crunch shows ' + (fr.least ? fr.least.clear : '?') + ' px clear of the "Saved to Journal" strip (44 or more), none of it under the strip, and a tap at its centre reaches Crunch', { least: fr.least, bad: fr.bad.slice(0, 3) });
+    ok(st.clear >= 44 && !st.under && st.hit && (st.dk || st.view), 'kit step, ' + at + ': with the strip shown, Crunch ' + J(st.c) + ' clear of the strip ' + J(st.s) + ' and reached at its centre' + (st.dk ? '' : '; View on the strip reached at its own centre'), st); /* (the computer layout's strip is main's: a 32 px sliver at the left edge after a save, HANDOFF) */
+    ok(walk.shown && walk.n >= 1 && !walk.bad.length, 'kit step, ' + at + ': through a scroll of the whole page (' + walk.H + ' px, ' + walk.n + ' steps) with the strip shown, no part of Crunch under it, and wherever 44 px of it show, a tap at their centre reaches it', walk);
+    if (st.dk) ok(st.bot === bot0, 'kit step, ' + at + ': the computer layout: the pinned bottom of Crunch unchanged while the strip shows (' + st.bot + ')', { bot0, st });
+    await until(() => p.evaluate(() => document.getElementById('planSaved').hidden), 8000); await p.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const af = await p.evaluate(() => Object.assign(window.__q100cl(), { bot: getComputedStyle(document.getElementById('crunchBar')).bottom, nav: document.querySelector('nav.tabs').offsetHeight, gone: document.getElementById('planSaved').hidden }));
+    const home = st.dk ? af.bot === bot0 : af.bot === bot0 && Math.abs(parseFloat(af.bot) - af.nav) < .5; /* (on a phone Crunch is pinned on the tab bar, before the save and after the strip) */
+    ok(af.gone && home && af.hit && af.on >= 44, 'kit step, ' + at + ': the strip gone, Crunch back in its place (its pinned bottom ' + af.bot + ', as before the save' + (st.dk ? '' : ', on the ' + af.nav + ' px tab bar') + ') and reached at its centre', { bot0, af });
+    await x.close(); ERRS.push(x.errors.filter(e => !/^console: Not allowed to load local resource: file:/.test(e))); }
+  await wk.close();
 });
 
 section('theme', async () => {

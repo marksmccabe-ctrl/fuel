@@ -137,6 +137,11 @@ const M = [
   ['r6-nameswitch', 'switch,sync,backup', s => rep(s, "['prowBtn-crewshow','crewShow'],['prowBtn-crewnames','crewNames']].forEach", "['prowBtn-crewshow','crewShow']].forEach")], /* "Show their names" never drawn: off on screen and to VoiceOver while the names are on */
   // review round 7: the names list's accessibility gap in the test (the app was right)
   ['r7-namesaria', 'switch,motion,sync,backup', s => rep(rep(s, R7_ARIA, ''), "U.textContent=''; U.dataset.k=k; /* a new day: its five */", "U.textContent=''; U.dataset.k=k; /* a new day: its five */ " + R7_ARIA.trim())], /* the list's aria state set only when the five are built (a new day, the crew on): names turned on by a tap, a sync or a restore show, but the list stays aria-hidden for VoiceOver until a reload (and names off leave it a list of empty items) */
+  // kit step (a skeptic): after Save to Journal the strip covered the pinned Crunch (the app fixed; the check new in q100's saved section)
+  ['kit-savedover', 'saved', s => rep(s, 'html:not(.dk):has(#view-plan.active #planSaved:not([hidden])){--pbsh:var(--psh,53px)}', '')], /* the strip over the pinned Crunch, as db59e7a: 11 px of Crunch at 100% text */
+  ['kit-savedlate', 'saved', s => rep(s, 'el.hidden=false; planSavedH(); planSavedT=', 'el.hidden=false; planSavedT=')], /* the strip's height from its observer alone, a frame late: the first frame at 200% text has Crunch under it */
+  ['kit-savedguess', 'saved', s => rep(rep(s, 'el.hidden=false; planSavedH(); planSavedT=', 'el.hidden=false; planSavedT='), "if('ResizeObserver' in window) new ResizeObserver(roDefer(planSavedH)).observe($('planSaved'));", '')], /* never measured: 53 px, the strip at 100% text (87 px at 200%) */
+  ['kit-savedstays', 'saved', s => rep(s, 'html:not(.dk):has(#view-plan.active #planSaved:not([hidden])){--pbsh', 'html:not(.dk){--pbsh')], /* Crunch raised for good, the strip gone or not */
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mut100.log'); fs.mkdirSync(path.dirname(out), { recursive: true });
 for (const [name, only, f] of M) {
