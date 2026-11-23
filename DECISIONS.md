@@ -2753,3 +2753,43 @@
       inventory `OK: inventory nothing removed (7 checks)`; npm test in wt-q100 1829 tests, 1782 pass, 0 fail, 47 todo; every inline
       script compiles (probe100/rv3/syn/syn.mjs: 5 scripts OK).
   - Open as before (round 3's list, unchanged).
+- Review round 5 (the reviewers on e7befd9: 2 confirmed findings, 1 in the app (a11y), 1 in q100 (tests lens); each reproduced first:
+  the new fit cases on the unfixed page fred100/null.html sha1 1721fc38 `FAIL 12` (probe100/rv5/head-fit.log), the new trigger
+  checks pass there and fail on their mutants (rv5/head-fetchnofc.log, rv5/pre-*.log); cache still v124, no bundle change).
+  - App (wt-q100 index.html, 5f58e13):
+    - The time broken past 200% text (low; the reviewers rated it medium, the skeptics low): the weekday and "8:00 AM ·" were plain
+      text on #planSky .pvs-l, whose overflow-wrap:anywhere broke them in the room beside fred whenever they did not fit there. The root
+      is the iPhone text size, uncapped (html{font:-apple-system-body}); Larger Text AX3-AX5 (40, 47, 53 px) on a 320 pt screen gave
+      "12:30 PM / · CARMEL ·" (40 px), "8:00 A / M · CARMEL ·" (47 px), "8:00 A / M · / CARMEL ·" (53 px), in WebKit and Chromium, and a
+      375 px screen at 53 px with 12:30 started a row with the dot. Now skyBoxRender builds the line from groups (the weekday and time,
+      the place's words): every part an inline-block .pvs-p piece with its dot inside the piece before it (Chrome breaks after an
+      inline-block whatever follows), so a piece that does not fit beside fred goes under him whole; overflow-wrap:anywhere stays on
+      the line as the last resort for a piece wider than the box. The line's text is unchanged ("Thu 8:00 AM · Carmel · 61°"). The
+      reviewers' Safari page-zoom widths (183-214 CSS px) are under the 320 px floor and not counted; the same change covers them.
+  - Kit (q100/q100.test.mjs, 305 checks, was 289):
+    - fit: the line's measure is one function (fitOf); new cases at 320 px with 40, 47 and 53 px roots, 8:00 and 12:30, and 375 px /
+      53 px / 12:30, in Chromium and in WebKit (14): the time on one row with its dot in the same unit, no word over two rows, no row
+      starting with a dot, the rows beside fred clear of him, inside the box. Unfixed: FAIL 12 (40 px with 8:00 held in both engines).
+    - fetch: the app back in front with the forecast over an hour old: a real hidden-then-visible pair (visibilityState and hidden
+      overridden) and nothing else, the second lookup answered 1.2 s late and cold and wet: the cap at once, one more place search and
+      one more forecast, the box live with the new number (61° then 41°). Every other check that wanted a new box lookup got it from a
+      tab tap, so a page without skySoon in the app-back-in-front listener passed all 289.
+    - nofc: opened offline (the cap, no request), then setOffline(false) and the online event alone: one place search, one forecast,
+      the box live (103 ms). The only other online check had the forecast in hand, so a plain redraw passed it.
+  - mut100.mjs gains 4 mutants (rv5-*): visbox (skySoon gone from the visibilitychange listener, crewSoon kept), onlinerender (online
+    -> skyBoxRender), onlinenone (no online listener), wrap (the line as it was: weekday and time plain text); explain, c2-words and
+    c2-dot rewritten on the new line (c2-dot: every dot outside its piece); 106 in all.
+  - Runs on fred100/null.html (q100-front 5f58e13, v124, sha1 872f3161), main page fred/null.html (8c66750), Mac Studio, one at a time
+    (probe100/rv5: runs.sh, logs and summary.txt in rv5/runs):
+    - q100 (main second) `OK: item 100: Front page, the sky card and the crew (305 checks)` (411 s).
+    - mut100, the 4 new, the 3 on changed text and the 2 other fit mutants (fitOf moved): all FAIL (443 s; rv5/w/mut100.log):
+      rv5-visbox 1, rv5-onlinerender 1, rv5-onlinenone 1, rv5-wrap 12, explain 15, c2-words 29, c2-dot 17, tight 42, c1-split 17. No
+      other mutant patches a changed line, so the full 106 were not rerun.
+    - q99 (main second) `OK: item 99: Your rider, and the rider on the Closet card (8650 checks)` (958 s); q98 in parts `OK (253
+      checks)`, `OK (49)`, `OK (21)`; q97 `OK: item 97: fred world, the bundle, motion plumbing and switch (128 checks)`.
+    - motion `OK: motion audit: Reduce Motion still on 14 screens ... (27 checks)`; budgets `OK: fred world budgets: 15 screens (15 with
+      fred world art) ... (host reference 1.12-1.42 ms, quiet at most 1.8) ... (62 checks)`, no host busy line outside its self-tests;
+      smoke `OK (14 checks)`; contrast `OK: contrast AA on 14 screens ... (54 checks)`; layout 320 px and 390 px on the new screens `OK`;
+      inventory `OK: inventory nothing removed (7 checks)`; npm test in wt-q100 1829 tests, 1782 pass, 0 fail, 47 todo; every inline
+      script compiles (probe100/rv3/syn/syn.mjs: 5 scripts OK).
+  - Open as before (round 3's list, unchanged).
