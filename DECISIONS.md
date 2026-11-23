@@ -2793,3 +2793,54 @@
       inventory `OK: inventory nothing removed (7 checks)`; npm test in wt-q100 1829 tests, 1782 pass, 0 fail, 47 todo; every inline
       script compiles (probe100/rv3/syn/syn.mjs: 5 scripts OK).
   - Open as before (round 3's list, unchanged).
+- Review round 6 (the reviewers on 5f58e13: 3 confirmed findings, 2 in the app (state, perf), 1 in q100 (tests lens); each reproduced
+  first: the new checks on the unfixed page (a copy of fred100/null.html sha1 872f3161 in probe100/rv6/page0) `FAIL 2` (probe100/rv6/
+  pre.log: the slow case 9122 ms with 2 place searches, 2 forecasts and 2 weather.gov requests; the saved-copy case not done in 12 s,
+  a second place search hung), the new switch checks pass there and fail on their mutant; cache still v124, no bundle change).
+  - App (wt-q100 index.html, db59e7a):
+    - A Crunch on the box's slow lookup (medium-low; the skeptics 2 real, 1 refuted as the price of the 4 s rule): fetchWeather gave
+      up on the box's lookup of the same ride 4 s after the tap whenever it had no forecast yet, and wxLookup's gone() then dropped
+      that lookup's answer (a newer lookup had started). On a slow signal (2.5 s a request, Crunch 0.5 s after the box's place search)
+      the box's forecast came half a second after Crunch gave up: Crunch made its own lookup, every request twice, 9.4 s against
+      main's 5.4 s (and if that second place search failed, "Couldn't get the forecast" with a good forecast thrown away). The 4 s now
+      count from the tap and from the lookup's last answer, whichever is later (wxHung; the record stamped `at` when it starts and
+      when the place search answers): a lookup still answering is followed to its end (4.5 s, one request of each kind), a hung one
+      still frees Crunch 4 s after its last answer (the race case's own place search 3.8-5 s after the tap, unchanged). A lookup
+      slower than 4 s a request still counts as hung, as decided.
+    - A saved forecast no longer made Crunch instant (medium-low; 2 real, 1 refuted as round 3's recorded change): with a saved copy
+      in hand (Crunch fell back on it), the results taken away by the sport (a timed run, the same key) and the box's lookup out on a
+      stalled signal, a Crunch waited the 4 s and then made a lookup of its own, which nothing bounds: "Crunching..." until the
+      browser gave up (main and round 2: at once, no request); at 6 s a request, 22 s and every request twice. Now, when the box's
+      lookup hangs (the 4 s above) or fails and a saved copy of this ride under an hour old is in hand (main's own condition), Crunch
+      takes that copy as main does, after first overtaking the box's lookup (wxLatest a new record, wxBusy let go), so its late
+      answer writes nothing under the results: round 3's reason for the wait kept. With no saved copy, Crunch looks up itself as
+      before (main's unbounded lookup, unchanged).
+  - Kit (q100/q100.test.mjs, 312 checks, was 305):
+    - fetch: each Open-Meteo request 2.5 s, weather.gov fast, Crunch 0.5 s after the box's place search: one request of each kind,
+      results with the forecast under 6.5 s (4548 ms; unfixed 9122 ms, 2/2/2).
+    - keep: round 3's saved-copy steps, then the signal stalled (requests held), Run, the box's 10 minutes over and its lookup out,
+      Crunch 1 s later: done under 4.8 s (4059 ms) with no request of its own and "Saved forecast" on the run's results; the held
+      requests then answered: the box's forecast request goes out and wxLast stays the saved copy, #tempF unchanged.
+    - switch, sync, backup: both crew switches read as shown (swOf: aria-pressed and .on, which only renderProfileRows sets) after
+      each tap (names on, crew off; crew on again), after the reload, on B once A's names arrive and on A once B's crew-off arrives,
+      after a restore of a file with the names on onto a device with them off, and before each round 3 restore (on), so its "off"
+      after is the file's. Before, the names switch was read only where the HTML's own aria-pressed="false" gave the answer: a page
+      that never drew it passed all 305 checks.
+  - mut100.mjs gains 3 mutants: r6-slowwait (the `at` stamp at the place search's answer gone: the 4 s from the tap alone),
+    r6-savedhang (the saved-copy return gone), r6-nameswitch (['prowBtn-crewnames','crewNames'] dropped from renderProfileRows' list);
+    c1-hang, c2-wait4 and c1-crunchnote rewritten on the new text (same bugs); 109 in all.
+  - Runs on fred100/null.html (q100-front db59e7a, v124, sha1 f9444883), main page fred/null.html (8c66750), Mac Studio, one at a time
+    (probe100/rv6: runs.sh, logs and summary.txt in rv6/runs):
+    - q100 (main second) `OK: item 100: Front page, the sky card and the crew (312 checks)` (428 s).
+    - mut100, the 3 new, the 3 on changed text and nobusy (its line changed): all FAIL (593 s; rv6/w/mut100.log): r6-slowwait 1,
+      r6-savedhang 1, r6-nameswitch 7, c1-hang 2, c2-wait4 2, c1-crunchnote 1, nobusy 6. No other mutant patches a changed line, so
+      the full 109 were not rerun.
+    - q99 (main second) `OK: item 99: Your rider, and the rider on the Closet card (8650 checks)` (975 s); q98 in parts `OK (253
+      checks)`, `OK (49)`, `OK (21)`; q97 `OK: item 97: fred world, the bundle, motion plumbing and switch (128 checks)`.
+    - motion `OK: motion audit: Reduce Motion still on 14 screens ... (27 checks)`; budgets `OK: fred world budgets: 15 screens (15 with
+      fred world art) ... (host reference 1.08-1.37 ms, quiet at most 1.8) ... (62 checks)`, no host busy line outside its self-tests;
+      smoke `OK (14 checks)`; contrast `OK: contrast AA on 14 screens ... (54 checks)`; layout 320 px and 390 px on the new screens `OK`;
+      inventory `OK: inventory nothing removed (7 checks)`; npm test in wt-q100 1829 tests, 1782 pass, 0 fail, 47 todo; every inline
+      script compiles (probe100/rv3/syn/syn.mjs: 5 scripts OK).
+  - Open as before (round 3's list), with one change: round 3's "a Crunch tapped while the box's lookup is out with a saved copy in
+    hand waits for that lookup" now waits 4 s at most on a stalled lookup, then shows the saved copy (main: at once).
