@@ -19,7 +19,7 @@ const M = [
   ['fixedh', 'place', s => rep(s, '#planSky{margin:0;min-height:calc(var(--wxf) * 1.3);', '#planSky{margin:0;height:calc(var(--wxf) * 1.3);')],
   ['nosky', 'looks', s => rep(s, 'if(sk) g.dataset.sky=sk; else delete g.dataset.sky;', 'delete g.dataset.sky;')],
   ['look', 'looks', s => rep(s, "fk=w ? sk||'night' : 'clouds',", "fk=w ? 'clouds' : 'clouds',")],
-  ['explain', 'looks,nofc', s => rep(s, "const line=[t && esc(t), PW", "const line='fred is dressed for it · '+[t && esc(t), PW")],
+  ['explain', 'looks,nofc', s => rep(s, "line=G.map((g,j)=>", "line='fred is dressed for it · '+G.map((g,j)=>")],
   ['nofred', 'once', s => rep(s, '#planSky>.rwx-fred{display:block}', '')],
   ['tight', 'fit', s => rep(s, "#planSky .pvs-l::before{content:'';float:right;", "#planSky .pvs-l::before{content:none;float:right;")],
   // 100.2: no forecast, the lookup
@@ -83,8 +83,8 @@ const M = [
   ['c1-printroom', 'media', s => rep(s, ' #planSky .pvs-l::before{display:none} }', ' }')],
   ['c1-daystale', 'crew', s => rep(rep(s, "if(document.visibilityState==='visible'){ skySoon(); crewSoon(); } });", "if(document.visibilityState==='visible'){ skySoon(); } });"), 'onAppOpen(crewSoon); skySoon(); crewSoon();', 'skySoon(); crewSoon();')],
   // check round 2: the problems the checkers found, each as round 1 had it (app) or as their mutant (tests), and the checks that now catch it
-  ['c2-words', 'fit', s => rep(s, "const line=[t && esc(t), PW.map((s,k)=>`<span class=\"pvs-p\">${s}${num && k===PW.length-1 ? '\\u00a0·' : ''}</span>`).join(' ')].filter(Boolean).join('\\u00a0· ')+(num ? (PW.length ? ' ' : t ? '\\u00a0· ' : '')+num : '');", "const line=[t && esc(t), pl && `<span class=\"pvs-p\">${esc(pl)}</span>`].filter(Boolean).join(' · ')+(num ? ' · '+num : '');")], /* the place one piece: a band left empty beside fred, a row starting with the dot */
-  ['c2-dot', 'fit', s => rep(s, "${num && k===PW.length-1 ? '\\u00a0·' : ''}</span>`).join(' ')].filter(Boolean).join('\\u00a0· ')+(num ? (PW.length ? ' '", "</span>`).join(' ')].filter(Boolean).join('\\u00a0· ')+(num ? (PW.length ? '\\u00a0· '")], /* per word, but the last dot outside its piece: it can start a row */
+  ['c2-words', 'fit', s => rep(s, "const G=[T, PW].filter(g=>g.length), line=G.map((g,j)=>g.map((s,k)=>`<span class=\"pvs-p\">${s}${k===g.length-1 && (j<G.length-1 || num) ? '\\u00a0·' : ''}</span>`).join(' ')).join(' ')+(num ? (G.length ? ' ' : '')+num : '');", "const line=[T.join(' '), pl && `<span class=\"pvs-p\">${esc(pl)}</span>`].filter(Boolean).join(' · ')+(num ? ' · '+num : '');")], /* the place one piece: a band left empty beside fred, a row starting with the dot */
+  ['c2-dot', 'fit', s => rep(s, "${s}${k===g.length-1 && (j<G.length-1 || num) ? '\\u00a0·' : ''}</span>`", "${s}</span>${k===g.length-1 && (j<G.length-1 || num) ? '\\u00a0·' : ''}`")], /* per word, but each dot outside its piece: it can start a row (Chrome breaks after an inline-block) */
   ['c2-crewcap', 'room', s => rep(s, '.crew-a{position:relative;width:min(calc((100vw - 65px) * var(--bw,1) / var(--sw,5)), calc(76px * var(--bw,1)));width:min(calc((100cqw - 33px) * var(--bw,1) / var(--sw,5)), calc(76px * var(--bw,1)));', '.crew-a{position:relative;width:calc((100vw - 65px) * var(--bw,1) / var(--sw,5));width:calc((100cqw - 33px) * var(--bw,1) / var(--sw,5));')], /* no size cap: friends twice fred's size on a tablet */
   ['c2-printh', 'media', s => rep(s, ' #planSky{min-height:0!important} #planSky .pvs-l::before', ' #planSky .pvs-l::before')], /* print keeps fred's height: a mostly empty panel */
   ['c2-stale', 'nofc,keep', s => rep(s, 'if(quiet) return false; /* q100: the box', '/* q100: the box')], /* the box's failed lookup takes the saved copy in: Crunch then makes no request, the box the cap for the hour */
@@ -125,6 +125,11 @@ const M = [
   ['rv4-inset', 'room', s => rep(s, 'gap:8px;margin:10px 0 env(safe-area-inset-bottom,0px);padding:0;list-style:none}', 'gap:8px;margin:10px 0 0;padding:0;list-style:none}')], /* no room for the home indicator's inset: the crew always left out on a Face ID iPhone */
   ['rv4-metric', 'looks', s => rep(s, 'deg=w ? tempDisp(tp!=null ? tp : w.air) : null', 'deg=w ? Math.round(tp!=null ? tp : w.air) : null')], /* the box in F whatever the rider's units */
   ['rv4-unitsstale', 'looks', s => rep(s, 'if(P._l!==line){ P._l=line; P.innerHTML=line; }', 'if(P._w!==w){ P._w=w; P._l=line; P.innerHTML=line; }')], /* the line written only for a new forecast: a units change (or a new start time) keeps the old number */
+  // review round 5: the box's two triggers held (a test gap: the app was right), and the time broken past 200% text
+  ['rv5-visbox', 'fetch', s => rep(s, "if(document.visibilityState==='visible'){ skySoon(); crewSoon(); }", "if(document.visibilityState==='visible'){ crewSoon(); }")], /* the app back in front: the crew's new day only, an hour-old forecast still shown as live */
+  ['rv5-onlinerender', 'nofc', s => rep(s, "addEventListener('online', skySoon);", "addEventListener('online', skyBoxRender);")], /* the signal back: a redraw only, the cap kept with no lookup */
+  ['rv5-wrap', 'fit', s => rep(s, "const G=[T, PW].filter(g=>g.length), line=G.map((g,j)=>g.map((s,k)=>`<span class=\"pvs-p\">${s}${k===g.length-1 && (j<G.length-1 || num) ? '\\u00a0·' : ''}</span>`).join(' ')).join(' ')+(num ? (G.length ? ' ' : '')+num : '');", "const t=T.join(' '), line=[t, PW.map((s,k)=>`<span class=\"pvs-p\">${s}${num && k===PW.length-1 ? '\\u00a0·' : ''}</span>`).join(' ')].filter(Boolean).join('\\u00a0· ')+(num ? (PW.length ? ' ' : t ? '\\u00a0· ' : '')+num : '');")], /* the bug as it was: the weekday and the time plain text, so the line's overflow-wrap:anywhere breaks them beside fred past 200% text */
+  ['rv5-onlinenone', 'nofc', s => rep(s, "addEventListener('online', skySoon);", '')], /* ... no online listener at all */
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mut100.log'); fs.mkdirSync(path.dirname(out), { recursive: true });
 for (const [name, only, f] of M) {

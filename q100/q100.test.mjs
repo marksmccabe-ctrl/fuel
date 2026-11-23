@@ -16,7 +16,8 @@
 //            saved forecast from the cache (a failing network: the box takes nothing in; Crunch then falls back on it itself, as main), and a
 //            ride 11 or more days out (typical weather only: no lookup from the box), a forecast now over an hour old whose new lookup fails
 //            (check round 2): fred in his cap (wx:clouds, FW.bird with no wear), no sky,
-//            no number
+//            no number; review round 5: opened offline, then the signal back: the online event alone looks up (one place search, one
+//            forecast) and the box is live
 //   fetch    100.2: the forecast is looked up when Plan opens (on load: one lookup), through Crunch's own (the same key: a Crunch then makes
 //            no request); tab switches and the app back in front make no more; an hour-old one is looked up again (once); a failing
 //            network: one try, none again from the Plan for 10 minutes, then one; a Crunch during the box's lookup waits for it (one
@@ -27,7 +28,9 @@
 //            when that lookup is (weather.gov 8 s at most); review round 3: the line kept in place (no write on a render that changes
 //            nothing, a selection on it kept); the 10 minutes held from both sides (none at 9 min 40 s); the box live 7.5-9.5 s after the
 //            weather.gov request (its 8 s limit, by the HOOK's stamps); a Crunch 3 s into weather.gov's wait done within 6.5 s, and one 7 s
-//            after the box's place search (weather.gov at 18 s) still takes the box's lookup (its 15 s outlasts weather.gov's 8 s)
+//            after the box's place search (weather.gov at 18 s) still takes the box's lookup (its 15 s outlasts weather.gov's 8 s); review
+//            round 5: the app back in front (a hidden-then-visible pair alone, no tab tap) with the forecast over an hour old: the cap at
+//            once, one place search and one forecast, the box live with the new forecast
 //   keep     100.2 (check round 1): the box keeps a live forecast it has: a day changed and back, Crunch then Save to Journal, the computer
 //            layout's + New ride: live, its sky and number, no new lookup; offline after a live forecast: the cap; online again: the sky back;
 //            (check round 2) a forecast saved earlier, the box's lookup at boot failing, the network back: Crunch looks up (a forecast request,
@@ -85,7 +88,9 @@
 //   fit      QA: 320 and 390 px at 150% and 200% text: the line inside the box and its rows beside fred clear of him (the rows under him
 //            take the box's width), fred inside the box, no sideways scroll; long places (Indianapolis, Mechanicsburg): no word over two rows;
 //            places of several words (Salt Lake City, San Francisco, Rancho Santa Margarita; 320 / 375 / 390 px, check round 2): no row beside
-//            fred left empty or short of a word that would fit there, and no row starts with a dot
+//            fred left empty or short of a word that would fit there, and no row starts with a dot; review round 5, past 200% (Larger Text
+//            AX3-AX5: 40, 47, 53 px roots) at 320 px (and 375 px / 53 px), 8:00 and 12:30, Chromium and WebKit: the time on one row with its
+//            dot, never broken inside, no row starting with a dot, the rows beside fred clear of him
 //   main     (with [main null.html]) main has no box and no crew
 // Q100_ONLY=section,section runs some sections.
 import fs from 'node:fs';
@@ -234,6 +239,12 @@ section('nofc', async () => {
   { const x = await openH({ forecast: false }); await x.ctx.setOffline(true); await reload(x.p); await sleep(1500);
     const L = await reqs(x.p), on = await x.p.evaluate(() => navigator.onLine); await ready(x.p, 'none', 'clouds');
     ok(on === false && L.length === 0, '100.2: offline: the box asks for no forecast (no request)', { on, L }); cap(await boxOf(x.p), 'offline'); await x.close(); }
+  /* opened offline, then the signal back while the rider stays on Plan (review round 5): the online event alone looks up (one place search,
+     one forecast) and the box is live; the only other online check had the forecast in hand, so a redraw passed it */
+  { const x = await openH(), p = x.p; await ready(p, 'live', null); await x.ctx.setOffline(true); await reload(p); await sleep(1500); await ready(p, 'none', 'clouds'); const a = kinds(await reqs(p)), A = await boxOf(p);
+    await x.ctx.setOffline(false); await p.evaluate(() => dispatchEvent(new Event('online'))); const t0 = Date.now(), L = await until(async () => (await boxOf(p)).wx === 'live', 6000), ms = Date.now() - t0; await sleep(800);
+    const B = await boxOf(p), b = kinds(await reqs(p));
+    ok(a.all === 0 && A.wx === 'none' && !!L && B.wx === 'live' && LINE.test(B.line || '') && b.geo === 1 && b.fc === 1, '100.2: opened offline (the cap, no request), then the signal back: the online event alone looks up (one place search, one forecast) and the box is live in ' + ms + ' ms ("' + B.line + '")', { a, b, ms, A: A.wx, B: [B.wx, B.line] }); await x.close(); }
   // a failing network with a forecast saved earlier (fetchWeather's cache): a saved forecast is not a live one
   { let mode = 'live'; const x = await openH({ forecast: false, route: (r, u) => mode === 'live' ? WX(r, u) : /open-meteo|weather\.gov/.test(u) ? r.fulfill({ status: 500, body: 'down' }) : null });
     await ready(x.p, 'live', null); mode = 'fail'; await reload(x.p); await until(async () => (await reqs(x.p)).length > 0, 8000); await sleep(1000); await ready(x.p, 'none', 'clouds');
@@ -279,6 +290,17 @@ section('fetch', async () => {
     await p.evaluate(() => { window.__q100.wxLast.checkedAt -= 61 * 60e3; const T = window.__q100.skyBoxFetch.t || {}; Object.keys(T).forEach(k => { T[k] -= 61 * 60e3; }); }); /* an hour on: the forecast and the box's own last try both an hour old */ await tab(p, 'journal'); await tab(p, 'plan'); await sleep(1500);
     for (let k = 0; k < 4; k++) { await tab(p, 'journal'); await tab(p, 'plan'); } await sleep(500); const b = kinds(await reqs(p));
     ok(b.fc === a.fc + 1, '100.2: the hour-old rule (Crunch\'s): a forecast over an hour old is looked up again when Plan opens, once', { a, b }); await x.close(); }
+  /* the app back in front with the forecast over an hour old (review round 5): a real hidden-then-visible pair and nothing else (no tab tap):
+     the cap at once, then one place search and one forecast, and the box live with the new forecast (it turned cold and wet meanwhile);
+     every other new lookup reaches the box through a tab tap, so a page that dropped the box from the app-back-in-front listener passed */
+  { let wet = false; const WET = weatherRouteFor({ lo: 40, hi: 44, rain: 80 }), x = await openH({ route: (r, u) => wet && /open-meteo/.test(u) ? new Promise(res => setTimeout(() => res(WET(r, u)), 1200)) : null }), p = x.p;
+    await ready(p, 'live', null); await sleep(500); const a = kinds(await reqs(p)), A = await boxOf(p);
+    const vis = v => p.evaluate(v => { for (const k of ['visibilityState', 'hidden']) Object.defineProperty(document, k, { configurable: true, get: () => k === 'hidden' ? v === 'hidden' : v }); document.dispatchEvent(new Event('visibilitychange')); }, v);
+    await vis('hidden'); await sleep(300); wet = true; await p.evaluate(() => { window.__q100.wxLast.checkedAt -= 61 * 60e3; const T = window.__q100.skyBoxFetch.t || {}; Object.keys(T).forEach(k => { T[k] -= 61 * 60e3; }); });
+    await vis('visible'); await sleep(250); const C = await boxOf(p);
+    await until(async () => { const B = await boxOf(p); return B.wx === 'live' && B.num && B.num !== A.num; }, 8000); await sleep(500); const B = await boxOf(p), b = kinds(await reqs(p));
+    await p.evaluate(() => { delete document.visibilityState; delete document.hidden; });
+    ok(C.wx === 'none' && C.look === 'clouds' && !C.num && b.geo === a.geo + 1 && b.fc === a.fc + 1 && B.on && B.wx === 'live' && LINE.test(B.line || '') && !!A.num && B.num !== A.num, '100.2: the app back in front (visibilitychange alone) with the forecast over an hour old: the cap at once (' + C.wx + '), one place search and one forecast, the box live with the new forecast (' + A.num + ' then ' + B.num + ')', { a, b, A: A.num, C: [C.wx, C.look, C.num], B: [B.wx, B.num, B.line] }); await x.close(); }
   // a failing network: one try; no more from the Plan for 10 minutes; then one
   { const x = await openH({ forecast: false, route: (r, u) => /open-meteo|weather\.gov/.test(u) ? r.fulfill({ status: 500, body: 'down' }) : null }), p = x.p;
     await until(async () => (await reqs(p)).length > 0, 8000); await sleep(1000); const a = kinds(await reqs(p));
@@ -718,11 +740,8 @@ section('media', async () => {
 });
 
 section('fit', async () => {
-  for (const [w, h] of [[320, 568], [375, 812], [390, 844]]) for (const sc of [1.5, 2]) {
-    const x = await openH({ query: '?sky=rain', width: w, height: h, scale: sc }), p = x.p; await ready(p, 'live', 'rain');
-    for (const place of ['Carmel, IN', 'Indianapolis, IN', 'Mechanicsburg, PA', 'Salt Lake City, UT', 'San Francisco, CA', 'Rancho Santa Margarita, CA']) {
-      if (place !== 'Carmel, IN') { await setPlace(p, place); await until(async () => { const B = await boxOf(p); return B.wx === 'live' && B.line.includes(place.split(',')[0]); }, 15000); await sleep(300); }
-      const g = await p.evaluate(() => { const W = document.getElementById('planSky'), Wr = W.getBoundingClientRect(), L = document.getElementById('planSkyL'), f = W.querySelector(':scope>.rwx-fred').getBoundingClientRect(), rg = document.createRange(); rg.selectNodeContents(L);
+  // the line as laid out: its rows (units: no break inside but at a plain space), whether they sit inside the box and clear of fred
+  const fitOf = p => p.evaluate(() => { const W = document.getElementById('planSky'), Wr = W.getBoundingClientRect(), L = document.getElementById('planSkyL'), f = W.querySelector(':scope>.rwx-fred').getBoundingClientRect(), rg = document.createRange(); rg.selectNodeContents(L);
         const T = [...rg.getClientRects()].filter(r => r.width > .5), bodyL = f.left + f.width * .12, beside = T.filter(r => (r.top + r.bottom) / 2 < f.bottom), right = Math.max(...beside.map(r => r.right)); /* (rows whose middle is above fred's foot: beside him; the rows under him take the box's width) */
         const split = [], U = []; const tw = document.createTreeWalker(L, NodeFilter.SHOW_TEXT); let n; while ((n = tw.nextNode())) { const re = /[^ \t\n]+/g; let m; while ((m = re.exec(n.data))) { const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length); const Q = [...r.getClientRects()].filter(q => q.width > .5);
           if (new Set(Q.map(q => Math.round(q.top))).size > 1) split.push(m[0]); /* (a unit: no break inside it but at a plain space: "8:00 AM ·" is one, each word of the place one) */
@@ -734,9 +753,26 @@ section('fit', async () => {
         const short = R.slice(0, -1).map((r, k) => ({ r, nx: R[k + 1].u[0] })).filter(({ r, nx }) => r.t < roomB - .5 && nx.r - nx.l + .4 * sp < roomL - r.u[r.u.length - 1].r) /* (with a space before it: .4em, a little more than a space and the letter-spacing) */.map(({ r, nx }) => r.u.map(u => u.w).join(' ') + ' | ' + nx.w);
         const band = R.slice(1).filter((r, k) => R[k].t < roomB - .5 && r.t - R[k].b > sp && r.u[0].r - r.u[0].l < roomL - Lr.left).length; /* an empty row beside fred: the next row a line or more below one beside him (rows sit about .3em apart) though its first word fits beside him (a word too long for that room goes under him whole) */
         return { line: L.textContent, rows: R.map(r => r.u.map(u => u.w).join(' ')), band, dot: R.filter(r => /^\s*·/.test(r.u[0].w)).length /* (\s: a no-break space before the dot moves with it) */, short, h: Math.round(Wr.height), inside: T.every(r => r.left >= Wr.left && r.right <= Wr.right && r.top >= Wr.top && r.bottom <= Wr.bottom), clear: right <= bodyL + .5, split, fred: f.bottom <= Wr.bottom && f.top >= Wr.top && f.right <= Wr.right, cut: L.scrollWidth > L.clientWidth + 1, sx: document.documentElement.scrollWidth > innerWidth, right: Math.round(right), bodyL: Math.round(bodyL) }; });
+  for (const [w, h] of [[320, 568], [375, 812], [390, 844]]) for (const sc of [1.5, 2]) {
+    const x = await openH({ query: '?sky=rain', width: w, height: h, scale: sc }), p = x.p; await ready(p, 'live', 'rain');
+    for (const place of ['Carmel, IN', 'Indianapolis, IN', 'Mechanicsburg, PA', 'Salt Lake City, UT', 'San Francisco, CA', 'Rancho Santa Margarita, CA']) {
+      if (place !== 'Carmel, IN') { await setPlace(p, place); await until(async () => { const B = await boxOf(p); return B.wx === 'live' && B.line.includes(place.split(',')[0]); }, 15000); await sleep(300); }
+      const g = await fitOf(p);
       ok(g.inside && g.clear && g.fred && !g.cut && !g.sx && !g.split.length, 'QA: ' + place + ', ' + w + ' px, ' + sc * 100 + '% text: the line wraps inside the box, its rows beside fred clear of him, no word over two rows; fred inside the box; nothing cut, no sideways scroll', g);
       ok(!g.short.length && !g.band && !g.dot, 'QA: ' + place + ', ' + w + ' px, ' + sc * 100 + '% text: no row beside fred left empty or short of a word that fits there, no row starting with a dot (' + g.rows.join(' / ') + '; the box ' + g.h + ' px)', g); }
     await x.close(); }
+  /* review round 5: past 200% (the root is the iPhone text size, uncapped: Larger Text AX3-AX5 are 40, 47 and 53 px) the time goes under
+     fred whole as a place word does, a two-digit hour too, in Chromium and WebKit (the line's overflow-wrap:anywhere once broke the plain
+     text "8:00 AM ·" in the room beside him: "8:00 A / M ·" from 47 px, "12:30 PM / · CARMEL ·" at 40 px, a row starting with the dot) */
+  const wk = await webkit.launch();
+  for (const [eng, b] of [['Chromium', browser], ['WebKit', wk]]) for (const [w, h, sc, st] of [[320, 568, 2.5, '08:00'], [320, 568, 2.5, '12:30'], [320, 568, 2.9375, '08:00'], [320, 568, 2.9375, '12:30'], [320, 568, 3.3125, '08:00'], [320, 568, 3.3125, '12:30'], [375, 667, 3.3125, '12:30']]) {
+    const x = await openH({ query: '?sky=rain', width: w, height: h, scale: sc, browser: b, noErrs: true }), p = x.p, tm = st === '08:00' ? '8:00 AM' : '12:30 PM'; await ready(p, 'live', 'rain');
+    if (st !== '08:00') await sheet(p, () => setField(p, '#startTime', st));
+    await until(async () => { const B = await boxOf(p); return B.wx === 'live' && (B.line || '').includes(tm); }, 15000); await sleep(400);
+    const g = await fitOf(p), what = eng + ', ' + w + ' px, a ' + Math.round(16 * sc) + ' px root, ' + st.replace(/^0/, '') + ': ';
+    ok(g.inside && g.clear && g.fred && !g.cut && !g.sx && !g.split.length && !g.dot && g.rows.some(r => r.includes(tm + ' ·')), 'QA: ' + what + 'the time on one row with its dot (never broken inside), no row starting with a dot, the rows beside fred clear of him, inside the box (' + g.rows.join(' / ') + ')', g);
+    await x.close(); ERRS.push(x.errors.filter(e => !/^console: Not allowed to load local resource: file:/.test(e))); }
+  await wk.close();
 });
 
 section('main', async () => {
