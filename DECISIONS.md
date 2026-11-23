@@ -2982,3 +2982,5 @@
       q91 324, q92 285, q93 209, q95 43, q96 101, q97 128, q98 321 (857 s), q99 8650 (961 s), q100 388 (540 s; 319 + the saved
       section's 69). No new exemption and no audit rule change (the entry's why text only); the only kit changes after the first run are q100's saved section, the 4
       mutants and the KNOWN_ON_MAIN entry's why (fa97979), all before this run, so it is the end-to-end run after the last change.
+  - mut100, every mutant once on the final page (fred100 = q100-front 784e9b2, v124, sha1 b066bd39; Nov 23): all 114 FAIL (4902 s;
+    probe100/kit/w/mut100.log, per-mutant logs probe100/kit/mut100-<name>/), every patch applied to today's text, none needed work.
