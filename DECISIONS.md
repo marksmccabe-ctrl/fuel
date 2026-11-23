@@ -2844,3 +2844,34 @@
       script compiles (probe100/rv3/syn/syn.mjs: 5 scripts OK).
   - Open as before (round 3's list), with one change: round 3's "a Crunch tapped while the box's lookup is out with a saved copy in
     hand waits for that lookup" now waits 4 s at most on a stalled lookup, then shows the saved copy (main: at once).
+- Review round 7 (the reviewers on db59e7a: 1 confirmed finding, in q100 (tests lens; the app was right, so no app change and no app
+  commit this round); reproduced first: the reviewers' mutant (crewRender's aria line moved into its build block) passed the full q100
+  `OK (312 checks)`, the same as the page; cache still v124, no bundle change).
+  - The crew list's accessibility tree read only at load (medium by the finder, a test gap by all three skeptics): the one read of
+    #planCrew's accessibility state was the 'names' section's, on pages opened with the names already set. crewRender sets the list's
+    aria-hidden / aria-label "The crew" on every call, after the per-friend loop; a names change made with the page open (a tap, a
+    sync through crewSoon, a restore) keeps the day's five, so the build block (`if(U.dataset.k!==k)`) is skipped and only that line
+    changes the list for VoiceOver. A page that set it in the build block alone showed the five names but stayed aria-hidden (no list,
+    no name) until a reload, and names off left a list "The crew" of empty items; every check after a change counted .crew-n or read
+    the switches.
+  - Kit (q100/q100.test.mjs, 319 checks, was 312): a11yCrew(p, on) reads #planCrew's ariaSnapshot with Plan showing (a hidden view
+    reads '') plus its aria-hidden and aria-label: on, exactly `- list "The crew":` with the day's five listitems, aria-hidden absent,
+    the label "The crew"; off, an empty snapshot, aria-hidden "true", no label. Read in motion after each names toggle (on, off), in
+    switch after the names tap with the crew still shown (a new stop on Plan before the crew-off tap: after the crew comes back on the
+    build block runs, so a read there alone cannot tell) and after the crew is on again, on B in sync once A's names arrive, in backup
+    after the names-on restore over names off and after the names-off restore over names on.
+  - mut100.mjs gains r7-namesaria (R7_ARIA, the aria line, moved after `U.dataset.k=k; /* a new day: its five */`; sections switch,
+    motion, sync, backup): `FAIL 5` (motion on, switch, sync, both backup reads; motion off passes, as the build left it hidden). No
+    app text changed, so no other mutant's source changed and the full 110 were not rerun.
+  - Runs on fred100/null.html (q100-front db59e7a, v124, sha1 f9444883, rebuilt and byte-identical), main page fred/null.html (8c66750),
+    Mac Studio, one at a time (probe100/rv7: runs.sh, logs and summary.txt in rv7/runs):
+    - q100 (main second) `OK: item 100: Front page, the sky card and the crew (319 checks)` (428 s).
+    - mut100 r7-namesaria `FAIL 5` (65 s; rv7/w/mut100.log).
+    - q99 (main second) `OK: item 99: Your rider, and the rider on the Closet card (8650 checks)` (958 s); q98 in parts `OK (253
+      checks)`, `OK (49)`, `OK (21)`; q97 `OK: item 97: fred world, the bundle, motion plumbing and switch (128 checks)`.
+    - motion `OK: motion audit: Reduce Motion still on 14 screens ... (27 checks)`; budgets `OK: fred world budgets: 15 screens (15 with
+      fred world art) ... (host reference 1.02-1.8 ms, quiet at most 1.8) ... (62 checks)`, no host busy line outside its self-tests;
+      smoke `OK (14 checks)`; contrast `OK: contrast AA on 14 screens ... (54 checks)`; layout 320 px and 390 px on the new screens `OK`;
+      inventory `OK: inventory nothing removed (7 checks)`; npm test in wt-q100 1829 tests, 1782 pass, 0 fail, 47 todo; every inline
+      script compiles (probe100/rv3/syn/syn.mjs: 5 scripts OK).
+  - Open as before (round 6's list).
