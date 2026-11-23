@@ -2912,11 +2912,73 @@
     mounted in #view-plan on every screen (Journal, Settings: 469 nodes in 6 spots, 0 running, as the walk requires); item 99's run had
     46 of 145.
   - Layout's notes: the KNOWN_ON_MAIN overlap of plan-saved (#calcBtn + #planSavedView) was not seen at 430 px either this time (item
-    99's run saw it there; 40 known on main at 430 then, 39 now). Not item 100's: LAYOUT_ONLY=plan-saved at 430 px shows no known
-    failure on main's page now as well (the strip's timing); the entry stays, main has the strip over the Crunch bar. The other
-    not-seen notes are the same as item 99's run.
-  - No app change (q100-front stays at db59e7a, cache v124), no new exemption (no inventory/allow.json, KNOWN_ON_MAIN, EXEMPT,
-    SOLID_ALLOW, SIDEWAYS_OK, ELLIPSIS_OK or KEYFRAMES entry), no audit change. The only kit change is the two screens, made before
-    the run, so the run above is the end-to-end run after the last change. Not revisited (decided or waiting on Mark): v9's brick red
-    boots, the crew left out on the run's graphite (html.run-theme #planCrew{display:none}, provisional), docs/LEGAL.md "Crew
-    likenesses" (item 100 cannot merge before it), q99's FORMER_V8 and ACCEPTED_V8 entry 6.
+    99's run saw it there; 40 known on main at 430 then, 39 now). The other not-seen notes are the same as item 99's run. Corrected
+    after the skeptic (below): this note first said the cover was "not item 100's ... (the strip's timing)", from a probe
+    (kit100/saved.mjs) at 430 x 932, not the audit's 844 px, though its own big/saved100.png showed Crunch under the strip. It is item
+    100's: after Save to Journal the box is back, the page is 116 px longer, the pinned Crunch goes down to the tab bar and the fixed
+    strip covers all but 11 px of it at 100% text (320-390 x 844; 28 px at 430), where main's Crunch sits in place above the strip.
+    The audit printed nothing for it because it skips a target none of whose five sample points (the centre and the quarters) a hit
+    test finds uncovered (n.covered): at 100% text, where the entry does not apply, Crunch was not a target at all.
+  - Before the skeptic: no app change (q100-front stayed at db59e7a, cache v124), no new exemption (no inventory/allow.json,
+    KNOWN_ON_MAIN, EXEMPT, SOLID_ALLOW, SIDEWAYS_OK, ELLIPSIS_OK or KEYFRAMES entry), no audit change. The only kit change was the two
+    screens, made before the run. The skeptic's finding brought one app change and a q100 section (below); the end-to-end run is the
+    one after it. Not revisited (decided or waiting on Mark): v9's brick red boots, the crew left out on the run's graphite
+    (html.run-theme #planCrew{display:none}, provisional), docs/LEGAL.md "Crew likenesses" (item 100 cannot merge before it), q99's
+    FORMER_V8 and ACCEPTED_V8 entry 6.
+  - Skeptic 1 (one finding, real, in the app; fixed in the app, held by a new q100 section; Nov 23):
+    - The finding: after Save to Journal, the sky box pushes "Crunch the plan" under the "Saved to Journal ✓ · View ›" strip at 100%
+      text on every phone width; the layout audit cannot see it, and this part's layout note had called it not item 100's.
+      Reproduced on fred100 (db59e7a, sha1 f9444883) with the skeptic's probe (kit100/skeptic/saved2.mjs: plan-saved opened as the
+      layout audit opens it, 844 px tall): Crunch 724-780, the strip 735-788 at 320, 375 and 390 px, 11 of its 56 px showing and a tap
+      at its centre on the strip; at 430 px Crunch in place at 707-763, 28 px showing, the centre on the strip; at 150% 11 px (430 px:
+      main 20); at 200% none. Main's page (8c66750) at 100%: Crunch in place above the strip (634-690 at 320 px, 577-633 at 430), all
+      56 px clear, its centre on Crunch; main at 150% and 200% as item 100 (the known entry). The cause: Plan after a save is the
+      ticket again with the box back (382-498 at 390 px), so the page is long enough that the pinned Crunch bar (#crunchBar, sticky,
+      bottom var(--navh) + var(--pbsh), z-index 4) sits on the tab bar, where the fixed strip (bottom var(--navh), z-index 6, 5 s) is.
+      Real, item 100's (main's shorter page kept Crunch above the strip at 100%), against Mark's 44 px rule for the page's main action
+      at the default text size.
+    - The fix (app, q100-front 784e9b2, cache still v124): the pinned Crunch already adds --pbsh to its bottom (a hook since q31, never
+      set; the rule's comment: "just above the tab bar (and the Save bar when it shows)"). While the strip shows on a phone,
+      `html:not(.dk):has(#view-plan.active #planSaved:not([hidden])){--pbsh:var(--psh,53px)}` sets it on the root to the strip's
+      height, --psh, which planSavedShow reads as the strip shows (planSavedH, so its first frame has it) and a ResizeObserver on the
+      strip reads again when its size changes (text size). So Crunch sits on the strip, not under it, at every text size and through
+      any scroll (sticky: never lower than that line), and the focus scroll padding (the same --pbsh) clears both; when the strip goes,
+      Crunch is back on the tab bar. My call against the HANDOFF suggestion (the strip moved above Crunch): Crunch moves up and back
+      once, but a strip fixed above the pinned spot is crossed by Crunch whenever Crunch is in place above it (430 px at 100%: 707-763
+      against a strip at 663-716) or scrolls past it; Crunch above the strip is right in every case and is the rule's own intent. Main's
+      150% and 200% cover ends with it (the KNOWN_ON_MAIN entry stays for main's page until item 100 merges: its why says so). The
+      computer layout is unchanged (html.dk: Crunch in the page, not pinned). Probe after: Crunch 671-727 above the strip 735-788 at
+      320-430 x 844, 100% (637-693 above 701-788 at 320 px / 200%), all 56 px, the centre on Crunch
+      (kit100/fix/saved-item100-390-100-fixed.png; the skeptic's before: kit100/skeptic/saved-item100-390-100.png).
+    - q100 `saved` (new section): from the first frame the strip shows, in every frame for a second (61-75 frames), Crunch is on the
+      screen, none of it under the strip (both ways: the computer layout's strip is in another column), at least 44 px of it showing,
+      and a tap at the centre of its shown part reaches it; the same at rest with View on the strip reached at its own centre (phone);
+      through a scroll of the whole page and back while the strip shows, none of Crunch under it and wherever 44 px show, a tap reaches
+      it; after the strip, Crunch back on the tab bar (its pinned bottom as before the save, the tab bar's height) and reached. Sizes:
+      320, 375, 390 and 430 x 844 at 100, 150 and 200% (main's known cover included), 320 x 568 at 100 and 200%, WebKit 390 x 844 and
+      320 x 568 / 200%, and 1280 x 800 (Crunch's position unchanged there). On fred100 (784e9b2, sha1 b066bd39) `OK (70 checks)`.
+    - Mutants (mut100.mjs, now 114; MUT_BASE kit100, kit100/w/mut100.log): kit-savedover (the rule out: the strip over Crunch as at
+      db59e7a) `FAIL 45`; kit-savedlate (no read as the strip shows, the observer's a frame late) `FAIL 5` (the first frame at 200%,
+      the strip 87 px against 53); kit-savedguess (never measured: 53 px) `FAIL 15`; kit-savedstays (--pbsh set for good) `FAIL 16`
+      (after its first run, `FAIL 5`, "back in its place" also asks the tab bar's height, not only the pinned bottom before the save,
+      which that mutant had raised from the start).
+    - Not changed: the layout audit. It skips a target none of whose sample points a hit test finds uncovered, which is how a covered
+      tap target escapes it; a rule for covered targets would judge every screen's content under the header, the tab bar and the pinned
+      bars, not only this one, so the case is held in q100 instead. After the fix, LAYOUT_ONLY=plan-saved at 320/375/390/430 px: `OK`,
+      no new failures, 0 known on main (Crunch a target now: its centre reached; 15 targets at 390 px / 100%, 1 covered), and main's
+      page the same (its cover skipped as covered).
+    - Found while fixing, main's own (not item 100's; HANDOFF, Open items for Mark): on the computer layout the strip after a save is a
+      32 px sliver at the window's left edge (planSavedShow places it over #planRideView, which is hidden then: left 0, width 0); and
+      with results up at 320 px / 200% text, scrolled back up to the form, the fixed Save bar covers the pinned Crunch (724-780 under
+      the bar from 605), identical on main.
+    - Runs (fred100 = 784e9b2, v124, sha1 b066bd39; main fred/null.html 8c66750): npm test in wt-q100 1829 tests, 1782 pass, 0 fail, 47
+      todo; the whole kit again (the app changed), KIT_ITEMS unset, KIT_MAIN default (kit100/runkit2.out, logs
+      kit2/logs/runkit-20261123-051516-71057), every line OK on its first run: `kit: OK: 19 steps passed, 0 item tests skipped (10127
+      s)`; answer 1782 pass, 0 fail; smoke 14 checks; contrast 161 screens (4 known on main), 348 checks; layout 150 screens (438
+      opened) at 320/375/430 and 161 (471) at 390, no new failures, the same known counts (44, 36, 38, 39) and not-seen notes as the
+      first run (plan-saved's entry not seen at any width: fixed on this page); inventory nothing removed (7 checks); motion 169
+      screens, 56 checks; budgets 161 screens, the reference 1.05-1.57 ms, costliest frame 1.41 ms (plan-wx-fred-snow), slowest insert
+      25.5 ms at 6x (plan-avatar-rider), most nodes 703, plan-saved 609 nodes in 8 spots, 62 checks, host busy only in its self-tests;
+      q91 324, q92 285, q93 209, q95 43, q96 101, q97 128, q98 321 (857 s), q99 8650 (961 s), q100 388 (540 s; 319 + the saved
+      section's 69). No new exemption and no audit rule change (the entry's why text only); the only kit changes after the first run are q100's saved section, the 4
+      mutants and the KNOWN_ON_MAIN entry's why (fa97979), all before this run, so it is the end-to-end run after the last change.

@@ -224,12 +224,16 @@ commands use `perl tools/timeout.pl <s> node ...`. 10 cores: two reviews or a re
 - Item 100 brings 16 screens (needs '#planSky': plan-sky-sun, -rain, -snow, -night, -none, -noplace, -offline, -run, desktop-plan-sky,
   desktop-plan-sky-results, and from the kit step plan-sky-rain-320-200 and plan-sky-run-320-200, the line at 200% over the box's lower
   sky; needs '#planCrew': plan-crew, plan-crew-names, plan-crew-names-320-200, plan-crew-names-430-150). A screen may carry its own
-  route (tried before the kit's). New test q100/q100.test.mjs (about 7 min; q100/mut100.mjs, 110 mutants). Proof on q100-front (db59e7a,
-  v124), KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 8c66750, v123), Mac Studio: `kit: OK: 19 steps passed, 0 item tests
-  skipped (10052 s)`; answer 1782 pass, contrast 161 screens, layout 150 (438 opened) at 320/375/430 and 161 (471) at 390, inventory
-  nothing removed, motion 169 (56 checks), budgets 161 (all with fred world art: the box and crew sit in #view-plan on every screen),
-  q91 324, q92 285, q93 209, q95 43, q96 101, q97 128, q98 321, q99 8650, q100 319. No app change and no exemption in the kit step.
-  On main's page the 16 print `skipped (needs ...)`.
+  route (tried before the kit's). New test q100/q100.test.mjs (about 9 min; q100/mut100.mjs, 114 mutants). The kit step's skeptic found
+  the layout audit blind to a covered tap target (it skips a target none of whose sample points a hit test reaches): after Save to
+  Journal the box made the page long enough that the pinned Crunch sat under the "Saved to Journal" strip at 100% text. App fix
+  784e9b2 (the pinned Crunch rides above the strip while it shows); q100's saved section holds it. Proof on q100-front (784e9b2, v124),
+  KIT_ITEMS unset, KIT_MAIN default (fred/null.html = main 8c66750, v123), Mac Studio: `kit: OK: 19 steps passed, 0 item tests skipped
+  (10127 s)`; answer 1782 pass, contrast 161 screens, layout 150 (438 opened) at 320/375/430 and 161 (471) at 390, inventory nothing
+  removed, motion 169 (56 checks), budgets 161 (all with fred world art: the box and crew sit in #view-plan on every screen), q91 324,
+  q92 285, q93 209, q95 43, q96 101, q97 128, q98 321, q99 8650, q100 388. No exemption in the kit step; the plan-saved KNOWN_ON_MAIN
+  entry (main's cover at 150%/200%) is not seen on item 100's page and goes when item 100 merges. On main's page the 16 print
+  `skipped (needs ...)`.
 - Reloads: on about 1 reload in 8-15, Chromium gives a file:// page a blank, throwaway localStorage (the next load sees the real
   store again; an http origin never does this). lib/open.mjs seeds once per open() with a token in localStorage and marks such a load
   `window.__kitFresh`; use `reload(p)` from lib/open.mjs in tests, which loads again when that happens. Measured with
