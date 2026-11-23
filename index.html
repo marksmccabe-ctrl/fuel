@@ -4632,6 +4632,7 @@ input.gsw:disabled{opacity:.5; cursor:not-allowed}
 #results .plan-bar,.plan-saved{position:fixed;left:0;right:0;bottom:var(--navh,0px);z-index:6;margin:0;padding:10px 16px 12px;background:var(--panel);border-top:1px solid var(--hairline);box-shadow:none}
 #view-plan:has(#planBar:not([hidden])){padding-bottom:calc(var(--pbh,140px) + 16px)} /* the page's end (the footer too) scrolls clear of the bar */
 #view-plan:has(#planSaved:not([hidden])){padding-bottom:60px}
+html:not(.dk):has(#view-plan.active #planSaved:not([hidden])){--pbsh:var(--psh,53px)} /* item 100 (kit step): while "Saved to Journal" shows on a phone, the pinned Crunch rides above it (--psh: its height, planSavedShow), never under it */
 .plan-saved{display:flex;align-items:center;justify-content:center;gap:2px;min-height:44px;padding:4px 16px;font:600 .9375rem/1.3 var(--font);color:var(--text)}
 .plan-saved[hidden]{display:none}
 .plan-saved button{min-height:44px;padding:0 6px;border:0;background:none;font:600 .9375rem/1 var(--font);color:var(--blue);cursor:pointer}
@@ -14884,7 +14885,10 @@ if('ResizeObserver' in window) new ResizeObserver(roDefer(()=>{ const h=$('planB
 let planSavedT=null, planSavedId=null;
 function planSavedShow(id){ planSavedId=id; const el=$('planSaved'); clearTimeout(planSavedT);
   if(dkOn()){ const c=($('planRideView')||$('view-plan')).getBoundingClientRect(); Object.assign(el.style, {left:Math.round(c.left)+'px', right:'auto', width:Math.round(c.width)+'px'}); } else Object.assign(el.style, {left:'', right:'', width:''});
-  el.hidden=false; planSavedT=setTimeout(()=>{ el.hidden=true; }, 5000); }
+  el.hidden=false; planSavedH(); planSavedT=setTimeout(()=>{ el.hidden=true; }, 5000); }
+/* item 100 (kit step): the strip's height as --psh, read as it shows (so its first frame has it) and when its size changes (text size): the pinned Crunch sits that far up while the strip shows */
+function planSavedH(){ const h=$('planSaved').getBoundingClientRect().height; if(h) document.documentElement.style.setProperty('--psh', Math.ceil(h)+'px'); }
+if('ResizeObserver' in window) new ResizeObserver(roDefer(planSavedH)).observe($('planSaved'));
 $('planSavedView').addEventListener('click',()=>{ $('planSaved').hidden=true; clearTimeout(planSavedT); if(planSavedId && typeof jhShow==='function') jhShow(planSavedId); else goTo('journal'); }); // r1013 (item 83): its group's list, the entry open
 // the record keys every journal entry has had (gel, pw, plan) from a full result, with the plan counts taken from the screen (legPlan)
 function jRecFromResult(r){
