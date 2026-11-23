@@ -63,7 +63,7 @@ const M = [
   ['c1-keep', 'keep', s => rep(s, 'SKY_KEPT.set(R.key, w); ', '')], /* the box keeps no copy: a reset ride or a day come back to loses its sky (a new lookup at best) */
   ['c1-offline', 'keep', s => rep(s, 'if(!R || navigator.onLine===false) return null;', 'if(!R) return null;')], /* offline after a live forecast: still the sky and number */
   ['c1-race', 'race', s => rep(s, 'const gone=()=>quiet && (wxLatest!==own || (wxReq()||{}).key!==key);', 'const gone=()=>false;')], /* the box's late lookup writes the shared forecast */
-  ['c1-hang', 'race', s => rep(s, "(quiet ? b.p : Promise.race([b.p, new Promise(r=>setTimeout(()=>{ if(!b.fc) r('late'); }, WX_WAIT_MS))]))", '(b.p)')], /* Crunch waits on a hung lookup */
+  ['c1-hang', 'race', s => rep(s, '(quiet ? b.p : Promise.race([b.p, wxHung(b, Date.now())]))', '(b.p)')], /* Crunch waits on a hung lookup */
   ['c1-slowchange', 'race', s => rep(s, 'if(ok===null) delete T[R.key]; skySoon(); });', 'if(ok===null) delete T[R.key]; skyBoxRender(); });')], /* the ride changed meanwhile: no lookup of it */
   ['c1-overtaken', 'race', s => rep(s, 'if(ok===null) delete T[R.key]; skySoon(); });', 'skySoon(); });')], /* an overtaken try kept for 10 minutes: back to that ride, the cap */
   ['c1-backup', 'backup', s => rep(s, "  Object.keys(pcw).forEach(k=>{ if(!(d.settings && k in d.settings)){ if(pcw[k]!==undefined) settings[k]=pcw[k]; else delete settings[k]; } });", '')], /* an old backup wipes the switches */
@@ -72,7 +72,7 @@ const M = [
   ['c1-nofoot', 'room', s => css(s, '#view-plan>.fredfoot{display:none!important}')],
   ['c1-typical', 'nofc', s => rep(rep(s, 'if(!R || R.ahead>10 || (wxAccepted', 'if(!R || (wxAccepted'), '&& !w.stale && !w.typical && !wxOld()){', '&& !w.stale && !wxOld()){')],
   ['c1-sheetopen', 'fetch', s => rep(s, " || $('planSheet').classList.contains('open') || document.visibilityState", " || document.visibilityState")],
-  ['c1-crunchnote', 'fetch', s => rep(s, "if(ok!=='late' && ((ok && wxKey===R.key) || quiet)) return ok; }", "if(ok!=='late') return ok; }")],
+  ['c1-crunchnote', 'fetch', s => rep(s, "if(ok!=='late' && ((ok && wxKey===R.key) || quiet)) return ok;\n", "if(ok!=='late') return ok;\n")],
   ['c1-fredagain', 'motion', s => rep(s, '  wxDress(W, true); } /* in place:', "  W.querySelectorAll(':scope>.rwx-fred').forEach(x=>{ fwMount(x, ''); x.remove(); }); wxDress(W, true); } /* in place:")],
   ['c1-crewredo', 'motion', s => rep(s, "if(U.dataset.k!==k){ U.querySelectorAll('.crew-a').forEach(a=>fwMount(a, ''));", "if(true){ U.querySelectorAll('.crew-a').forEach(a=>fwMount(a, ''));")],
   ['c1-namebreak', 'names', s => rep(s, '.crew-n{display:block;max-width:100%;', '.crew-n{display:block;width:0;min-width:100%;')],
@@ -89,7 +89,7 @@ const M = [
   ['c2-printh', 'media', s => rep(s, ' #planSky{min-height:0!important} #planSky .pvs-l::before', ' #planSky .pvs-l::before')], /* print keeps fred's height: a mostly empty panel */
   ['c2-stale', 'nofc,keep', s => rep(s, 'if(quiet) return false; /* q100: the box', '/* q100: the box')], /* the box's failed lookup takes the saved copy in: Crunch then makes no request, the box the cap for the hour */
   ['c2-nwsbound', 'fetch', s => rep(s, 'const r=await fetch(url,{signal:ctl.signal});', 'const r=await fetch(url);')], /* weather.gov unbounded: it sets the lookup's length */
-  ['c2-wait4', 'fetch', s => rep(s, "setTimeout(()=>{ if(!b.fc) r('late'); }, WX_WAIT_MS)", "setTimeout(()=>r('late'), WX_WAIT_MS)")], /* Crunch drops the box's lookup at 4 s even with its forecast in: a second lookup, slower than main */
+  ['c2-wait4', 'fetch', s => rep(s, 'const k=()=>{ if(b.fc) return; const w=', 'const k=()=>{ const w=')], /* Crunch drops the box's lookup at 4 s even with its forecast in: a second lookup, slower than main */
   ['c2-latedrop', 'race', s => rep(s, 'const gone=()=>quiet && (wxLatest!==own ||', 'const gone=()=>quiet && (wxBusy!==own ||')], /* the box's late answer dropped though the ride is the same and nothing took over */
   ['c2-hourlive', 'nofc', s => rep(s, '&& !w.stale && !w.typical && !wxOld()){', '&& !w.stale && !w.typical){')], /* an hour-old forecast shown as live while its new lookup fails */
   ['c2-zline', 'looks,theme', s => rep(s, '.r-wx .rwx-tile>*,.r-wx .pvs-l{position:relative;z-index:3}', '.r-wx .rwx-tile>*{position:relative;z-index:3}')],
@@ -130,6 +130,10 @@ const M = [
   ['rv5-onlinerender', 'nofc', s => rep(s, "addEventListener('online', skySoon);", "addEventListener('online', skyBoxRender);")], /* the signal back: a redraw only, the cap kept with no lookup */
   ['rv5-wrap', 'fit', s => rep(s, "const G=[T, PW].filter(g=>g.length), line=G.map((g,j)=>g.map((s,k)=>`<span class=\"pvs-p\">${s}${k===g.length-1 && (j<G.length-1 || num) ? '\\u00a0·' : ''}</span>`).join(' ')).join(' ')+(num ? (G.length ? ' ' : '')+num : '');", "const t=T.join(' '), line=[t, PW.map((s,k)=>`<span class=\"pvs-p\">${s}${num && k===PW.length-1 ? '\\u00a0·' : ''}</span>`).join(' ')].filter(Boolean).join('\\u00a0· ')+(num ? (PW.length ? ' ' : t ? '\\u00a0· ' : '')+num : '');")], /* the bug as it was: the weekday and the time plain text, so the line's overflow-wrap:anywhere breaks them beside fred past 200% text */
   ['rv5-onlinenone', 'nofc', s => rep(s, "addEventListener('online', skySoon);", '')], /* ... no online listener at all */
+  // review round 6: the app problems as the branch had them, and the switch gap in the test (the app was right)
+  ['r6-slowwait', 'fetch,race', s => rep(s, ' own.at=Date.now(); /* q100: an answer', ' /* q100: an answer')], /* the 4 s counted from the tap alone: a lookup still answering (2.5 s a request) dropped, a second lookup, every request twice */
+  ['r6-savedhang', 'keep', s => rep(s, "    if(ok!==null && wxAccepted && wxKey===R.key && !wxOld()){ if(wxBusy===b) wxBusy=null; wxLatest={key:R.key}; return true; } }", '    }')], /* a saved copy in hand ignored after the 4 s: a lookup of its own, hung on a stalled signal */
+  ['r6-nameswitch', 'switch,sync,backup', s => rep(s, "['prowBtn-crewshow','crewShow'],['prowBtn-crewnames','crewNames']].forEach", "['prowBtn-crewshow','crewShow']].forEach")], /* "Show their names" never drawn: off on screen and to VoiceOver while the names are on */
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mut100.log'); fs.mkdirSync(path.dirname(out), { recursive: true });
 for (const [name, only, f] of M) {

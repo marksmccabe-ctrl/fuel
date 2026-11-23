@@ -144,6 +144,9 @@ async function unitsTo(p, u) {
   await p.selectOption('#sUnits', u); await sleep(300); await p.keyboard.press('Escape'); await until(() => p.evaluate(() => !document.getElementById('setSheet').classList.contains('open')), 5000);
   await tab(p, 'plan'); await sleep(600); }
 const crewOf = p => p.evaluate(() => { const U = document.getElementById('planCrew'), T = U && U.cloneNode(true); if (T) T.querySelectorAll('svg').forEach(s => s.remove()); return { on: !!U && !U.hidden && getComputedStyle(U).display !== 'none', ids: U ? [...U.querySelectorAll('.crew-f')].map(li => +li.dataset.i) : [], art: U ? U.querySelectorAll('.crew-a svg').length : 0, names: U ? [...U.querySelectorAll('.crew-n')].map(n => n.textContent) : [], text: T ? T.textContent : '', /* (words outside the drawings: a drawing's own bib number is art) */ hid: U && U.getAttribute('aria-hidden'), room: U && U.dataset.room }; });
+// the two crew switches as shown: aria-pressed and the drawn state (.on), 'true on' or 'false off' (only renderProfileRows sets them: the
+// HTML's own aria-pressed is the off state for the names, so a check before any tap, or one expecting off, cannot tell; review round 6)
+const swOf = p => p.evaluate(() => Object.fromEntries(['crewshow', 'crewnames'].map(k => { const b = document.getElementById('prowBtn-' + k); return [k, b ? b.getAttribute('aria-pressed') + ' ' + (b.classList.contains('on') ? 'on' : 'off') : null]; })));
 // the rule, worked out here: the local date as a day number, five friends from 5 x day, round the 19
 const NAMES = ['Ryan', 'Dustin', 'Chelsea', 'Bobby', 'Anne', 'Heather', 'Luke', 'Mark', 'Maria', 'Rob', 'Marc', 'Katie', 'Bentley', 'John', 'Steve', 'Julia', 'Chiara', 'Rob', 'Paul'];
 const fiveOf = (y, m, d) => { const day = Date.UTC(y, m - 1, d) / 864e5, s = ((day * 5) % 19 + 19) % 19; return [0, 1, 2, 3, 4].map(k => (s + k) % 19); };
@@ -317,6 +320,14 @@ section('fetch', async () => {
     { const o = await outQuiet(p); ok(o.quiet, '100.2, item 76: during the box\'s lookup no "Looking up the forecast" note under the Plan form (#wxOut hidden)', o); }
     await p.click('#calcBtn'); await until(() => p.evaluate(() => getComputedStyle(document.getElementById('results')).display !== 'none'), 20000); await sleep(500);
     const a = kinds(await reqs(p)); ok(a.geo === 1 && a.fc === 1, '100.2: a Crunch during the box\'s lookup waits for it: one place search and one forecast in all', a); await x.close(); }
+  /* a Crunch during the box's slow lookup (review round 6): each Open-Meteo request 2.5 s, Crunch 0.5 s after the box's place search: the
+     lookup is still answering (no hung one), so Crunch waits for it: one request of each kind, results about 4.5 s after the tap (dropping it
+     at 4 s from the tap, its forecast half a second off, made a second lookup: 9.4 s, every request twice; main 5.4 s) */
+  { const slow = (r, u) => /open-meteo/.test(u) ? new Promise(res => setTimeout(() => res(WX(r, u)), 2500)) : null;
+    const x = await openH({ forecast: false, route: slow, settle: 100 }), p = x.p; await until(async () => kinds(await reqs(p)).geo >= 1, 5000);
+    const g = await p.evaluate(() => (window.__q100t.find(([u]) => /geocoding/.test(u)) || [0, 0])[1]); await p.waitForFunction(g => performance.now() >= g + 500, g, { timeout: 5000 });
+    const t0 = Date.now(); await p.click('#calcBtn'); const done = await shown(p), ms = Date.now() - t0, k = kinds(await reqs(p)), src = await p.evaluate(() => window.__q100.wxLast && window.__q100.wxLast.place);
+    ok(!!done && k.geo === 1 && k.fc === 1 && k.nws === 1 && ms < 6500 && !!src, '100.2: each Open-Meteo request taking 2.5 s, Crunch tapped 0.5 s after the place search of the box: it waits for that lookup, still answering (one request of each kind), and shows results with its forecast in ' + ms + ' ms (under 6.5 s; review round 6)', { ms, k, src }); await x.close(); }
   // a Crunch during the box's failing lookup: Crunch tries again itself and says so (check round 1)
   { const bad = (r, u) => /open-meteo/.test(u) ? new Promise(res => setTimeout(() => res(r.fulfill({ status: 500, body: 'down' })), 1500)) : null;
     const x = await openH({ forecast: false, route: bad, settle: 100 }), p = x.p; await until(async () => (await reqs(p)).length > 0, 5000); await p.click('#calcBtn'); await shown(p); await sleep(300);
@@ -387,6 +398,21 @@ section('keep', async () => {
     await p.evaluate(() => { const T = window.__q100.skyBoxFetch.t || {}; Object.keys(T).forEach(k => { T[k] = Date.now() - (10 * 60e3 + 1000); }); }); await tab(p, 'journal'); await tab(p, 'plan');
     const L = await until(async () => (await boxOf(p)).wx === 'live', 8000), c = kinds(await reqs(p)), B = await boxOf(p), st = await p.evaluate(() => { const Q = window.__q100; return { stale: (Q.wxLast && Q.wxLast.stale) || '', same: Q.wxKey === (Q.wxReq() || {}).key }; });
     ok(s0 && b.all === a.all && !!L && !!B.sky && LINE.test(B.line || '') && c.geo === b.geo + 1 && c.fc === b.fc + 1 && !st.stale && st.same, '100.2: a saved forecast taken in by Crunch on a failing network, the network back, the sport changed (the same key): none asked within the 10 minutes, then one lookup, the box live and the saved copy replaced (review round 3)', { s0, a, b, c, st, B: [B.wx, B.line] });
+    await x.close(); }
+  /* (review round 6) the same saved copy in hand, the signal back but stalled, the sport changed and the box's lookup out (its 10 minutes
+     over): Crunch on the run waits on that lookup 4 s at most, then takes the saved copy as main does (main: at once, no request), with no
+     lookup of its own to hang on (it made one: "Crunching..." until the browser gave up); the box's lookup answering later writes nothing
+     under those results (the saved copy and the feels-like kept) */
+  { let mode = 'live'; const held = []; const x = await openH({ forecast: false, route: (r, u) => !/open-meteo|weather\.gov/.test(u) ? null : mode === 'live' ? WX(r, u) : mode === 'hang' ? new Promise(res => held.push(() => res(WX(r, u)))) : r.abort() }), p = x.p;
+    await ready(p, 'live', null); mode = 'fail'; await reload(p); await until(async () => (await reqs(p)).length > 0, 8000); await sleep(1000); await ready(p, 'none', 'clouds');
+    await crunch(p); const s0 = await p.evaluate(() => (window.__q100.wxLast || {}).stale || '');
+    mode = 'hang'; await p.evaluate(() => dispatchEvent(new Event('online'))); await p.click('#sportBtn'); await p.click('#sportMenu [data-sport=run]'); await sleep(800);
+    await p.evaluate(() => { const T = window.__q100.skyBoxFetch.t || {}; Object.keys(T).forEach(k => { T[k] = Date.now() - (10 * 60e3 + 1000); }); }); const a = kinds(await reqs(p)); await tab(p, 'journal'); await tab(p, 'plan');
+    await until(async () => kinds(await reqs(p)).geo > a.geo, 5000); await sleep(1000); const b = kinds(await reqs(p)), tf = await p.evaluate(() => document.getElementById('tempF').value);
+    const t0 = Date.now(); await p.click('#calcBtn'); const done = await until(() => p.evaluate(() => !document.getElementById('runResults').hidden && !document.getElementById('calcBtn').disabled), 12000, 50), ms = Date.now() - t0;
+    const c = kinds(await reqs(p)), card = await p.evaluate(() => document.getElementById('runResults').textContent.replace(/\s+/g, ' '));
+    mode = 'live'; held.splice(0).forEach(f => f()); await sleep(2500); const d = kinds(await reqs(p)), st = await p.evaluate(() => ({ stale: (window.__q100.wxLast || {}).stale || '', tf: document.getElementById('tempF').value }));
+    ok(!!s0 && b.geo === a.geo + 1 && !!done && ms < 4800 && c.all === b.all && /Saved forecast/.test(card) && d.fc === c.fc + 1 && !!st.stale && st.tf === tf, '100.2: a saved forecast in hand, the signal back but stalled, the sport changed (the same key), the lookup of the box out: Crunch on the run takes the saved copy in ' + ms + ' ms (under 4.8 s; no lookup of its own), and that lookup answering later leaves it (review round 6)', { s0, a, b, c, d, ms, st, tf, card: card.slice(0, 160) });
     await x.close(); }
 });
 
@@ -637,12 +663,13 @@ section('switch', async () => {
   ok(s.names && s.names.in && s.names.label === 'Show their names' && s.names.pressed === 'false' && s.names.h >= 44, '100.5: Settings › fred world › "Show their names", off', s.names);
   ok(!s.stored.length && !s.def.length, '100.5: neither is stored, nor in DEFAULT_SETTINGS, until tapped (as settings.worldMotion)', s);
   await p.click('#prowBtn-crewnames'); await settle(p, 150); await p.click('#prowBtn-crewshow'); await settle(p, 150);
-  const a = await p.evaluate(() => JSON.parse(localStorage.getItem('bluebird.settings.v2'))); await tab(p, 'plan'); const c = await crewOf(p);
+  const a = await p.evaluate(() => JSON.parse(localStorage.getItem('bluebird.settings.v2'))), w1 = await swOf(p); await tab(p, 'plan'); const c = await crewOf(p);
   ok(a.crewNames === true && a.crewShow === false && !c.on && c.art === 0, '100.5: a tap stores settings.crewNames / crewShow; the crew off: none shown, no art kept', { st: [a.crewShow, a.crewNames], c });
-  await toSettings(p); await p.click('#prowBtn-crewshow'); await settle(p, 150); await tab(p, 'plan'); await until(async () => (await crewOf(p)).art === 5); const d = await crewOf(p);
-  ok(d.on && d.names.length === 5, '100.5: on again (with the names on): the crew shows with its names', d);
-  await reload(p); await until(async () => (await crewOf(p)).art === 5); const e = await crewOf(p), st = await p.evaluate(() => JSON.parse(localStorage.getItem('bluebird.settings.v2')));
-  ok(e.on && e.names.length === 5 && st.crewShow === true && st.crewNames === true, 'switch: a reload keeps them', { e, st: [st.crewShow, st.crewNames] });
+  ok(w1.crewnames === 'true on' && w1.crewshow === 'false off', '100.5: each switch shows its new state after the tap ("Show their names" on, "Show the crew" off: aria-pressed and drawn; review round 6)', w1);
+  await toSettings(p); await p.click('#prowBtn-crewshow'); await settle(p, 150); const w2 = await swOf(p); await tab(p, 'plan'); await until(async () => (await crewOf(p)).art === 5); const d = await crewOf(p);
+  ok(d.on && d.names.length === 5 && w2.crewshow === 'true on' && w2.crewnames === 'true on', '100.5: on again (with the names on): the crew shows with its names, both switches shown on', { d, w2 });
+  await reload(p); await until(async () => (await crewOf(p)).art === 5); const e = await crewOf(p), st = await p.evaluate(() => JSON.parse(localStorage.getItem('bluebird.settings.v2'))); await toSettings(p); const w3 = await swOf(p);
+  ok(e.on && e.names.length === 5 && st.crewShow === true && st.crewNames === true && w3.crewshow === 'true on' && w3.crewnames === 'true on', 'switch: a reload keeps them (both switches shown on)', { e, st: [st.crewShow, st.crewNames], w3 });
   await x.close();
 });
 
@@ -688,10 +715,12 @@ section('sync', async () => {
   const got = await nudge(() => B.p.evaluate(() => window.__q100.settings.crewNames === true));
   await sleep(600); const bOk = await crewOf(B.p), kept = await B.p.evaluate(() => { const now = [...document.querySelectorAll('#planCrew .crew-a>svg')]; return now.length === 5 && now.every((s, i) => s === window.__q100crew[i]); });
   ok(!!got && bOk.names.length === 5 && kept, 'QA: the crew switches sync: B (on Plan) shows the names A turned on as soon as they arrive, each friend kept (the same drawings: a name is no new look; review round 3)', { bOk, kept });
+  { const w = await swOf(B.p); ok(w.crewnames === 'true on' && w.crewshow === 'true on', 'sync: "Show their names" on B shows on once the value from A arrives (review round 6)', w); }
   await toSettings(B.p); await B.p.click('#prowBtn-crewshow'); await settle(B.p, 200);
   await A.p.evaluate(() => document.querySelector('nav.tabs button[data-view=plan]').click()); await settle(A.p, 200);
   const gotA = await nudge(() => A.p.evaluate(() => window.__q100.settings.crewShow === false)); await sleep(600); const aOff = await crewOf(A.p);
   ok(!!gotA && !aOff.on && aOff.art === 0 && (doc().settings || {}).crewShow === false && typeof (doc().settingsAt || {}).crewShow === 'number', 'QA: B turns the crew off: A\'s crew goes as soon as it arrives (settings.crewShow false in the cloud, its own stamp)', aOff);
+  { const w = await swOf(A.p); ok(w.crewshow === 'false off' && w.crewnames === 'true on', 'sync: "Show the crew" on A shows off once the value from B arrives, the names switch still on (review round 6)', w); }
   await A.close(); await B.close();
 });
 
@@ -705,7 +734,7 @@ section('backup', async () => {
   const x = await openH({ settings: { crewNames: true } }), ex = await x.p.evaluate(() => JSON.parse(JSON.stringify(window.__q100.backupData()))); await x.close();
   ok(ex.settings && ex.settings.crewNames === true, 'backup: a backup made here carries the switches (backupData().settings.crewNames)', ex.settings && ex.settings.crewNames);
   const y = await openH(), p = y.p; await restore(p, ex); await sleep(400); const r1 = await crewOf(p); /* (before the Plan tab: the restore itself redraws the crew) */
-  ok(r1.names.length === 5, 'backup: restored on a fresh page, the names show (the restore redraws the crew)', r1); await tab(p, 'plan');
+  const w1 = await swOf(p); ok(r1.names.length === 5 && w1.crewnames === 'true on', 'backup: restored on a fresh page (names off), the names show (the restore redraws the crew) and their switch shows on (review round 6)', { r1, w1 }); await tab(p, 'plan');
   const old = JSON.parse(JSON.stringify(ex)); delete old.settings.crewNames; delete old.settings.crewShow; await restore(p, old); await tab(p, 'plan'); await sleep(300);
   const c = await crewOf(p), st = await p.evaluate(() => window.__q100.settings), ls = await p.evaluate(() => JSON.parse(localStorage.getItem('bluebird.settings.v2')));
   ok(c.on && c.names.length === 5 && st.crewNames === true && ls.crewNames === true && !('crewShow' in st), 'backup: a backup without them keeps this device\'s (names on stay on, stored; as the rider, birthday and gender)', { c, st: [st.crewShow, st.crewNames], ls: ls.crewNames });
@@ -718,7 +747,8 @@ section('backup', async () => {
   for (const [k, mine] of [['crewShow', {}], ['crewNames', { crewNames: true }]]) {
     const s = await openH({ settings: { [k]: false } }), e = await s.p.evaluate(() => JSON.parse(JSON.stringify(window.__q100.backupData()))); await s.close();
     ok(e.settings && e.settings[k] === false, 'backup: a backup made with ' + k + ' off carries it (backupData().settings.' + k + ' false)', e.settings && e.settings[k]);
-    const u = await openH({ settings: mine }), q = u.p; await until(async () => (await crewOf(q)).art === 5); await restore(q, e); await tab(q, 'plan'); await sleep(300);
+    const u = await openH({ settings: mine }), q = u.p; await until(async () => (await crewOf(q)).art === 5); const w0 = await swOf(q);
+    ok(w0[k.toLowerCase()] === 'true on', 'backup: before that restore the ' + k + ' switch of the device shows on (so the off after it comes from the file; review round 6)', w0); await restore(q, e); await tab(q, 'plan'); await sleep(300);
     const c = await crewOf(q), r = await q.evaluate(k => { const b = document.getElementById(k === 'crewShow' ? 'prowBtn-crewshow' : 'prowBtn-crewnames'); return { st: window.__q100.settings[k], ls: JSON.parse(localStorage.getItem('bluebird.settings.v2'))[k], pressed: b && b.getAttribute('aria-pressed') }; }, k);
     ok(r.st === false && r.ls === false && r.pressed === 'false' && (k === 'crewShow' ? !c.on && c.art === 0 : c.on && c.names.length === 0), 'backup: one with ' + k + ' off restored on a device with it on: off (' + (k === 'crewShow' ? 'no crew, no art' : 'no names') + ', stored, the switch off; review round 3)', { c: [c.on, c.art, c.names.length], r });
     await u.close(); }
