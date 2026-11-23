@@ -2704,3 +2704,52 @@
     scope from Mark) before merge, whether worldMotion should also survive an old backup, the weather.gov limit for Crunch (a change
     from main); and now a Crunch tapped while the box's lookup is out with a saved copy in hand waits for that lookup (a small change
     to main's Crunch in that one state, as it already waits on the box's lookup otherwise).
+- Review round 4 (the reviewers on c894d7b: 3 confirmed findings, 2 in the app (a11y 1, perf 1), 1 in q100 (tests lens); each
+  reproduced first on the unfixed page (probe100/rv4/repro.mjs, repro-before.log; the new checks on probe100/rv4/base/null.html, sha1
+  5a8ace92: `FAIL 11`, rv4/base-new.log); all fixed; cache still v124, no bundle change).
+  - App (wt-q100 index.html, e7befd9):
+    - Crunch landed past the results' top in WebKit (high, a11y): the box sits above the results and only the MutationObserver hid it,
+      a microtask after the synchronous scrollIntoView in the Crunch handler, runCrunchResult and renderClothingOnly. WebKit has no
+      scroll anchoring (CSS.supports('overflow-anchor','auto') false), so everything moved up by the box's height after the scroll: the
+      results' top 118 px under the header at 390 px (184 at 320 px, 200%), the run's headline panel entirely under it; main lands 13 px
+      below the header. Chromium's anchoring hid it from every audit. Now the observer's body is skySync(), also called in render,
+      runCrunchResult and renderClothingOnly the moment the results show, before the scroll is measured (an opened saved plan goes
+      through the Crunch handler, so it is covered); the observer stays for the paths that do not scroll. WebKit: ride, run and
+      Clothing land at 13 px, scrollY 467 / 802 / 505, as main (rv4/repro-after.log).
+    - The crew left out on every Face ID iPhone used as the installed app (high, perf): viewport-fit=cover and the standalone manifest
+      give env(safe-area-inset-bottom) 34 px; nav.tabs pads by it (57 -> 91 px) but html's own inset padding sits inside its 100%
+      height and adds no scroll room, so crewFit read 5 px (1-5 at larger text) and hid the crew; the build's 33-46 px were all taken
+      at an inset of 0. Now .crew's bottom margin is env(safe-area-inset-bottom,0px): only while it shows (hidden is display none, the
+      page then as main's), counted by crewFit (it unhides before measuring). With the real env() through CDP: 35-39 px, shown.
+  - Kit (q100/q100.test.mjs, 289 checks, was 276):
+    - land (new section): WebKit (playwright's webkit, the kit's open() with {browser}), dpr 2, a fresh Crunch on the ride, the run, Plan
+      for Clothing (a full plan, render), the Clothing-only results (athlete A with the library emptied: renderClothingOnly,
+      data-wear-only 1) and the ride at 320 x 568 / 200%: the box shown before, out after, the results' top within 2 px of main's under
+      the header (main opened the same way; 13 at every size). WebKit's "Not allowed to load local resource" console lines for a file
+      page's own files are dropped from that section's errors only. The unfixed page: -118 x4, -184.
+    - room: the home indicator's inset through CDP Emulation.setSafeAreaInsetsOverride {top 47, bottom 34} and a reload, at 375 x 812,
+      390 x 844, 430 x 932 (17 px text), 375 and 430 (21 px), and 390 / 17 px on the sign-in page: env computes 34px (never vacuous),
+      the tab bar 88 px or more, the crew shown and 8 px or more clear of it, the footer clear, no sideways scroll (35-39 px). Unfixed:
+      room 5, 5, 5, 4, 1, 5, left out.
+    - looks (the units gap: tempDisp is plain rounding in US units, so a box that skipped it passed all 276; the reviewers' mutant
+      passed `OK (276 checks)`, rv4-tests/logs/metric.log): opened in metric with ?sky=sun the number is the US reading in C (16°, not
+      61°) and the weather card's after Crunch; on a US page with the box live, Units to metric and back through Settings › Advanced ›
+      Units (q98's steps, unitsTo): 61°, 16°, 61°, no new place search or forecast. The app was already right here.
+  - mut100.mjs gains 7 mutants (rv4-*): land (the three skySync calls gone: the bug as it was), landride, landrun, landwear (each call
+    alone), inset (the margin back to 0), metric (Math.round for tempDisp on the box's deg= line), unitsstale (the line written only for
+    a new forecast object); 102 in all.
+  - Runs on fred100/null.html (q100-front e7befd9, v124, sha1 1721fc38), main page fred/null.html (8c66750), Mac Studio, one at a time
+    (probe100/rv4: runs.sh, logs and summary.txt in rv4/runs):
+    - q100 (main second) `OK: item 100: Front page, the sky card and the crew (289 checks)` (379 s).
+    - mut100, the 7 new and the 3 on changed text (band and nowrap patch the .crew rule; boxstays skyShown, which skySync calls): all
+      FAIL (244 s; rv4/w/mut100.log): rv4-land 5, rv4-landride 3 (the ride, Plan for Clothing, 320 px), rv4-landrun 1, rv4-landwear 1,
+      rv4-inset 6, rv4-metric 2 (the metric open and the switch), rv4-unitsstale 1 (61°, 61°, 61°), band 1, nowrap 1, boxstays 3. No
+      other mutant patches a changed line, so the full 95 were not rerun.
+    - q99 (main second) `OK: item 99: Your rider, and the rider on the Closet card (8650 checks)` (961 s); q98 in parts `OK (253
+      checks)`, `OK (49)`, `OK (21)`; q97 `OK: item 97: fred world, the bundle, motion plumbing and switch (128 checks)`.
+    - motion `OK: motion audit: Reduce Motion still on 14 screens ... (27 checks)`; budgets `OK: fred world budgets: 15 screens (15 with
+      fred world art) ... (host reference 1.15-1.55 ms, quiet at most 1.8) ... (62 checks)`, no host busy line outside its self-tests;
+      smoke `OK (14 checks)`; contrast `OK: contrast AA on 14 screens ... (54 checks)`; layout 320 px and 390 px on the new screens `OK`;
+      inventory `OK: inventory nothing removed (7 checks)`; npm test in wt-q100 1829 tests, 1782 pass, 0 fail, 47 todo; every inline
+      script compiles (probe100/rv3/syn/syn.mjs: 5 scripts OK).
+  - Open as before (round 3's list, unchanged).
