@@ -9,6 +9,7 @@ const SRC = process.env.MUT_SRC || '/Users/markmccabe/code/fuel-work/fred100/nul
 const KIT = path.dirname(new URL(import.meta.url).pathname), MAIN = process.env.MUT_MAIN || '/Users/markmccabe/code/fuel-work/fred/null.html';
 const src = fs.readFileSync(SRC, 'utf8'), sw = fs.readFileSync(path.join(path.dirname(SRC), 'sw.js'), 'utf8');
 const rep = (s, a, b) => { const n = s.split(a).length - 1; if (n !== 1) throw new Error('mutant: ' + JSON.stringify(a.slice(0, 80)) + ' found ' + n + ' times'); return s.replace(a, () => b); };
+const R7_ARIA = "  if(names){ U.removeAttribute('aria-hidden'); U.setAttribute('aria-label', 'The crew'); } else { U.setAttribute('aria-hidden', 'true'); U.removeAttribute('aria-label'); }\n";
 const css = (s, rules) => rep(s, '/* }} q100 front */', rules + '\n/* }} q100 front */');
 const M = [
   // the cache
@@ -134,6 +135,8 @@ const M = [
   ['r6-slowwait', 'fetch,race', s => rep(s, ' own.at=Date.now(); /* q100: an answer', ' /* q100: an answer')], /* the 4 s counted from the tap alone: a lookup still answering (2.5 s a request) dropped, a second lookup, every request twice */
   ['r6-savedhang', 'keep', s => rep(s, "    if(ok!==null && wxAccepted && wxKey===R.key && !wxOld()){ if(wxBusy===b) wxBusy=null; wxLatest={key:R.key}; return true; } }", '    }')], /* a saved copy in hand ignored after the 4 s: a lookup of its own, hung on a stalled signal */
   ['r6-nameswitch', 'switch,sync,backup', s => rep(s, "['prowBtn-crewshow','crewShow'],['prowBtn-crewnames','crewNames']].forEach", "['prowBtn-crewshow','crewShow']].forEach")], /* "Show their names" never drawn: off on screen and to VoiceOver while the names are on */
+  // review round 7: the names list's accessibility gap in the test (the app was right)
+  ['r7-namesaria', 'switch,motion,sync,backup', s => rep(rep(s, R7_ARIA, ''), "U.textContent=''; U.dataset.k=k; /* a new day: its five */", "U.textContent=''; U.dataset.k=k; /* a new day: its five */ " + R7_ARIA.trim())], /* the list's aria state set only when the five are built (a new day, the crew on): names turned on by a tap, a sync or a restore show, but the list stays aria-hidden for VoiceOver until a reload (and names off leave it a list of empty items) */
 ];
 const pick = (process.argv[2] || '').split(',').filter(Boolean), out = path.join(BASE, 'w', 'mut100.log'); fs.mkdirSync(path.dirname(out), { recursive: true });
 for (const [name, only, f] of M) {

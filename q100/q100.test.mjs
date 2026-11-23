@@ -76,8 +76,9 @@
 //   names    100.5, QA: names on: the first name under each friend (CREW_NAMES order, the five of the day), real text in the accessibility
 //            tree, never cut, broken over two lines or overlapping (320 / 390 / 430 px, 100 / 150 / 200% text); the accessibility tree reads
 //            exactly a list "The crew" of the five names, each drawing aria-hidden; names off: no name in the strip, the page's text or the
-//            accessibility tree
-//   sync     QA: two devices (the q91 Firebase stand-in): A turns the names on, B gets them (one settingsAt stamp each, crewNames); B turns
+//            accessibility tree. The same list read (a11yCrew) after each names change made with the page open: the tap (switch, motion),
+//            the sync (B), the restores (backup), names on and off (review round 7)
+//   sync    QA: two devices (the q91 Firebase stand-in): A turns the names on, B gets them (one settingsAt stamp each, crewNames); B turns
 //            the crew off, A's crew goes; the Plan footer's Privacy link shows where sign-in is configured, not covered; B's five keep their
 //            drawings when the names arrive (review round 3)
 //   backup   a backup carries the switches and a restore brings them; one without them keeps this device's (names on stay on, the crew
@@ -150,6 +151,11 @@ const swOf = p => p.evaluate(() => Object.fromEntries(['crewshow', 'crewnames'].
 // the rule, worked out here: the local date as a day number, five friends from 5 x day, round the 19
 const NAMES = ['Ryan', 'Dustin', 'Chelsea', 'Bobby', 'Anne', 'Heather', 'Luke', 'Mark', 'Maria', 'Rob', 'Marc', 'Katie', 'Bentley', 'John', 'Steve', 'Julia', 'Chiara', 'Rob', 'Paul'];
 const fiveOf = (y, m, d) => { const day = Date.UTC(y, m - 1, d) / 864e5, s = ((day * 5) % 19 + 19) % 19; return [0, 1, 2, 3, 4].map(k => (s + k) % 19); };
+/* the list as VoiceOver gets it, read with Plan showing (a hidden view reads ''): names on, exactly a list "The crew" of the day's five (real
+   text); off, nothing (aria-hidden, no label). Read after each names change made with the page open (a tap, a sync, a restore: the day's
+   five kept, so only crewRender's aria line sets it), not only at load (review round 7) */
+const a11yCrew = async (p, on) => { const snap = (await p.locator('#planCrew').ariaSnapshot()).trim(), a = await p.evaluate(() => { const U = document.getElementById('planCrew'); return { hid: U.getAttribute('aria-hidden'), label: U.getAttribute('aria-label') }; });
+  return Object.assign({ ok: on ? snap === ['- list "The crew":', ...fiveOf(2026, 10, 29).map(i => '  - listitem: ' + NAMES[i])].join('\n') && a.hid === null && a.label === 'The crew' : snap === '' && a.hid === 'true' && a.label === null, snap }, a); };
 const sheet = async (p, f) => { await p.click('#locRow'); await until(() => p.evaluate(() => document.getElementById('planSheet').classList.contains('open'))); await f(); await p.click('#psAct'); await until(() => p.evaluate(() => !document.getElementById('planSheet').classList.contains('open'))); };
 const setField = async (p, sel, v) => { await p.fill(sel, v); await p.dispatchEvent(sel, 'change'); };
 const setPlace = async (p, place) => { await p.click('#locRow'); await until(() => p.evaluate(() => document.getElementById('planSheet').classList.contains('open'))); await setField(p, '#wxLoc', place); await sleep(300); await p.keyboard.press('Escape').catch(() => {}); /* (the suggestions shut) */
@@ -568,7 +574,8 @@ section('motion', async () => {
     await toSettings(p); await p.click('#prowBtn-crewnames'); await settle(p, 150); await tab(p, 'plan');
     const N = await p.evaluate(S => new Promise(res => { let go = 0, run = 0; const V = document.getElementById('view-plan'), t0 = performance.now(); const look = () => { go = Math.max(go, V.querySelectorAll('.fwm-go').length); run = Math.max(run, document.getAnimations().filter(a => a.playState === 'running' && /^fw-/.test(a.animationName || '') && a.effect && V.contains(a.effect.target)).length);
       if (performance.now() - t0 < 1500) setTimeout(look, 50); else { const now = [...document.querySelectorAll(S)]; res({ go, run, names: document.querySelectorAll('#planCrew .crew-n').length, same: now.length === 6 && now.every((s, i) => s === window.__q100svg[i]) }); } }; look(); }), SPOTS);
-    ok(N.go === 0 && N.run === 0 && N.same && N.names === (on ? 5 : 0), 'round rule a: "Show their names" turned ' + (on ? 'on' : 'off') + ': the names ' + (on ? 'under the friends' : 'gone') + ', nothing moves again and each spot keeps its drawing (the same svg nodes; review round 3)', N); }
+    ok(N.go === 0 && N.run === 0 && N.same && N.names === (on ? 5 : 0), 'round rule a: "Show their names" turned ' + (on ? 'on' : 'off') + ': the names ' + (on ? 'under the friends' : 'gone') + ', nothing moves again and each spot keeps its drawing (the same svg nodes; review round 3)', N);
+    const Y = await a11yCrew(p, on); ok(Y.ok, 'names: turned ' + (on ? 'on' : 'off') + ' with the page open, the accessibility tree ' + (on ? 'reads the list "The crew" of the five names' : 'reads no list and no name (aria-hidden, no label)') + ' at once, no reload (review round 7)', Y); }
   await x.close();
   for (const [what, o] of [['Reduce Motion', { motion: false }], ['Animate the world off', { motion: true, settings: { worldMotion: false } }]]) {
     const y = await openH(Object.assign({ query: '?sky=sun', width: 430, height: 932, settle: 50 }, o)); const s = await y.p.evaluate(() => new Promise(res => { let go = 0, run = 0, n = 0; const t0 = performance.now();
@@ -662,12 +669,15 @@ section('switch', async () => {
   ok(s.show && s.show.in && s.show.label === 'Show the crew' && s.show.pressed === 'true' && s.show.h >= 44, '100.5: Settings › fred world › "Show the crew", on', s.show);
   ok(s.names && s.names.in && s.names.label === 'Show their names' && s.names.pressed === 'false' && s.names.h >= 44, '100.5: Settings › fred world › "Show their names", off', s.names);
   ok(!s.stored.length && !s.def.length, '100.5: neither is stored, nor in DEFAULT_SETTINGS, until tapped (as settings.worldMotion)', s);
-  await p.click('#prowBtn-crewnames'); await settle(p, 150); await p.click('#prowBtn-crewshow'); await settle(p, 150);
+  await p.click('#prowBtn-crewnames'); await settle(p, 150); await tab(p, 'plan'); /* (the crew on and built: only the aria line can change the list for VoiceOver) */
+  { const Y = await a11yCrew(p, true); ok(Y.ok, 'switch: "Show their names" tapped on, the crew already shown: the accessibility tree reads the list "The crew" of the five names (review round 7)', Y); }
+  await toSettings(p); await p.click('#prowBtn-crewshow'); await settle(p, 150);
   const a = await p.evaluate(() => JSON.parse(localStorage.getItem('bluebird.settings.v2'))), w1 = await swOf(p); await tab(p, 'plan'); const c = await crewOf(p);
   ok(a.crewNames === true && a.crewShow === false && !c.on && c.art === 0, '100.5: a tap stores settings.crewNames / crewShow; the crew off: none shown, no art kept', { st: [a.crewShow, a.crewNames], c });
   ok(w1.crewnames === 'true on' && w1.crewshow === 'false off', '100.5: each switch shows its new state after the tap ("Show their names" on, "Show the crew" off: aria-pressed and drawn; review round 6)', w1);
   await toSettings(p); await p.click('#prowBtn-crewshow'); await settle(p, 150); const w2 = await swOf(p); await tab(p, 'plan'); await until(async () => (await crewOf(p)).art === 5); const d = await crewOf(p);
   ok(d.on && d.names.length === 5 && w2.crewshow === 'true on' && w2.crewnames === 'true on', '100.5: on again (with the names on): the crew shows with its names, both switches shown on', { d, w2 });
+  { const Y = await a11yCrew(p, true); ok(Y.ok, 'switch: on again (with the names on): the accessibility tree reads the list "The crew" of the five names (review round 7)', Y); }
   await reload(p); await until(async () => (await crewOf(p)).art === 5); const e = await crewOf(p), st = await p.evaluate(() => JSON.parse(localStorage.getItem('bluebird.settings.v2'))); await toSettings(p); const w3 = await swOf(p);
   ok(e.on && e.names.length === 5 && st.crewShow === true && st.crewNames === true && w3.crewshow === 'true on' && w3.crewnames === 'true on', 'switch: a reload keeps them (both switches shown on)', { e, st: [st.crewShow, st.crewNames], w3 });
   await x.close();
@@ -716,6 +726,7 @@ section('sync', async () => {
   await sleep(600); const bOk = await crewOf(B.p), kept = await B.p.evaluate(() => { const now = [...document.querySelectorAll('#planCrew .crew-a>svg')]; return now.length === 5 && now.every((s, i) => s === window.__q100crew[i]); });
   ok(!!got && bOk.names.length === 5 && kept, 'QA: the crew switches sync: B (on Plan) shows the names A turned on as soon as they arrive, each friend kept (the same drawings: a name is no new look; review round 3)', { bOk, kept });
   { const w = await swOf(B.p); ok(w.crewnames === 'true on' && w.crewshow === 'true on', 'sync: "Show their names" on B shows on once the value from A arrives (review round 6)', w); }
+  { const Y = await a11yCrew(B.p, true); ok(Y.ok, 'sync: on B (on Plan) the names from A reach the accessibility tree too: the list "The crew" of the five names (review round 7)', Y); }
   await toSettings(B.p); await B.p.click('#prowBtn-crewshow'); await settle(B.p, 200);
   await A.p.evaluate(() => document.querySelector('nav.tabs button[data-view=plan]').click()); await settle(A.p, 200);
   const gotA = await nudge(() => A.p.evaluate(() => window.__q100.settings.crewShow === false)); await sleep(600); const aOff = await crewOf(A.p);
@@ -735,6 +746,7 @@ section('backup', async () => {
   ok(ex.settings && ex.settings.crewNames === true, 'backup: a backup made here carries the switches (backupData().settings.crewNames)', ex.settings && ex.settings.crewNames);
   const y = await openH(), p = y.p; await restore(p, ex); await sleep(400); const r1 = await crewOf(p); /* (before the Plan tab: the restore itself redraws the crew) */
   const w1 = await swOf(p); ok(r1.names.length === 5 && w1.crewnames === 'true on', 'backup: restored on a fresh page (names off), the names show (the restore redraws the crew) and their switch shows on (review round 6)', { r1, w1 }); await tab(p, 'plan');
+  { const Y = await a11yCrew(p, true); ok(Y.ok, 'backup: that restore (names on, over names off) reaches the accessibility tree: the list "The crew" of the five names (review round 7)', Y); }
   const old = JSON.parse(JSON.stringify(ex)); delete old.settings.crewNames; delete old.settings.crewShow; await restore(p, old); await tab(p, 'plan'); await sleep(300);
   const c = await crewOf(p), st = await p.evaluate(() => window.__q100.settings), ls = await p.evaluate(() => JSON.parse(localStorage.getItem('bluebird.settings.v2')));
   ok(c.on && c.names.length === 5 && st.crewNames === true && ls.crewNames === true && !('crewShow' in st), 'backup: a backup without them keeps this device\'s (names on stay on, stored; as the rider, birthday and gender)', { c, st: [st.crewShow, st.crewNames], ls: ls.crewNames });
@@ -751,6 +763,7 @@ section('backup', async () => {
     ok(w0[k.toLowerCase()] === 'true on', 'backup: before that restore the ' + k + ' switch of the device shows on (so the off after it comes from the file; review round 6)', w0); await restore(q, e); await tab(q, 'plan'); await sleep(300);
     const c = await crewOf(q), r = await q.evaluate(k => { const b = document.getElementById(k === 'crewShow' ? 'prowBtn-crewshow' : 'prowBtn-crewnames'); return { st: window.__q100.settings[k], ls: JSON.parse(localStorage.getItem('bluebird.settings.v2'))[k], pressed: b && b.getAttribute('aria-pressed') }; }, k);
     ok(r.st === false && r.ls === false && r.pressed === 'false' && (k === 'crewShow' ? !c.on && c.art === 0 : c.on && c.names.length === 0), 'backup: one with ' + k + ' off restored on a device with it on: off (' + (k === 'crewShow' ? 'no crew, no art' : 'no names') + ', stored, the switch off; review round 3)', { c: [c.on, c.art, c.names.length], r });
+    if (k === 'crewNames') { const Y = await a11yCrew(q, false); ok(Y.ok, 'backup: that restore (names off, over names on) takes them from the accessibility tree too: no list, no name (aria-hidden, no label; review round 7)', Y); }
     await u.close(); }
 });
 
