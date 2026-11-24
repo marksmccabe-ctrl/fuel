@@ -111,7 +111,9 @@ const LATER = [{ item: 98, has: /\nfunction wxFred\(/, spots: ['.rwx-fred'], fns
   // and draw it (each reads FW's rider options or draws with fwMount)
   { item: 99, has: /\nfunction riderStrip\(/, spots: ['#rRider', '.av-r', '#rdFig'], fns: ['riderNorm', 'riderIds', 'riderStrip', 'riderAv', 'rdOpts', 'rdName', 'rdSwatch', 'rdColour', 'riderRowV', 'riderSheet', 'riderSheetSync'] },
   // item 100: the Plan's sky box (its fred is wxFred's, item 98's) and the crew after the footer (crewRender mounts five friends)
-  { item: 100, has: /\nfunction crewRender\(/, spots: ['#planSky', '#planCrew'], fns: ['crewRender'] }].filter(l => l.has.test(SRC));
+  { item: 100, has: /\nfunction crewRender\(/, spots: ['#planSky', '#planCrew'], fns: ['crewRender'] },
+  // item 101: the holiday looks (no spot of its own: fred's spots are items 98 and 100's, wxFred dresses him); holAt reads FW.HOLIDAYS
+  { item: 101, has: /\nfunction holAt\(/, spots: [], fns: ['holAt'] }].filter(l => l.has.test(SRC));
 const LATER_SPOTS = LATER.flatMap(l => l.spots), LATER_FNS = LATER.flatMap(l => l.fns);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function until(fn, ms = 15000, step = 100) { const t = Date.now(); let v; while (Date.now() - t < ms) { try { v = await fn(); } catch (e) { v = null; } if (v) return v; await sleep(step); } return v; }
@@ -302,8 +304,8 @@ section('switch', async () => {
     const r = b && b.getBoundingClientRect(), k = b && b.querySelector(':scope > .gsw-k[aria-hidden="true"]');
     return { title: s && s.textContent.trim(), sp: sec && sec.classList.contains('sp-both'), gs: sec && sec.classList.contains('gs'), rows: rows.map(r => r.dataset.prow), label: b && b.querySelector('.prow-l').textContent.trim(), pressed: b && b.getAttribute('aria-pressed'), h: r && Math.round(r.height), shown: !!(r && r.height), after: sec && sec.nextElementSibling && sec.nextElementSibling.querySelector('.pg-t') && sec.nextElementSibling.querySelector('.pg-t').textContent.trim(),
       kind: !!(b && b.matches('.prow.prow-sw > button.prow-h.gr-swb[aria-pressed]') && k), kOn: k ? getComputedStyle(k).backgroundColor : null }; });
-  const J = v => JSON.stringify(v), ROWS = ['worldmotion', ...(LATER.some(l => l.item === 100) ? ['crewshow', 'crewnames'] : [])]; /* item 100 adds its two switches here, after this one (on a page that has it) */
-  ok(g.title === 'fred world' && g.sp && g.gs && J(g.rows) === J(ROWS) && g.label === 'Animate the world' && g.pressed === 'true' && g.shown, 'switch: Settings › fred world, a box for both sports with one switch row, "Animate the world", on' + (ROWS.length > 1 ? ' (first; then item 100\'s Show the crew and Show their names)' : ''), g);
+  const J = v => JSON.stringify(v), ROWS = ['worldmotion', ...(LATER.some(l => l.item === 100) ? ['crewshow', 'crewnames'] : []), ...(LATER.some(l => l.item === 101) ? ['holidaylooks', 'holidaycare'] : [])]; /* item 100 adds its two switches here, after this one, and item 101 its two after those (on a page that has each) */
+  ok(g.title === 'fred world' && g.sp && g.gs && J(g.rows) === J(ROWS) && g.label === 'Animate the world' && g.pressed === 'true' && g.shown, 'switch: Settings › fred world, a box for both sports with one switch row, "Animate the world", on' + (ROWS.length > 1 ? ' (first; then item 100\'s Show the crew and Show their names' + (ROWS.length > 3 ? ', and item 101\'s Holiday looks and Cultural and religious holidays' : '') + ')' : ''), g);
   ok(g.kind, 'switch: the row is drawn as a switch like Same recipe (.prow.prow-sw > button.prow-h.gr-swb[aria-pressed] > .gsw-k)', g);
   ok(g.h >= 44, 'switch: the row is at least 44 px tall', g.h);
   // titles and labels only (item 76): the group is its title and a card of switch rows, and no text shows but the title and the labels
